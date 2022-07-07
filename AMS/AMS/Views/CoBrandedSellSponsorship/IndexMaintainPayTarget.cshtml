@@ -1,0 +1,344 @@
+﻿@model Domain.CoBrandedSellSponsorship.QueryBankDataReq
+
+@section scripts {
+    @*引用此js才可使用Ajax.BeginForm*@
+    <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+}
+
+<style>
+    .mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(0,0,0,0.9);
+        display: none;
+    }
+
+    .mask_content {
+        width: 60%;
+        border: 2px solid #ccc;
+        background-color: white;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1001;
+        word-wrap: break-word;
+        padding: 3px;
+        display: inline-block;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function () {
+
+        //觸發查詢聯名卡行銷贊助金支付對象明細
+        $("#but_QueryPayTarget").click();
+
+        //按下[新增支付對象]鈕
+        $("#btn_Add").click(function () {
+
+            var json_data_PayTarget = {};
+            json_data_PayTarget["ExecType"] = "Add";
+            json_data_PayTarget["PTID"] = -1;
+            json_data_PayTarget["UnifiedBusinessNo"] = null;
+            json_data_PayTarget["PayTargetName"] = null;
+
+            $("#hid_Data_PayTarget").val(JSON.stringify(json_data_PayTarget));
+
+            fun_load_mask_data();
+        });//$("#btn_Add").click
+
+        //按下遮罩[取消]鈕
+        $("#btn_Cancle").click(function () {
+            obj_div_mask = $("#div_mask");
+            obj_div_mask.css("display", "none");
+        });//$("#btn_Cancle").click
+
+    });//$(document).ready
+
+    //按下[支付對象明細清單]的[編輯]鈕
+    function fun_editlink_click(obj_link) {
+
+        var json_data_PayTarget = {};
+        json_data_PayTarget["ExecType"] = "Modify";
+        json_data_PayTarget["PTID"] = fun_set_value($(obj_link).attr("PTID"));
+        json_data_PayTarget["UnifiedBusinessNo"] = fun_set_value($(obj_link).attr("UnifiedBusinessNo"));
+        json_data_PayTarget["PayTargetName"] = fun_set_value($(obj_link).attr("PayTargetName"));
+
+        $("#hid_Data_PayTarget").val(JSON.stringify(json_data_PayTarget));
+
+        fun_load_mask_data();
+
+    }//fun_editlink_click
+
+    //按下[支付對象明細清單]的[刪除]鈕
+    function fun_deletelink_click(obj_link) {
+
+        var v_UnifiedBusinessNo = $(obj_link).closest("tr").find("td:eq(0)").text();//取得支付對象統編
+        var v_PayTargetName = $(obj_link).closest("tr").find("td:eq(1)").text();//取得支付對象名稱
+
+        if (confirm([
+            "支付對象統編：", v_UnifiedBusinessNo, "\r\n",
+            "支付對象名稱：", v_PayTargetName, "\r\n",
+            "確定要刪除？"].join("")) == true) {
+
+            var json_data_PayTarget = {};
+            json_data_PayTarget["ExecType"] = "Delete";
+            json_data_PayTarget["PTID"] = $(obj_link).attr("PTID");
+            json_data_PayTarget["UnifiedBusinessNo"] = null;
+            json_data_PayTarget["PayTargetName"] = null;
+
+            $("#hid_Data_PayTarget").val(JSON.stringify(json_data_PayTarget));
+
+            fun_save_mask_data(obj_link);
+        }
+
+    }//fun_editlink_click
+
+    //載入遮罩資料
+    function fun_load_mask_data() {
+
+        //設定變數
+        var obj_div_mask = $("#div_mask");
+        var json_data_PayTarget = JSON.parse($("#hid_Data_PayTarget").val());
+        var obj_title = obj_div_mask.find("h3:first");
+
+        //設定抬頭
+        switch (json_data_PayTarget.ExecType) {
+            case "Add":
+                obj_title.text("新增支付對象");
+                break;
+            case "Modify":
+                obj_title.text("編輯支付對象");
+                break;
+        }//switch
+
+        //將資料寫入控制項
+        $("#txt_mask_UnifiedBusinessNo").val(json_data_PayTarget.UnifiedBusinessNo);
+        $("#txt_mask_PayTargetName").val(json_data_PayTarget.PayTargetName);
+
+        //開啟遮罩
+        obj_div_mask.css("display", "block");
+
+    }//fun_load_mask_data
+
+    //存檔資料
+    function fun_save_mask_data(obj_id) {
+
+        //設定變數
+        var obj_trigger_control = $(obj_id);//觸發function控制項
+        var obj_div_mask = $("#div_mask");
+        var json_data_PayTarget = JSON.parse($("#hid_Data_PayTarget").val());
+
+        //更新Json物件
+        if (json_data_PayTarget.ExecType == "Add" ||
+            json_data_PayTarget.ExecType == "Modify") {
+
+            json_data_PayTarget.UnifiedBusinessNo = fun_set_value($("#txt_mask_UnifiedBusinessNo").val());
+            json_data_PayTarget.PayTargetName = fun_set_value($("#txt_mask_PayTargetName").val());
+
+            //檢核資料
+            $("#hid_Data_PayTarget").val(JSON.stringify(json_data_PayTarget));
+            if (fun_chk_mask_save() == false) {
+                return;
+            }
+            else {
+                //檢核成功，鎖定觸發控制項
+                obj_trigger_control.prop("disabled", true);
+            }
+        }
+        else if (json_data_PayTarget.ExecType == "Delete") {
+            //設定連結失效
+            obj_trigger_control.css("pointer-events", "none").css("color", "gray");
+        }
+
+        //呼叫Ajax
+        $.ajax({
+            type: "POST",
+            url: $("#hid_script_url_SavePayTarget").val(),
+            data: json_data_PayTarget,
+            async: true,
+            timeout: (1000 * 30),//30秒timeout
+            cache: false,
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(["ajax發生異常：", "。Status：", textStatus, "。ErrMsg：", errorThrown].join(""));
+                if (json_data_PayTarget.ExecType == "Add" ||
+                    json_data_PayTarget.ExecType == "Modify") {
+                    obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+                }
+                else if (json_data_PayTarget.ExecType == "Delete") {
+                    //設定連結啟用
+                    obj_trigger_control.prop("style").removeProperty("pointer-events")
+                    obj_trigger_control.prop("style").removeProperty("color");
+                }
+            }, //error結束
+            success: function (ajax_rtn_data) {
+
+                if (ajax_rtn_data.ExecInfo.RtnResult == false) {
+                    //顯示訊息
+                    alert(ajax_rtn_data.ExecInfo.RtnMsg);
+                }
+                else {
+                    //顯示訊息
+                    alert("存檔成功");
+
+                    //觸發查詢年度清單
+                    $("#but_QueryPayTarget").click();
+
+                    //關閉遮罩
+                    obj_div_mask.css("display", "none");
+                }
+
+                if (json_data_PayTarget.ExecType == "Add" ||
+                    json_data_PayTarget.ExecType == "Modify") {
+                    obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+                }
+                else if (json_data_PayTarget.ExecType == "Delete") {
+                    //設定連結啟用
+                    obj_trigger_control.prop("style").removeProperty("pointer-events")
+                    obj_trigger_control.prop("style").removeProperty("color");
+                }
+            } //success結束
+        }); //ajax結束
+
+    }//fun_save_mask_data
+
+    //設定值
+    function fun_set_value(v_value) {
+        if (!v_value) {
+            return null;
+        }
+        else {
+            return (jQuery.trim(v_value) == "" ? null : jQuery.trim(v_value));
+        }
+    }//fun_set_value
+
+    //遮罩[支付對象]，按下[確定]鈕，檢核存檔資料
+    function fun_chk_mask_save() {
+
+        var v_Rtn_Msg = "";
+        var json_data_PayTarget = JSON.parse($("#hid_Data_PayTarget").val());
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_PayTarget.UnifiedBusinessNo, "欄位[支付對象統編]為必填欄位")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_PayTarget.PayTargetName, "欄位[支付對象名稱]為必填欄位")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_UnifiedBusinessNo(json_data_PayTarget.UnifiedBusinessNo, "欄位[支付對象統編]格式錯誤，格式為8碼數字")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        //都沒錯誤，回傳true
+        return true;
+    }//fun_chk_mask_save
+
+    //檢核必填欄位
+    function fun_chk_required(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+        v_value = fun_set_value(v_value);
+
+        if (!v_value) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_required
+
+    //檢核統編格式
+    function fun_chk_UnifiedBusinessNo(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+        var v_regex_UnifiedBusinessNo = /^[0-9]{8}$/;
+
+        if (v_regex_UnifiedBusinessNo.test(v_value) == false) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_UnifiedBusinessNo
+
+</script>
+
+<h2>聯名卡行銷贊助金</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">維護支付對象</h3>
+    </div>
+    <div class="panel-body">
+        <div>
+            <button id="btn_Add" type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true">新增支付對象</span>
+            </button>
+            <button id="btn_Back" type="button" class="btn btn-primary" onclick="window.location.href='@(Url.Action("IndexQuotaTrack","CoBrandedSellSponsorship",Model))'">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true">返回年度銀行特約機構明細</span>
+            </button>
+        </div>
+        @using (Ajax.BeginForm("QueryPayTarget", "CoBrandedSellSponsorship",
+            new AjaxOptions()
+            {
+                HttpMethod = "Post",
+                UpdateTargetId = "div_QueryResult",
+                InsertionMode = InsertionMode.Replace
+            }))
+        {
+            <div style="display:none;">
+                <button id="but_QueryPayTarget" type="submit" />
+            </div>
+        }
+    </div>
+</div>
+
+@* Alert訊息 *@
+<div id="div_Alert" class="alert alert-danger" role="alert" style="display:none;">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <div id="div_AlertMsg"></div>
+</div>
+
+@* 查詢結果 *@
+<div id="div_QueryResult">
+</div>
+
+<div id="div_Data">
+    @Html.Hidden("hid_script_url_SavePayTarget", Url.Action("SavePayTarget", "CoBrandedSellSponsorship"))
+</div>
+
+@* 支付對象遮罩 *@
+<div id="div_mask" class="mask" style="display:none;">
+    <div class="mask_content">
+        <div class="panel panel-default" style="margin:auto;">
+            <div class="panel-heading">
+                <h3 class="panel-title"></h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group row">
+                        @Html.Label("支付對象統編：", new { @class = "control-label col-md-2" })
+                        <div class="col-md-1">
+                            @Html.TextBox("txt_mask_UnifiedBusinessNo", "", new { id = "txt_mask_UnifiedBusinessNo", maxlength = "8", style = "width:100px;", @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.Label("支付對象名稱：", new { @class = "control-label col-md-2" })
+                        <div class="col-md-1">
+                            @Html.TextBox("txt_mask_PayTargetName", "", new { id = "txt_mask_PayTargetName", maxlength = "50", style = "width:500px;", @class = "form-control" })
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="text-right col-md-8" style="text-align:left;">
+                            <button id="btn_Save" type="button" class="btn btn-primary" onclick="fun_save_mask_data(this);">
+                                <span class="glyphicon" aria-hidden="true">確定</span>
+                            </button>
+                            <button id="btn_Cancle" type="button" class="btn btn-primary">
+                                <span class="glyphicon" aria-hidden="true">取消</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

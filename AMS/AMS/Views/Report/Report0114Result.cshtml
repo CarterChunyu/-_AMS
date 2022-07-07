@@ -1,0 +1,275 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    ViewBag.Title = "特約機構交易表現圖(數量)";
+
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+@if (ViewBag.Count > 0)
+{
+    <style type='text/css'>
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            text-align: left;
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            background-color: #ffffff;
+            text-align: right;
+        }
+    </style>
+}
+@*模糊搜尋_卷軸*@
+<style>
+    .ui-autocomplete {
+        max-height: 500px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+        $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+
+    $(document).ready(function () {
+        d = new Date();
+        $("#image1").attr("src", "../images/Image.jpg?" + d.getTime());
+        //alert(searchForm.elements["Merchant"].options[Choice].);
+        //searchForm.elements['Merch'].value = "a";
+        //showsel();
+    })
+
+    //JQuery模糊搜尋
+    $(function () {
+        $.widget("custom.combobox", {
+            _create: function () {
+                this.wrapper = $("<span>")
+                    .addClass("custom-combobox")
+                    .insertAfter(this.element);
+                this.element.hide();
+                this._createAutocomplete();
+                this._createShowAllButton();
+            },
+
+            _createAutocomplete: function () {
+                var selected = this.element.children(":selected"),
+                    value = selected.val() ? selected.text() : "";
+
+                this.input = $("<input>")
+                    .appendTo(this.wrapper)
+                    .val(value)
+                    .attr("title", "")
+                    .autocomplete({
+                        delay: 0,
+                        minLength: 0,
+                        source: $.proxy(this, "_source")
+                    });
+                this._on(this.input, {
+                    autocompleteselect: function (event, ui) {
+                        ui.item.option.selected = true;
+                        this._trigger("select", event, {
+                            item: ui.item.option
+                        });
+                        merch_add(ui.item.option.value, ui.item.option.text);
+                    },
+                });
+
+            },
+
+            _createShowAllButton: function () {
+                var input = this.input,
+                    wasOpen = false;
+
+                input
+                    .on("mousedown", function () {
+                        wasOpen = input.autocomplete("widget").is(":visible");
+                    })
+                    .on("click", function () {
+                        input.trigger("focus");
+
+                        // Close if already visible
+                        if (wasOpen) {
+                            return;
+                        }
+
+                        // Pass empty string as value to search for, displaying all results
+                        input.autocomplete("search", "");
+                    });
+            },
+
+            _source: function (request, response) {
+                var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                response(this.element.children("option").map(function () {
+                    var text = $(this).text();
+                    if (this.value && (!request.term || matcher.test(text))) {
+                        return {
+                            label: text,
+                            value: text,
+                            option: this
+                        };
+                    }
+                }));
+            },
+
+            _destroy: function () {
+                this.wrapper.remove();
+                this.element.show();
+            }
+        });
+        $('#items').combobox();
+    });
+    function merch_add(merchant_val, merchant_text) {
+        var sel = "";
+        if ($('#merchant option').length > 0) {
+            $("#merchant option").each(function () {
+                sel = sel + "," + $(this).val();
+            });
+            if (sel.indexOf(merchant_val) < 0) {
+                $('#merchant').append($('<option></option>').val(merchant_val).text(merchant_text));
+            }
+        }
+        else {
+            $('#merchant').append($('<option></option>').val(merchant_val).text(merchant_text));
+        }
+    }
+
+    function merch_remove() {
+        $("#merchant").find(":selected").remove();
+    }
+
+    function merch_submit() {
+        var sel = "'";
+        if ($('#merchant option').length > 0) {
+            $("#merchant option").each(function () {
+                if (sel != "'")
+                    sel = sel + ",'" + $(this).val() + "'";
+                else
+                    sel = sel + $(this).val() + "'";
+            });
+        }
+        else {
+            sel = sel + merchant_val + "'";
+        }
+        if (sel != "'") {
+            searchForm.elements['Merch'].value = sel;
+        }
+    }
+</script>
+
+<h2>特約機構交易表現圖(金額)</h2>
+
+@using (Html.BeginForm("Report0113Result", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">時間區間 :</label>
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.Start" style="width:100px;" /> -
+        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.End" style="width:100px;" />
+        <input type="text" name="Merch" id="Merch" value="@ViewBag.Merch" style="display: none" />
+        特約機構<font color="red">(可多選)</font>:
+        @*模糊搜尋show和hide用label呈現*@
+        <select id="items" name="items">
+            @for (int i = 0; i < ViewBag.Countd; i++)
+            {
+                <option value='@ViewBag.ViewBv[i]'>@ViewBag.ViewBt[i]</option>
+            }
+        </select>
+        <select id="merchant" name="merchant" size="5" style="width: 300px;height:80px" onclick="merch_remove()"></select>
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" onclick="merch_submit()" />
+    </div>
+}
+
+
+@if (ViewBag.Count > 0)
+{
+    <img id="image1" src="..\images\Image.jpg" alt="" />
+    <table class="grid" width="100%">
+        <thead>
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    <th style="text-align:right">@col.ColumnName</th>
+                }
+            </tr>
+
+        </thead>
+        <tbody>
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                int j = 0;
+                <tr>
+                    @foreach (DataColumn col in Model.Columns)
+                    {
+                        string colValue = row[col.ColumnName].ToString();
+                        j++;
+                        if (j > 1)
+                        {
+                            Int32 t = Int32.Parse(row[col.ColumnName].ToString());
+                            colValue = t.ToString("N", nfi);
+
+                        }
+                        <td>@colValue</td>
+                    }
+                </tr>
+            }
+
+
+
+        </tbody>
+        <tfoot>
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    //<th>@col.ColumnName</th>
+                }
+            </tr>
+        </tfoot>
+    </table>
+
+
+}
+
+

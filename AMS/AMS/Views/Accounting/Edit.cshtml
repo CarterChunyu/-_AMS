@@ -1,0 +1,173 @@
+﻿@model AMS.Models.AmEntReceDModel
+
+@{
+    ViewBag.Title = "收款明細編輯";
+}
+
+<h2>收款明細編輯</h2>
+
+@using (Html.BeginForm("Edit", "Accounting", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <input type="hidden" name="action" value="Update" />
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Sn, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Sn, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BankAcctTo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.BankAcctTo, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BankAcctFrom, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.BankAcctFrom, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ActDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ActDate, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Amt, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Amt, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Summary, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Summary, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CaseNo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @if ((bool)ViewBag.Dept)
+                {
+                   if (Model.AcctCheckStatus == "1")
+                    {
+                        @Html.EditorFor(model => model.CaseNo, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+                    }
+                    else
+                    {
+                        @Html.EditorFor(model => model.CaseNo, new { htmlAttributes = new { @class = "form-control", style = "width: 200px;", maxLength = 16 } })
+                        <div class="msg">字數限制:16</div>
+                        @Html.ValidationMessageFor(model => model.CaseNo, "", new { @class = "text-danger" })
+                    } 
+                }
+                else
+                {
+                    
+                    @Html.EditorFor(model => model.CaseNo, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+                }
+                
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CheckStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+            @if ((bool)ViewBag.Dept )
+            {
+                if (Model.AcctCheckStatus == "1")
+                {
+                    @Html.DropDownList("CheckStatus", null, new { @disabled = "disabled", @class = "form-control" })  
+                    @Html.HiddenFor(model => model.CheckStatus) 
+                }
+                else
+                {
+                    @Html.DropDownList("CheckStatus", null, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.CheckStatus, "", new { @class = "text-danger" })
+                }
+            }
+            else
+            {                
+                @Html.DropDownList("CheckStatus", null, new { @disabled = "disabled", @class = "form-control" })   
+                @Html.HiddenFor(model => model.CheckStatus)
+            }
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.AcctCheckStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+            @if (ViewBag.UserRole == "Accounting" && Model.CheckStatus == "1")
+            {
+                @Html.DropDownList("AcctCheckStatus", null, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.AcctCheckStatus, "", new { @class = "text-danger" })
+            }
+            else
+            {
+                @Html.DropDownList("AcctCheckStatus", null, new { @disabled = "disabled", @class = "form-control" })
+                @Html.HiddenFor(model => model.AcctCheckStatus)
+            }
+            </div>
+        </div>
+      
+        <div class="form-group">
+            @Html.LabelFor(model => model.Remark, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @if ((bool)ViewBag.Dept)
+                {
+                    if (Model.AcctCheckStatus == "1")
+                    {
+                        @Html.TextAreaFor(model => model.Remark, new { @readonly = "readonly", @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.TextAreaFor(model => model.Remark, new { @class = "form-control", style = "width: 300px; height: 75px", maxLength = 30 })
+                        <div class="msg">字數限制:30</div>
+                        @Html.ValidationMessageFor(model => model.Remark, "", new { @class = "text-danger" })
+                    }
+                }
+                else
+                {                  
+                    @Html.TextAreaFor(model => model.Remark, new { @readonly = "readonly", @class = "form-control" })
+                }
+                
+            </div>
+        </div>
+        <input type="hidden" name="StartDate" value="@ViewBag.StartDate" />
+        <input type="hidden" name="EndDate" value="@ViewBag.EndDate" />
+        <input type="hidden" name="CaseNoSearch" value="@ViewBag.CaseNoSel" />
+        <input type="hidden" name="CheckStatusSearch" value="@ViewBag.CheckStatusSel" />
+        <input type="hidden" name="AcctCheckStatusSearch" value="@ViewBag.AcctCheckStatusSel" />
+        <input type="hidden" name="ReceTypeSearch" value="@ViewBag.ReceTypeSel" />
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="確定更新" class="btn btn-warning" />
+            </div>
+        </div>
+    </div>
+}
+
+@using (Html.BeginForm("Result", "Accounting", FormMethod.Post))
+{
+    <input type="hidden" name="StartDate" value="@ViewBag.StartDate" />
+    <input type="hidden" name="EndDate" value="@ViewBag.EndDate" />
+    <input type="hidden" name="CaseNoSearch" value="@ViewBag.CaseNoSel" />
+    <input type="hidden" name="CheckStatusSearch" value="@ViewBag.CheckStatusSel" />
+    <input type="hidden" name="AcctCheckStatusSearch" value="@ViewBag.AcctCheckStatusSel" />
+    <input type="hidden" name="ReceTypeSearch" value="@ViewBag.ReceTypeSel" />
+    <button class="btn btn-success" type="submit">回查詢列表</button>
+}
+

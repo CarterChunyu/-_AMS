@@ -1,0 +1,1265 @@
+﻿@using System.Data;
+@using Domain.Common;
+@using Newtonsoft.Json;
+@using Domain.CoBrandedSellSponsorship;
+@model Domain.CoBrandedSellSponsorship.QueryBankDataReq
+
+@{
+    ExecInfo ei = ViewBag.ExecInfo;
+    DataTable dt_QueryResult = ViewBag.QueryResult;
+    string s_UserData = ViewBag.UserData;
+}
+
+@section scripts {
+    @*引用此js才可使用Ajax.BeginForm*@
+    <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+}
+
+<style>
+    .mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(0,0,0,0.9);
+        display: none;
+    }
+
+    .mask_content {
+        width: 60%;
+        border: 2px solid #ccc;
+        background-color: white;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1001;
+        word-wrap: break-word;
+        padding: 3px;
+        display: inline-block;
+    }
+
+    .mask_01 {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(142,183,225,0.9);
+        display: none;
+    }
+
+    .mask_content_01 {
+        width: 60%;
+        border: 2px solid #ccc;
+        background-color: white;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1002;
+        word-wrap: break-word;
+        padding: 3px;
+        display: inline-block;
+    }
+
+    .td_style1 {
+        padding-left: 15px;
+        padding-top: 14px;
+        width: 155px;
+        text-align: right;
+    }
+
+    .td_style2 {
+        padding-left: 15px;
+    }
+
+    .lable_style {
+        padding-bottom: 16px;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function () {
+
+        //觸發查詢額度明細、請款項目
+        $("#but_QueryQuotaTrack").click();
+
+        //按下[新增額度明細]鈕
+        $("#btn_Add_Quota").click(function () {
+
+            var json_data_Quota = {};
+            json_data_Quota["ExecType"] = "Add";
+            json_data_Quota["DQID"] = -1;
+            json_data_Quota["BID"] = $("#hid_script_BID").val();
+            json_data_Quota["ITEM"] = null;
+            json_data_Quota["AMT"] = null;
+
+            $("#hid_Data_Quota").val(JSON.stringify(json_data_Quota));
+
+            fun_load_mask_Quota_data();
+        });//$("#btn_Add_Quota").click
+
+        //按下遮罩[額度明細]的[取消]鈕
+        $("#btn_Cancle_Quota").click(function () {
+            var obj_div_mask_Quota = $("#div_mask_Quota");
+            obj_div_mask_Quota.css("display", "none");
+        });//$("#btn_Cancle_Quota").click
+
+        //按下[新增請款項目]鈕
+        $("#btn_Add_Track").click(function () {
+
+            var json_data_Track = {};
+            json_data_Track["ExecType"] = "Add";
+            json_data_Track["DTID"] = -1;
+            json_data_Track["BID"] = $("#hid_script_BID").val();
+            json_data_Track["ITEM"] = null;
+            json_data_Track["PTID"] = null;
+            json_data_Track["Range_Date_B"] = null;
+            json_data_Track["Range_Date_E"] = null;
+            json_data_Track["Bus_Invoice_Date"] = null;
+            json_data_Track["Bus_Invoice_No"] = null;
+            json_data_Track["AMT_UnTax"] = null;
+            json_data_Track["AMT_TaxIncluded"] = null;
+            json_data_Track["Comment"] = null;
+            json_data_Track["SendDate"] = null;
+            json_data_Track["Act_Invoice_No"] = null;
+            json_data_Track["AMT_Pay"] = null;
+
+            $("#hid_Data_Track").val(JSON.stringify(json_data_Track));
+
+            fun_load_mask_Track_data();
+        });//$("#btn_Add_Track").click
+
+        //按下遮罩[請款項目]的[取消]鈕
+        $("#btn_Cancle_Track").click(function () {
+            var obj_div_mask_Track = $("#div_mask_Track");
+            obj_div_mask_Track.css("display", "none");
+        });//$("#btn_Cancle_Track").click
+
+        //按下遮罩[選擇支付對象]的[取消]鈕
+        $("#btn_Cancle_PayTarget").click(function () {
+            var obj_div_mask_PayTarget = $("#div_mask_PayTarget");
+            obj_div_mask_PayTarget.css("display", "none");
+        });//$("#btn_Cancle_PayTarget").click
+
+    });//$(document).ready
+
+    //Ajax取得[額度明細][請款項目]資料後，載入相關資料
+    function fun_load_related_data() {
+
+        //設定控制項權限
+        fun_set_control_authority();
+
+        $("#lab_MERCHANT_STNAME").text($("#hid_MERCHANT_STNAME").val());
+        $("#lab_AMT_Quota").text(["可使用額度：", $("#hid_AMT_Quota").val()].join(""));
+        $("#lab_AMT_Track").text(["已使用額度：", $("#hid_AMT_Track").val()].join(""));
+        $("#lab_AMT_UnUse").text(["尚未請款數：", $("#hid_AMT_UnUse").val()].join(""));
+
+        //所有的支付對象資料
+        var json_data_PayTarget = JSON.parse($("#hid_PayTargetData").val());
+
+        //載入[請款項目清單]欄位[支付對象]的中文名稱
+        $("input:hidden[id^='PTID_']").each(function () {
+
+            var v_PTID = $(this).val();
+
+            //依照PTID，取得相關資料
+            var data = $.grep(json_data_PayTarget, function (detl, index) {
+                return detl.PTID == v_PTID;
+            });
+
+            var v_UnifiedBusinessNo = data[0].UnifiedBusinessNo;
+            var v_PayTargetName = data[0].PayTargetName;
+
+            $(this).closest("td").append([v_UnifiedBusinessNo, "(", v_PayTargetName, ")"].join(""));
+        });//fun_load_related_data
+
+    }//fun_load_title_data
+
+    //按下[額度明細清單]的[編輯]鈕
+    function fun_editlink_Quota_click(obj_link) {
+
+        var json_data_Quota = {};
+        json_data_Quota["ExecType"] = "Modify";
+        json_data_Quota["DQID"] = fun_set_value($(obj_link).attr("DQID"));
+        json_data_Quota["BID"] = fun_set_value($(obj_link).attr("BID"));
+        json_data_Quota["ITEM"] = fun_set_value($(obj_link).attr("ITEM"));
+        json_data_Quota["AMT"] = fun_set_value($(obj_link).attr("AMT"));
+
+        $("#hid_Data_Quota").val(JSON.stringify(json_data_Quota));
+
+        fun_load_mask_Quota_data();
+
+    }//fun_editlink_Quota_click
+
+    //按下[額度明細清單]的[刪除]鈕
+    function fun_deletelink_Quota_click(obj_link) {
+
+        var v_tr = $(obj_link).closest("tr");
+
+        //取得額度項目
+        var v_Quota_Id = v_tr.find("td:eq(0)").text();//項次
+        var v_Quota_Item = v_tr.find("td:eq(1)").text();//額度項目
+
+        if (confirm([
+            "項次：", v_Quota_Id, "\r\n",
+            "額度項目：", v_Quota_Item, "\r\n",
+            "確定要刪除？"].join("")) == true) {
+
+            var json_data_Quota = {};
+            json_data_Quota["ExecType"] = "Delete";
+            json_data_Quota["DQID"] = fun_set_value($(obj_link).attr("DQID"));
+            json_data_Quota["BID"] = fun_set_value($(obj_link).attr("BID"));
+
+            $("#hid_Data_Quota").val(JSON.stringify(json_data_Quota));
+
+            fun_save_mask_Quota_data(obj_link);
+        }
+
+    }//fun_deletelink_Quota_click
+
+    //載入遮罩資料-額度明細
+    function fun_load_mask_Quota_data() {
+
+        //設定變數
+        var obj_div_mask_Quota = $("#div_mask_Quota");
+        var json_data_Quota = JSON.parse($("#hid_Data_Quota").val());
+        var obj_title = obj_div_mask_Quota.find("h3:first");
+
+        //設定抬頭
+        switch (json_data_Quota.ExecType) {
+            case "Add":
+                obj_title.text("新增額度明細");
+                break;
+            case "Modify":
+                obj_title.text("編輯額度明細");
+                break;
+        }//switch
+
+        //將資料寫入控制項
+        $("#txt_mask_Quota_ITEM").val(json_data_Quota.ITEM);
+        $("#txt_mask_Quota_AMT").val(json_data_Quota.AMT);
+
+        //開啟遮罩
+        obj_div_mask_Quota.css("display", "block");
+
+    }//fun_load_mask_Quota_data
+
+    //存檔資料-額度明細
+    function fun_save_mask_Quota_data(obj_id) {
+
+        //設定變數
+        var obj_trigger_control = $(obj_id);//觸發function控制項
+        var obj_div_mask_Quota = $("#div_mask_Quota");
+        var json_data_Quota = JSON.parse($("#hid_Data_Quota").val());
+
+        //更新Json物件
+        if (json_data_Quota.ExecType == "Add" ||
+            json_data_Quota.ExecType == "Modify") {
+
+            json_data_Quota.ITEM = fun_set_value($("#txt_mask_Quota_ITEM").val());
+            json_data_Quota.AMT = fun_set_value($("#txt_mask_Quota_AMT").val());
+
+            //檢核資料
+            $("#hid_Data_Quota").val(JSON.stringify(json_data_Quota));
+            if (fun_chk_mask_save_Quota() == false) {
+                return;
+            }
+            else {
+                //檢核成功，鎖定觸發控制項
+                obj_trigger_control.prop("disabled", true);
+            }
+        }
+        else if (json_data_Quota.ExecType == "Delete") {
+            //設定連結失效
+            obj_trigger_control.css("pointer-events", "none").css("color", "gray");
+        }
+
+        //呼叫Ajax
+        $.ajax({
+            type: "POST",
+            url: $("#hid_script_url_SaveDetailQuota").val(),
+            data: json_data_Quota,
+            async: true,
+            timeout: (1000 * 30),//30秒timeout
+            cache: false,
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(["ajax發生異常：", "。Status：", textStatus, "。ErrMsg：", errorThrown].join(""));
+                if (json_data_Quota.ExecType == "Add" ||
+                    json_data_Quota.ExecType == "Modify") {
+                    obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+                }
+                else if (json_data_Quota.ExecType == "Delete") {
+                    //設定連結啟用
+                    obj_trigger_control.prop("style").removeProperty("pointer-events")
+                    obj_trigger_control.prop("style").removeProperty("color");
+                }
+            }, //error結束
+            success: function (ajax_rtn_data) {
+
+                if (ajax_rtn_data.ExecInfo.RtnResult == false) {
+                    //顯示訊息
+                    alert(ajax_rtn_data.ExecInfo.RtnMsg);
+                }
+                else {
+                    //顯示訊息
+                    alert("存檔成功");
+
+                    //觸發查詢額度明細、請款項目
+                    $("#but_QueryQuotaTrack").click();
+
+                    //關閉遮罩
+                    obj_div_mask_Quota.css("display", "none");
+                }
+
+                if (json_data_Quota.ExecType == "Add" ||
+                    json_data_Quota.ExecType == "Modify") {
+                    obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+                }
+                else if (json_data_Quota.ExecType == "Delete") {
+                    //設定連結啟用
+                    obj_trigger_control.prop("style").removeProperty("pointer-events")
+                    obj_trigger_control.prop("style").removeProperty("color");
+                }
+            } //success結束
+        }); //ajax結束
+
+    }//fun_save_mask_Quota_data
+
+    //按下[請款項目清單]的[編輯]鈕
+    function fun_editlink_Track_click(obj_link) {
+
+        var json_data_Track = {};
+        json_data_Track["ExecType"] = "Modify";
+        json_data_Track["DTID"] = fun_set_value($(obj_link).attr("DTID"));
+        json_data_Track["BID"] = fun_set_value($(obj_link).attr("BID"));
+        json_data_Track["ITEM"] = fun_set_value($(obj_link).attr("ITEM"));
+        json_data_Track["PTID"] = fun_set_value($(obj_link).attr("PTID"));
+        json_data_Track["Range_Date_B"] = fun_set_value($(obj_link).attr("Range_Date_B"));
+        json_data_Track["Range_Date_E"] = fun_set_value($(obj_link).attr("Range_Date_E"));
+        json_data_Track["Bus_Invoice_Date"] = fun_set_value($(obj_link).attr("Bus_Invoice_Date"));
+        json_data_Track["Bus_Invoice_No"] = fun_set_value($(obj_link).attr("Bus_Invoice_No"));
+        json_data_Track["AMT_UnTax"] = fun_set_value($(obj_link).attr("AMT_UnTax"));
+        json_data_Track["AMT_TaxIncluded"] = fun_set_value($(obj_link).attr("AMT_TaxIncluded"));
+        json_data_Track["Comment"] = fun_set_value($(obj_link).attr("Comment"));
+        json_data_Track["SendDate"] = fun_set_value($(obj_link).attr("SendDate"));
+        json_data_Track["Act_Invoice_No"] = fun_set_value($(obj_link).attr("Act_Invoice_No"));
+        json_data_Track["AMT_Pay"] = fun_set_value($(obj_link).attr("AMT_Pay"));
+
+        $("#hid_Data_Track").val(JSON.stringify(json_data_Track));
+
+        fun_load_mask_Track_data();
+
+    }//fun_editlink_Track_click
+
+    //按下[請款項目清單]的[刪除]鈕
+    function fun_deletelink_Track_click(obj_link) {
+
+        var obj_tr = $(obj_link).closest("tr");
+        var v_Track_Id = obj_tr.find("td:eq(0)").text();//項次
+        var v_Track_Item = obj_tr.find("td:eq(1)").text();//請款項目
+
+        //如果是業務，判斷是否還可以刪除資料
+        var v_UserData = $("#hid_UserData").val();//使用者所屬部門
+        if (v_UserData == "Sales") {
+
+            var v_Act_Invoice_No = fun_set_value($(obj_link).attr("Act_Invoice_No"));//發票號碼
+            var v_AMT_Pay = fun_set_value($(obj_link).attr("AMT_Pay"));//發票入帳數
+
+            if ((!v_Act_Invoice_No) == false ||
+                (!v_AMT_Pay) == false) {
+                alert("財會同仁已輸入資料，無法再進行刪除\r\n若要進行刪除，請聯絡財會同仁刪除已輸入的資料！");
+                return;
+            }
+        }
+
+        if (confirm([
+            "項次：", v_Track_Id, "\r\n",
+            "請款項目：", v_Track_Item, "\r\n",
+            "確定要刪除？"].join("")) == true) {
+
+            var json_data_Track = {};
+            json_data_Track["ExecType"] = "Delete";
+            json_data_Track["DTID"] = fun_set_value($(obj_link).attr("DTID"));
+            json_data_Track["BID"] = fun_set_value($(obj_link).attr("BID"));
+
+            $("#hid_Data_Track").val(JSON.stringify(json_data_Track));
+
+            fun_save_mask_Track_data(obj_link);
+        }
+
+    }//fun_deletelink_Track_click
+
+    //載入遮罩資料-請款項目
+    function fun_load_mask_Track_data() {
+
+        //設定變數
+        var obj_div_mask_Track = $("#div_mask_Track");
+        var json_data_Track = JSON.parse($("#hid_Data_Track").val());
+        var obj_title = obj_div_mask_Track.find("h3:first");
+
+        //如果是業務，判斷是否還可以調整資料
+        var v_UserData = $("#hid_UserData").val();//使用者所屬部門
+        if (v_UserData == "Sales") {
+            if ((!json_data_Track.Act_Invoice_No) == false ||
+                (!json_data_Track.AMT_Pay) == false) {
+                alert("財會同仁已輸入資料，無法再進行編輯\r\n若要進行編輯，請聯絡財會同仁刪除已輸入的資料！");
+                return;
+            }
+        }
+
+        //設定抬頭
+        switch (json_data_Track.ExecType) {
+            case "Add":
+                obj_title.text("新增請款項目");
+                break;
+            case "Modify":
+                obj_title.text("編輯請款項目");
+                break;
+        }//switch
+
+        //將資料寫入控制項
+        $("#txt_mask_Track_ITEM").val(json_data_Track.ITEM);//請款項目
+        fun_set_choice_PayTarget(json_data_Track.PTID);//支付對象
+        $("#txt_mask_Track_Range_Date_B").val(json_data_Track.Range_Date_B);//計算期間起日
+        $("#txt_mask_Track_Range_Date_E").val(json_data_Track.Range_Date_E);//計算期間迄日
+        $("#txt_mask_Track_Bus_Invoice_Date").val(json_data_Track.Bus_Invoice_Date);//發票日期
+        $("#txt_mask_Track_Bus_Invoice_No").val(json_data_Track.Bus_Invoice_No);//發票號碼
+        $("#txt_mask_Track_AMT_UnTax").val(json_data_Track.AMT_UnTax);//金額(未稅)
+        $("#txt_mask_Track_AMT_TaxIncluded").val(json_data_Track.AMT_TaxIncluded);//金額(含稅)
+        $("#txt_mask_Track_Comment").val(json_data_Track.Comment);//備註
+        $("#txt_mask_Track_SendDate").val(json_data_Track.SendDate);//送件時間
+        $("#txt_mask_Track_Act_Invoice_No").val(json_data_Track.Act_Invoice_No);//發票號碼
+        $("#txt_mask_Track_AMT_Pay").val(json_data_Track.AMT_Pay);//發票入帳數
+
+        //計算遮罩[請款項目]欄位[價差數]
+        fun_calculate_AMT_Diff();
+
+        //開啟遮罩
+        obj_div_mask_Track.css("display", "block");
+        $("#div_mask_Track_scroll").scrollTop(0);//將scroll bar移至頂端
+
+    }//fun_load_mask_Track_data
+
+    //存檔資料-請款項目
+    function fun_save_mask_Track_data(obj_id) {
+
+        //設定變數
+        var obj_trigger_control = $(obj_id);//觸發function控制項
+        var obj_div_mask_Track = $("#div_mask_Track");
+        var json_data_Track = JSON.parse($("#hid_Data_Track").val());
+
+        //更新Json物件
+        if (json_data_Track.ExecType == "Add" ||
+            json_data_Track.ExecType == "Modify") {
+
+            json_data_Track.ITEM = fun_set_value($("#txt_mask_Track_ITEM").val());//請款項目
+            json_data_Track.PTID = fun_set_value($("#hid_mask_Track_PTID").val());//支付對象流水號
+            json_data_Track.Range_Date_B = fun_set_value(fun_set_date_str($("#txt_mask_Track_Range_Date_B").val()));//期間開始日
+            json_data_Track.Range_Date_E = fun_set_value(fun_set_date_str($("#txt_mask_Track_Range_Date_E").val()));//期間結束日
+            json_data_Track.Bus_Invoice_Date = fun_set_value(fun_set_date_str($("#txt_mask_Track_Bus_Invoice_Date").val()));//營業請款發票日期
+            json_data_Track.Bus_Invoice_No = fun_set_value($("#txt_mask_Track_Bus_Invoice_No").val());//營業請款發票號碼
+            json_data_Track.AMT_UnTax = fun_set_value($("#txt_mask_Track_AMT_UnTax").val());//金額(未稅)
+            json_data_Track.AMT_TaxIncluded = fun_set_value($("#txt_mask_Track_AMT_TaxIncluded").val());//金額(含稅)
+            json_data_Track.Comment = fun_set_value($("#txt_mask_Track_Comment").val());//備註
+            json_data_Track.SendDate = fun_set_value(fun_set_date_str($("#txt_mask_Track_SendDate").val()));//送件時間
+            json_data_Track.Act_Invoice_No = fun_set_value($("#txt_mask_Track_Act_Invoice_No").val());//財會確認發票號碼
+            json_data_Track.AMT_Pay = fun_set_value($("#txt_mask_Track_AMT_Pay").val());//發票入帳數
+
+            //檢核資料
+            $("#hid_Data_Track").val(JSON.stringify(json_data_Track));
+            if (fun_chk_mask_save_Track() == false) {
+                return;
+            }
+            else {
+                //檢核成功，鎖定觸發控制項
+                obj_trigger_control.prop("disabled", true);
+            }
+        }
+        else if (json_data_Track.ExecType == "Delete") {
+            //設定連結失效
+            obj_trigger_control.css("pointer-events", "none").css("color", "gray");
+        }
+
+        //呼叫Ajax
+        $.ajax({
+            type: "POST",
+            url: $("#hid_script_url_SaveDetailTrack").val(),
+            data: json_data_Track,
+            async: true,
+            timeout: (1000 * 30),//30秒timeout
+            cache: false,
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(["ajax發生異常：", "。Status：", textStatus, "。ErrMsg：", errorThrown].join(""));
+                if (json_data_Track.ExecType == "Add" ||
+                    json_data_Track.ExecType == "Modify") {
+                    obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+                }
+                else if (json_data_Track.ExecType == "Delete") {
+                    //設定連結啟用
+                    obj_trigger_control.prop("style").removeProperty("pointer-events")
+                    obj_trigger_control.prop("style").removeProperty("color");
+                }
+            }, //error結束
+            success: function (ajax_rtn_data) {
+
+                if (ajax_rtn_data.ExecInfo.RtnResult == false) {
+                    //顯示訊息
+                    alert(ajax_rtn_data.ExecInfo.RtnMsg);
+                }
+                else {
+                    //顯示訊息
+                    alert("存檔成功");
+
+                    //觸發查詢額度明細、請款項目
+                    $("#but_QueryQuotaTrack").click();
+
+                    //關閉遮罩
+                    obj_div_mask_Track.css("display", "none");
+                }
+
+                if (json_data_Track.ExecType == "Add" ||
+                    json_data_Track.ExecType == "Modify") {
+                    obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+                }
+                else if (json_data_Track.ExecType == "Delete") {
+                    //設定連結啟用
+                    obj_trigger_control.prop("style").removeProperty("pointer-events")
+                    obj_trigger_control.prop("style").removeProperty("color");
+                }
+            } //success結束
+        }); //ajax結束
+
+    }//fun_save_mask_Track_data
+
+    //按下遮罩[請款項目]的[支付對象]的[選擇]鈕
+    function fun_load_PayTarget(obj_button) {
+
+        //設定變數
+        var obj_div_mask_PayTarget = $("#div_mask_PayTarget");
+        var json_data_PayTarget = sortJSON(JSON.parse($("#hid_PayTargetData").val()), "UnifiedBusinessNo");
+        var v_choice_PTID = $(obj_button).closest("tr").find("input:hidden").val();
+        var obj_table_tbody = $("#table_mask_PayTarget").find("tbody");
+        var v_template = '<tr style="cursor:pointer;" onclick="fun_choice_radio(this);"><td><input type="radio" name="radio_choice_paytarget" style="cursor:pointer;" value="XXPTIDXX"></td><td>XXUnifiedBusinessNoXX</td><td>XXPayTargetNameXX</td></tr>'
+
+        //先清除資料
+        obj_table_tbody.find("tr").remove();
+
+        //寫入支付對象資料
+        for (var index_detl in json_data_PayTarget) {
+
+            var obj_detl = json_data_PayTarget[index_detl];
+            var v_append = v_template;
+
+            v_append = v_append.replace("XXPTIDXX", obj_detl.PTID);
+            v_append = v_append.replace("XXUnifiedBusinessNoXX", obj_detl.UnifiedBusinessNo);
+            v_append = v_append.replace("XXPayTargetNameXX", obj_detl.PayTargetName);
+
+            obj_table_tbody.append(v_append);
+        }
+
+        //設定所選擇的支付對象
+        $("input[name='radio_choice_paytarget'][value='" + v_choice_PTID + "']").prop("checked", true);
+
+        //開啟遮罩
+        obj_div_mask_PayTarget.css("display", "block");
+        $("#div_mask_PayTarget_scroll").scrollTop(0);//將scroll bar移至頂端
+
+    }//fun_load_PayTarget
+
+    //按下遮罩[選擇支付對象]的[確定]鈕
+    function fun_save_mask_Choice_PayTarget_data() {
+
+        var obj_div_mask_PayTarget = $("#div_mask_PayTarget");
+
+        //取得所選擇的支付對象
+        var v_choice_PTID = $("input[name='radio_choice_paytarget']:checked").val();
+
+        //檢查是否有選擇
+        if (typeof (v_choice_PTID) == "undefined") {
+            alert("請選擇支付對象！");
+            return;
+        }
+
+        //設定所選擇的支付對象
+        fun_set_choice_PayTarget(v_choice_PTID);
+
+        //關閉遮罩
+        obj_div_mask_PayTarget.css("display", "none");
+
+    }//fun_save_mask_Choice_PayTarget_data
+
+    //設定所選擇的支付對象
+    function fun_set_choice_PayTarget(v_PTID) {
+
+        var json_data_PayTarget = JSON.parse($("#hid_PayTargetData").val());
+        var obj_lab_mask_Track_PayTarget = $("#lab_mask_Track_PayTarget");
+        var obj_hid_mask_Track_PTID = $("#hid_mask_Track_PTID");
+
+        if (!v_PTID ||
+            v_PTID == "") {
+            obj_lab_mask_Track_PayTarget.text("")
+            obj_hid_mask_Track_PTID.val("");
+        }
+        else {
+
+            //依照PTID，取得相關資料
+            var data = $.grep(json_data_PayTarget, function (detl, index) {
+                return detl.PTID == v_PTID;
+            });
+
+            var v_choice_UnifiedBusinessNo = data[0].UnifiedBusinessNo;
+            var v_choice_PayTargetName = data[0].PayTargetName;
+
+            obj_lab_mask_Track_PayTarget.text([v_choice_UnifiedBusinessNo, "(", v_choice_PayTargetName, ")"].join(""))
+            obj_hid_mask_Track_PTID.val(v_PTID);
+        }
+
+    }//fun_set_choice_PayTarget
+
+    //點擊遮罩[選擇支付對象]tr，選擇radio
+    function fun_choice_radio(obj_tr) {
+        $(obj_tr).find("input:radio").prop("checked", true);
+    }//fun_choice_radio
+
+    //排序
+    function sortJSON(arr, key) {
+        return arr.sort(function (a, b) {
+            var x = a[key];
+            var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+    }//sortJSON
+
+    //設定日期字串
+    function fun_set_date_str(v_date_str) {
+
+        var v_rtn_date_str = "";
+
+        if (v_date_str.length == 8) {
+            v_rtn_date_str = [
+                v_date_str.substr(0, 4), "/",
+                v_date_str.substr(4, 2), "/",
+                v_date_str.substr(6, 2)].join("");
+        }
+        else {
+            v_rtn_date_str = v_date_str;
+        }
+
+        return v_rtn_date_str;
+
+    }//fun_set_date_str
+
+    //設定值
+    function fun_set_value(v_value) {
+        if (!v_value) {
+            return null;
+        }
+        else {
+            return (jQuery.trim(v_value) == "" ? null : jQuery.trim(v_value));
+        }
+    }//fun_set_value
+
+    //計算遮罩[請款項目]欄位[價差數]
+    function fun_calculate_AMT_Diff() {
+
+        var v_rtn_AMT_Diff = "";
+        var v_AMT_UnTax = jQuery.trim($("#txt_mask_Track_AMT_UnTax").val());
+        var v_AMT_Pay = jQuery.trim($("#txt_mask_Track_AMT_Pay").val());
+
+        if (v_AMT_UnTax != "" &&
+            v_AMT_Pay != "" &&
+            isNaN(Number(v_AMT_UnTax)) == false &&
+            isNaN(Number(v_AMT_Pay)) == false &&
+            Number.isInteger(Number(v_AMT_UnTax)) &&
+            Number.isInteger(Number(v_AMT_Pay))) {
+            v_rtn_AMT_Diff = (Number.parseInt(v_AMT_UnTax) - Number.parseInt(v_AMT_Pay)).toString();
+        }
+
+        $("#lab_mask_Track_AMT_Diff").text(v_rtn_AMT_Diff);
+    }//fun_calculate_AMT_Diff
+
+    //設定控制項權限
+    function fun_set_control_authority() {
+
+        var v_UserData = $("#hid_UserData").val();//使用者所屬部門
+
+        //true=>失效、false=>生效
+        var json_control_authority = [];
+        //Button類
+        json_control_authority.push({ "Like": false, "Control_Id": "btn_Add_Quota", "System": false, "Sales": false, "Accounting": true, "Other": true });
+        json_control_authority.push({ "Like": false, "Control_Id": "btn_Add_Track", "System": false, "Sales": false, "Accounting": true, "Other": true });
+        json_control_authority.push({ "Like": false, "Control_Id": "btn_Maintain_PayTarget", "System": false, "Sales": false, "Accounting": true, "Other": true });
+
+        //清單列表的Link
+        json_control_authority.push({ "Like": true, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "a_link_Quota_edit_" });//額度明細清單-[編輯]鈕
+        json_control_authority.push({ "Like": true, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "a_link_Quota_delete_" });//額度明細清單-[刪除]鈕
+        json_control_authority.push({ "Like": true, "System": false, "Sales": false, "Accounting": false, "Other": true, "Control_Id": "a_link_Track_edit_" });//請款項目清單-[編輯]鈕
+        json_control_authority.push({ "Like": true, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "a_link_Track_delete_" });//請款項目清單-[刪除]鈕
+
+        //遮罩控制項
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_ITEM" });//請款項目
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "btn_Choice_PayTarget_Track" });//支付對象
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_Range_Date_B" });//計算期間起日
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_Range_Date_E" });//計算期間迄日
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_Bus_Invoice_Date" });//發票日期
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_Bus_Invoice_No" });//發票號碼
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_AMT_UnTax" });//金額(未稅)
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_AMT_TaxIncluded" });//金額(含稅)
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_Comment" });//備註
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "txt_mask_Track_SendDate" });//送件時間
+        json_control_authority.push({ "Like": false, "System": false, "Sales": true, "Accounting": false, "Other": true, "Control_Id": "txt_mask_Track_Act_Invoice_No" });//發票號碼
+        json_control_authority.push({ "Like": false, "System": false, "Sales": true, "Accounting": false, "Other": true, "Control_Id": "txt_mask_Track_AMT_Pay" });//發票入帳數
+
+        for (var index in json_control_authority) {
+
+            var json_detl = json_control_authority[index];
+            var v_control;
+
+            switch (json_detl.Like) {
+                case true:
+                    v_control = $(["a[id^='", json_detl.Control_Id, "']"].join(""));
+                    break;
+                case false:
+                    v_control = $(["#", json_detl.Control_Id].join(""));
+                    break;
+            }
+
+            var b_IsDisabled;
+
+            switch (v_UserData) {
+                case "System":
+                    b_IsDisabled = json_detl.System;
+                    break;
+                case "Sales":
+                    b_IsDisabled = json_detl.Sales;
+                    break;
+                case "Accounting":
+                    b_IsDisabled = json_detl.Accounting;
+                    break;
+                default:
+                    b_IsDisabled = json_detl.Other;
+                    break;
+            }
+
+            if (json_detl.Like == true) {
+                if (b_IsDisabled == true) {
+                    v_control.css("pointer-events", "none").css("color", "gray");
+                }
+            }
+            else {
+                v_control.prop("disabled", b_IsDisabled);
+            }
+
+        }//for
+
+    }//fun_set_control_authority
+
+    //遮罩[額度明細]，按下[確定]鈕，檢核存檔資料
+    function fun_chk_mask_save_Quota() {
+
+        var v_Rtn_Msg = "";
+        var json_data_Quota = JSON.parse($("#hid_Data_Quota").val());
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Quota.ITEM, "欄位[額度項目]為必填欄位")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Quota.AMT, "欄位[金額]為必填欄位")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_integer(json_data_Quota.AMT, "欄位[金額]必須為整數")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        //都沒錯誤，回傳true
+        return true;
+    }//fun_chk_mask_save_Quota
+
+    //遮罩[請款項目]，按下[確定]鈕，檢核存檔資料
+    function fun_chk_mask_save_Track() {
+
+        var v_Rtn_Msg = "";
+        var json_data_Track = JSON.parse($("#hid_Data_Track").val());
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Track.ITEM, "欄位[請款項目]為必填欄位")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Track.PTID, "欄位[支付對象]為必填欄位")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Track.AMT_UnTax, "欄位[金額(未稅)]為必填欄位")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Track.AMT_TaxIncluded, "欄位[金額(含稅)]為必填欄位")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        if (fun_set_value(json_data_Track.Range_Date_B)) { v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date(json_data_Track.Range_Date_B, "欄位[計算期間開始日]日期格式錯誤")].join(""); }
+        if (fun_set_value(json_data_Track.Range_Date_E)) { v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date(json_data_Track.Range_Date_E, "欄位[計算期間結束日]日期格式錯誤")].join(""); }
+        if (fun_set_value(json_data_Track.Bus_Invoice_Date)) { v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date(json_data_Track.Bus_Invoice_Date, "欄位[發票日期]日期格式錯誤")].join(""); }
+        if (fun_set_value(json_data_Track.SendDate)) { v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date(json_data_Track.SendDate, "欄位[送件時間]日期格式錯誤")].join(""); }
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        if ((json_data_Track.Range_Date_B) &&
+            (json_data_Track.Range_Date_E) &&
+            json_data_Track.Range_Date_B != "" &&
+            json_data_Track.Range_Date_E != "") {
+            var d_Date_B = fun_ParseDateType("yyyy/mm/dd", json_data_Track.Range_Date_B);
+            var d_Date_E = fun_ParseDateType("yyyy/mm/dd", json_data_Track.Range_Date_E);
+            v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date_compare(d_Date_B, d_Date_E, "欄位[計算期間結束日]不可小於欄位[計算期間開始日]")].join("");
+            if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+        }
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_integer(json_data_Track.AMT_UnTax, "欄位[金額(未稅)]必須為整數")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_integer(json_data_Track.AMT_TaxIncluded, "欄位[金額(含稅)]必須為整數")].join("");
+        if (fun_set_value(json_data_Track.AMT_Pay)) { v_Rtn_Msg = [v_Rtn_Msg, fun_chk_integer(json_data_Track.AMT_Pay, "欄位[發票入帳數]必須為整數")].join(""); }
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        if (fun_set_value(json_data_Track.Bus_Invoice_No)) { v_Rtn_Msg = [v_Rtn_Msg, fun_chk_InvoiceNo(json_data_Track.Bus_Invoice_No, "欄位[發票號碼(營業)]發票格式錯誤")].join(""); }
+        if (fun_set_value(json_data_Track.Act_Invoice_No)) { v_Rtn_Msg = [v_Rtn_Msg, fun_chk_InvoiceNo(json_data_Track.Act_Invoice_No, "欄位[發票號碼(財會)]發票格式錯誤")].join(""); }
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        //都沒錯誤，回傳true
+        return true;
+    }//fun_chk_mask_save_Track
+
+    //檢核必填欄位
+    function fun_chk_required(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+        v_value = fun_set_value(v_value);
+
+        if (!v_value) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_required
+
+    //檢核整數
+    function fun_chk_integer(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+
+        if (Number.isInteger(Number(v_value)) == false) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_required
+
+    //檢核日期型態
+    function fun_chk_date(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+
+        if (fun_ParseDateType("yyyy/mm/dd", v_value) == "Wrong Date Format") {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_date
+
+    //檢核開始結束日期
+    function fun_chk_date_compare(d_b, d_e, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+
+        if (d_e < d_b) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_date_compare
+
+    //字串轉型日期
+    function fun_ParseDateType(DateStringType, DateString) {
+
+        var i_Year = 0;
+        var i_Month = 0;
+        var i_Date = 0;
+
+        switch (DateStringType) {
+            case "yyyymmdd":
+                i_Year = parseInt(DateString.substring(0, 4), 10);
+                i_Month = parseInt(DateString.substring(4, 6), 10) - 1;
+                i_Date = parseInt(DateString.substring(6, 8), 10);
+                break;
+            case "yyyy/mm/dd":
+                i_Year = parseInt(DateString.substring(0, 4), 10);
+                i_Month = parseInt(DateString.substring(5, 7), 10) - 1;
+                i_Date = parseInt(DateString.substring(8, 10), 10);
+                break;
+        }
+
+        var d_Return = new Date(i_Year, i_Month, i_Date);
+
+        if (i_Year != d_Return.getFullYear() ||
+            i_Month != d_Return.getMonth() ||
+            i_Date != d_Return.getDate()) {
+
+            d_Return = "Wrong Date Format";
+            return d_Return;
+        }
+
+        return d_Return;
+    }//fun_ParseDateType
+
+    //檢核發票格式
+    function fun_chk_InvoiceNo(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+        var v_regex_InvoiceNo = /[A-Z]{2}[0-9]{8}/;
+
+        if (v_regex_InvoiceNo.test(v_value) == false) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_InvoiceNo
+
+</script>
+
+@{
+    string YearRange = string.Empty;
+    string s_Date_B = Model.Date_B.HasValue == true ? Model.Date_B.Value.ToString("yyyy/MM/dd") : string.Empty;
+    string s_Date_E = Model.Date_E.HasValue == true ? Model.Date_E.Value.ToString("yyyy/MM/dd") : string.Empty;
+
+    if (string.IsNullOrEmpty(s_Date_B) == false ||
+        string.IsNullOrEmpty(s_Date_E) == false)
+    {
+        YearRange = string.Format("{0}~{1}",
+                                  s_Date_B,
+                                  s_Date_E);
+    }
+    else
+    {
+        YearRange = string.Empty;
+    }
+}
+
+<h2>聯名卡行銷贊助金</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">年度(@YearRange)銀行特約機構(<span id="lab_MERCHANT_STNAME"></span>)明細</h3>
+    </div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <div class="form-group row">
+                <label id="lab_AMT_Quota" class="control-label col-md-9" style="text-align:left;"></label>
+                <label id="lab_AMT_Track" class="control-label col-md-9" style="text-align:left;"></label>
+                <label id="lab_AMT_UnUse" class="control-label col-md-9" style="text-align:left;"></label>
+            </div>
+            <hr />
+            <div class="form-group row">
+                <button id="btn_Add_Quota" type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true">新增額度明細</span>
+                </button>
+                <button id="btn_Add_Track" type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true">新增請款項目</span>
+                </button>
+                <button id="btn_Maintain_PayTarget" type="button" class="btn btn-primary" onclick="window.location.href='@(Url.Action("IndexMaintainPayTarget","CoBrandedSellSponsorship",Model))'">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true">維護支付對象</span>
+                </button>
+                <button id="btn_Back" type="button" class="btn btn-primary" onclick="window.location.href='@(Url.Action("IndexBankData", "CoBrandedSellSponsorship",new QueryBankDataReq { RID = Model.RID, BID = null, Date_B = Model.Date_B, Date_E = Model.Date_E}))'">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true">返回銀行特約機構明細清單</span>
+                </button>
+            </div>
+            @using (Ajax.BeginForm("QueryQuotaTrack", "CoBrandedSellSponsorship",
+            new AjaxOptions()
+            {
+                HttpMethod = "Post",
+                UpdateTargetId = "div_QueryResult",
+                InsertionMode = InsertionMode.Replace,
+                OnSuccess = "fun_load_related_data"
+            }))
+            {
+                @Html.Hidden("RID", (Model.RID.HasValue == false ? string.Empty : Model.RID.Value.ToString()))
+                @Html.Hidden("BID", (Model.BID.HasValue == false ? string.Empty : Model.BID.Value.ToString()))
+                <div style="display:none;">
+                    <button id="but_QueryQuotaTrack" type="submit" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* 查詢結果 *@
+<div id="div_QueryResult">
+</div>
+
+<div id="div_Data">
+    @Html.Hidden("hid_UserData", s_UserData)
+    @Html.Hidden("hid_PayTargetData", JsonConvert.SerializeObject(dt_QueryResult))
+    @Html.Hidden("hid_script_BID", (Model.BID.HasValue == false ? string.Empty : Model.BID.Value.ToString()))
+    @Html.Hidden("hid_script_url_SaveDetailQuota", Url.Action("SaveDetailQuota", "CoBrandedSellSponsorship"))
+    @Html.Hidden("hid_script_url_SaveDetailTrack", Url.Action("SaveDetailTrack", "CoBrandedSellSponsorship"))
+</div>
+
+@* 額度遮罩 *@
+<div id="div_mask_Quota" class="mask" style="display:none;">
+    <div class="mask_content">
+        <div class="panel panel-default" style="margin:auto;">
+            <div class="panel-heading">
+                <h3 class="panel-title"></h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group row">
+                        @Html.Label("額度項目：", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBox("txt_mask_Quota_ITEM", "", new { id = "txt_mask_Quota_ITEM", maxlength = "100", style = "width:800px;", @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.Label("金額：", new { @class = "control-label col-md-2" })
+                        <div class="col-md-1">
+                            @Html.TextBox("txt_mask_Quota_AMT", "", new { id = "txt_mask_Quota_AMT", style = "width:500px;", @class = "form-control" })
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="text-right col-md-8" style="text-align:left;">
+                            <button id="btn_Save_Quota" type="button" class="btn btn-primary" onclick="fun_save_mask_Quota_data(this);">
+                                <span class="glyphicon" aria-hidden="true">確定</span>
+                            </button>
+                            <button id="btn_Cancle_Quota" type="button" class="btn btn-primary">
+                                <span class="glyphicon" aria-hidden="true">取消</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 請款項目遮罩 *@
+<div id="div_mask_Track" class="mask" style="display:none;">
+    <div class="mask_content">
+        <div class="panel panel-default" style="margin:auto;">
+            <div class="panel-heading">
+                <h3 class="panel-title"></h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div id="div_mask_Track_scroll" style="height:300px;vertical-align:top;overflow-y:auto;">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td class="td_style1">
+                                        <span style="font-weight:bolder;color:red;">*</span>
+                                        @Html.Label("請款項目：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        @Html.TextArea("txt_mask_Track_ITEM", "", new { id = "txt_mask_Track_ITEM", maxlength = "100", style = "width:800px;", @class = "form-control", rows = "3" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        <span style="font-weight:bolder;color:red;">*</span>
+                                        @Html.Label("支付對象：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <button id="btn_Choice_PayTarget_Track" type="button" class="btn btn-primary" onclick="fun_load_PayTarget(this);">
+                                                            <span class="glyphicon" aria-hidden="true">選擇</span>
+                                                        </button>
+                                                    </td>
+                                                    <td>
+                                                        <span id="lab_mask_Track_PayTarget" style="padding-left:10px;"></span>
+                                                        @Html.Hidden("hid_mask_Track_PTID")
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("計算期間：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>@Html.TextBox("txt_mask_Track_Range_Date_B", "", new { id = "txt_mask_Track_Range_Date_B", maxlength = "8", style = "width:100px;", @class = "form-control" })</td>
+                                                    <td>~</td>
+                                                    <td>@Html.TextBox("txt_mask_Track_Range_Date_E", "", new { id = "txt_mask_Track_Range_Date_E", maxlength = "8", style = "width:100px;", @class = "form-control" })</td>
+                                                    <td>@Html.Label("(格式：YYYYMMDD)", new { @class = "control-label", style = "text-align:left;margin-left:15px;" })</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("發票日期：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @Html.TextBox("txt_mask_Track_Bus_Invoice_Date", "", new { id = "txt_mask_Track_Bus_Invoice_Date", maxlength = "8", style = "width:100px;", @class = "form-control" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.Label("(格式：YYYYMMDD)", new { @class = "control-label", style = "text-align:left;margin-left:15px;" })
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("發票號碼(營業)：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @Html.TextBox("txt_mask_Track_Bus_Invoice_No", "", new { id = "txt_mask_Track_Bus_Invoice_No", maxlength = "10", style = "width:150px;", @class = "form-control" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.Label("(格式：AB12345678)，大寫英文字母2碼+8碼數字", new { @class = "control-label", style = "text-align:left;margin-left:15px;" })
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        <span style="font-weight:bolder;color:red;">*</span>
+                                        @Html.Label("金額(未稅)：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        @Html.TextBox("txt_mask_Track_AMT_UnTax", "", new { id = "txt_mask_Track_AMT_UnTax", style = "width:150px;", @class = "form-control" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        <span style="font-weight:bolder;color:red;">*</span>
+                                        @Html.Label("金額(含稅)：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        @Html.TextBox("txt_mask_Track_AMT_TaxIncluded", "", new { id = "txt_mask_Track_AMT_TaxIncluded", style = "width:150px;", @class = "form-control" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("備註：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        @Html.TextArea("txt_mask_Track_Comment", "", new { id = "txt_mask_Track_Comment", maxlength = "500", style = "width:800px;", @class = "form-control", rows = "5" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("送件時間：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @Html.TextBox("txt_mask_Track_SendDate", "", new { id = "txt_mask_Track_SendDate", maxlength = "8", style = "width:150px;", @class = "form-control" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.Label("(格式：YYYYMMDD)", new { @class = "control-label", style = "text-align:left;margin-left:15px;" })
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("發票號碼(財會)：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @Html.TextBox("txt_mask_Track_Act_Invoice_No", "", new { id = "txt_mask_Track_Act_Invoice_No", maxlength = "10", style = "width:150px;", @class = "form-control" })
+                                                    </td>
+                                                    <td>
+                                                        @Html.Label("(格式：AB12345678)，大寫英文字母2碼+8碼數字", new { @class = "control-label", style = "text-align:left;margin-left:15px;" })
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("發票入帳數：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        @Html.TextBox("txt_mask_Track_AMT_Pay", "", new { id = "txt_mask_Track_AMT_Pay", style = "width:150px;", @class = "form-control", onchange = "fun_calculate_AMT_Diff();" })
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td_style1">
+                                        @Html.Label("價差數：", new { @class = "control-label lable_style" })
+                                    </td>
+                                    <td class="td_style2">
+                                        <span id="lab_mask_Track_AMT_Diff"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="text-right col-md-8" style="text-align:left;">
+                            <button id="btn_Save_Track" type="button" class="btn btn-primary" onclick="fun_save_mask_Track_data(this);">
+                                <span class="glyphicon" aria-hidden="true">確定</span>
+                            </button>
+                            <button id="btn_Cancle_Track" type="button" class="btn btn-primary">
+                                <span class="glyphicon" aria-hidden="true">取消</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 支付對象遮罩 *@
+<div id="div_mask_PayTarget" class="mask_01" style="display:none;">
+    <div class="mask_content_01">
+        <div class="panel panel-default" style="margin:auto;">
+            <div class="panel-heading">
+                <h3 class="panel-title">選擇支付對象</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div id="div_mask_PayTarget_scroll" style="height:300px;vertical-align:top;overflow-y:auto;">
+                        <table id="table_mask_PayTarget" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>請選擇</th>
+                                    <th>支付對象統編</th>
+                                    <th>支付對象名稱</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="text-right col-md-8" style="text-align:left;">
+                            <button id="btn_Save_PayTarget" type="button" class="btn btn-primary" onclick="fun_save_mask_Choice_PayTarget_data();">
+                                <span class="glyphicon" aria-hidden="true">確定</span>
+                            </button>
+                            <button id="btn_Cancle_PayTarget" type="button" class="btn btn-primary">
+                                <span class="glyphicon" aria-hidden="true">取消</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

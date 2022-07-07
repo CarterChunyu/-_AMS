@@ -1,0 +1,151 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#SettleDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+</script>
+<script type="text/javascript">
+    function padding1(num, length) {
+        for (var len = (num + "").length; len < length; len = num.length) {
+            num = "0" + num;
+        }
+        return num;
+    }
+    $(document).ready(function () {
+        $("#group_show option[value='@ViewBag.GROUP_VALUES']").prop("selected", "selected");
+        $("#classtype_show option[value='@ViewBag.CLASS_VALUES']").prop("selected", "selected");
+        $("#pay_show option[value='@ViewBag.PAY_VALUES']").prop("selected", "selected");
+    })
+</script>
+
+
+<meta name="viewport" content="width=device-width" />
+<title>@ViewBag.RepName</title>
+<h2>@ViewBag.RepName</h2>
+
+
+
+
+<div class="form-horizontal">
+    <hr />
+    @using (Html.BeginForm("Update_Store", "GmAccountStore", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div class="form-group">
+            <label for="mno" class="control-label col-md-2">特約機構代碼 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_NO" id="MERCHANT_NO" value="@ViewBag.MERCHANT_NO" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">門市代碼 :</label>
+            <div class="col-md-10">
+                <input type="text" name="STORE_NO" id="STORE_NO" value="@ViewBag.STORE_NO" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">門市名稱 :</label>
+            <div class="col-md-10">@ViewBag.MERCHANT_NAME</div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">門市代號對應值 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_NO_ACT" id="MERCHANT_NO_ACT" maxlength="20" value="@ViewBag.MERCHANT_NO_ACT" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">摘要欄位 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_NOTE" id="MERCHANT_NOTE" maxlength="100" value="@ViewBag.MERCHANT_NOTE" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">類別 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("classtype_show", (IEnumerable<SelectListItem>)ViewBag.CLASS, "--請選擇--", new { @disabled = "disabled" })
+                <input type="hidden" name="classtype" id="classtype" value="@ViewBag.CLASS_VALUES" class="form-control" />
+            </div>
+        </div>
+        @*<div class="form-group">
+            <label for="mname" class="control-label col-md-2">撥款單位 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("pay_show", (IEnumerable<SelectListItem>)ViewBag.PAY, "--請選擇--", new { @disabled = "disabled" })
+                <input type="hidden" name="pay" id="pay" value="@ViewBag.PAY_VALUES" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">關係人 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("group_show", (IEnumerable<SelectListItem>)ViewBag.GROUP, "--請選擇--", new { @disabled = "disabled" })
+                <input type="hidden" name="group" id="group" value="@ViewBag.GROUP_VALUES" class="form-control" />
+            </div>
+        </div>*@
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <input type="submit" name="searchConfirm" value="更新" class="btn btn-default" />
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <label for="mname" class="control-label col-md-2"></label>
+        <div class="col-md-10">
+            <input type="submit" name="back" value="取消" class="btn btn-default" onclick="history.back()" />
+        </div>
+    </div>
+</div>
+
+
+

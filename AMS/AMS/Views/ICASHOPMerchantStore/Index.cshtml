@@ -1,0 +1,257 @@
+﻿@using Domain.ICASHOPMerchantStore;
+@model Domain.ICASHOPMerchant.QueryReq
+
+@section scripts {
+    @*引用此js才可使用Ajax.BeginForm*@
+    <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+}
+
+<script>
+
+    //控制訊息框
+    //IsShow(是否顯示訊息框)，true=顯示、flase=不顯示
+    //Msg(訊息)
+    function fun_AlertCtrl(IsShow,Msg) {
+        var obj_div_Alert = $("#div_Alert");
+        var obj_msg = obj_div_Alert.find("#div_AlertMsg");
+
+        obj_div_Alert.css("display", (IsShow == true ? "block" : "none"));
+        obj_msg.html((IsShow == true ? Msg : ""));
+    }//fun_AlertCtrl
+
+    //按下[查詢]鈕，在按鈕送出(submit)之前
+    function fun_QueryBeforeSubmit() {
+        //將使用者在TextBox輸入的值寫入Hidden欄位
+        $("#CurrentPage").val("1");//設定頁碼，按下查詢鈕一定是從第一頁開始
+        $("#UnifiedBusinessNo").val($("#txt_UnifiedBusinessNo").val());//特店統編
+        $("#MerchantName").val($("#txt_MerchantName").val());//特店名稱
+    }//fun_QueryBeforeSubmit
+
+    //按下[查詢]鈕開始
+    function fun_QueryBegin() {
+        fun_AlertCtrl(false);//隱藏訊息框
+        //鎖定查詢鈕
+        $("#but_query").attr("disabled", true);
+    }//fun_QueryBegin
+
+    //按下[查詢]鈕結束
+    function fun_QueryComplete() {
+        //解除鎖定查詢鈕
+        $("#but_query").attr("disabled", false);
+    }//fun_QueryComplete
+
+    //換頁，重新查詢
+    function getData(CurrentPage) {
+        $("#CurrentPage").val(CurrentPage);//記錄頁碼
+        $("#but_query").submit();
+    }
+
+    //下載範例檔
+    function fun_but_download_template() {
+
+        fun_AlertCtrl(false);//隱藏訊息框
+
+        //設定下載連結
+        var url_download = "@Url.Action("FileDownload",
+                                        "ICASHOPMerchantStore",
+                                        new DownloadReq
+                                        {
+                                            DownloadType = DownloadReq.en_DownloadType.Template
+                                        })"
+        fun_download(url_download);
+    }//fun_but_download_template
+
+    //下載門市明細資料
+    function fun_but_download_store(button) {
+
+        fun_AlertCtrl(false);//隱藏訊息框
+
+        //設定下載連結
+        var url_download = "@Url.Action("FileDownload", "ICASHOPMerchantStore")";
+        var s_DownloadType = ["DownloadType=", "@DownloadReq.en_DownloadType.Store"].join("");
+        var s_UnifiedBusinessNo = ["UnifiedBusinessNo=", $(button).attr("UnifiedBusinessNo")].join("");
+        url_download = [url_download, "/?", s_DownloadType, "&", s_UnifiedBusinessNo].join("");
+
+        fun_download(url_download);
+
+    }//fun_but_download_store
+
+    //下載作業
+    function fun_download(url_download) {
+
+        //清除先前下載時所建立的iframe
+        $("iframe[id='iframe_download']").remove();
+
+        //新增iframe來進行下載
+        var obj_iframe_download = $("<iframe id='iframe_download' style='display:none;' />");
+        obj_iframe_download.attr("src", url_download);
+        obj_iframe_download.appendTo("body");
+
+        //iframe的Load事件
+        //下載發生錯誤，load事件會被觸發，會回傳頁面資訊
+        //下載沒發生錯誤，則load事件不會被觸發
+        obj_iframe_download.load(function () {
+            var Msg = $(this).contents().find("body").html();
+            fun_AlertCtrl(true, Msg);
+        });
+
+    }//fun_download
+
+    @* ===== 匯入相關Script，開始 ===== *@
+    //設定存放匯入的檔案
+    var data_upload = new FormData();
+
+    $(document).ready(function () {
+
+        //觸發選擇檔案上傳事件
+        $("#file_import").on("change", function (e) {
+
+            //設定UI上所選擇的檔案物件
+            var obj_files = e.target.files;
+
+            //因IE無法delete，因此只能每次觸發事件，就重新new物件，代替清空的動作
+            data_upload = new FormData();
+
+            //如果使用者有選擇上傳檔案，則將檔案寫入上傳檔案的FormData
+            if (obj_files.length > 0) {
+                for (var i = 0; i < obj_files.length; i++) {
+                    var obj_file = obj_files[i];
+                    data_upload.append(obj_file.name.split("\\").pop(), obj_file);
+                }//for
+            }//if
+        });//$("#file_upload")
+
+    });//$(document).ready
+
+    //使用Ajax上傳檔案
+    function fun_but_import(button) {
+
+        fun_AlertCtrl(false);//隱藏訊息框
+
+        //設定變數
+        obj_button = $(button);
+
+        //鎖定Button，避免使用者重複按
+        obj_button.attr("disabled", true);
+
+        //呼叫Ajax
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("Import", "ICASHOPMerchantStore")",
+            contentType: false,
+            processData: false,
+            data: data_upload,
+            timeout: 300*1000,/*設定5分鐘timeout*/
+            error: function (jqXHR, textStatus, errorThrown ) {
+                alert(["Ajax發生錯誤","，jqXHR=[", JSON.stringify(jqXHR),"]",
+                      "，textStatus=[", textStatus, "]",
+                      "，errorThrown=[", errorThrown, "]"].join(""));
+            },
+            success: function (ajax_rtn) {
+
+                //清空選擇檔案控制項
+                data_upload = new FormData();
+                $("#file_import").val("");
+
+                switch (ajax_rtn.RtnResult) {
+                    case true:
+                        alert("匯入作業完成，請確認匯入結果！！");
+                        fun_AlertCtrl(true, ajax_rtn.RtnMsg);
+                        break;
+                    case false:
+                        alert("匯入作業失敗！！");
+                        fun_AlertCtrl(true, ajax_rtn.RtnMsg);
+                        break;
+                }//switch
+
+                //解鎖Button
+                obj_button.attr("disabled", false);
+            }
+        });//ajax結束
+    }//fun_but_import()
+
+    @* ===== 匯入相關Script，結束 ===== *@
+
+</script>
+
+<h2>自串點數特店門市匯入</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">特店主檔查詢</h3>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div id="div_query" class="form-horizontal">
+                <div class="form-group row">
+                    <div class="col-md-8">
+                        @Html.Label("特店統編：", new { @class = "control-label col-md-2" })
+                        @Html.TextBoxFor(m => m.UnifiedBusinessNo, new { id = "txt_UnifiedBusinessNo", maxlength = "8", style = "width:200px;" })
+                    </div>
+                    <div class="col-md-8">
+                        @Html.Label("特店名稱：", new { @class = "control-label col-md-2" })
+                        @Html.TextBoxFor(m => m.MerchantName, new { id = "txt_MerchantName", style = "width:200px;" })
+                    </div>
+                    <div class="text-right col-md-2">
+                        <table>
+                            <tr>
+                                <td>
+
+                                    @using (Ajax.BeginForm("Query", "ICASHOPMerchantStore", new AjaxOptions()
+                                    {
+                                        HttpMethod = "Post",
+                                        UpdateTargetId = "div_QueryResult",
+                                        InsertionMode = InsertionMode.Replace,
+                                        OnBegin = "fun_QueryBegin",
+                                        OnComplete = "fun_QueryComplete"
+                                    }))
+                                    {
+                                        @Html.Hidden("CurrentPage", 1)
+                                        @Html.Hidden("UnifiedBusinessNo")
+                                        @Html.Hidden("MerchantName")
+                                        <button id="but_query" type="submit" class="btn btn-primary" onclick="fun_QueryBeforeSubmit();">
+                                            <span class="glyphicon glyphicon-search" aria-hidden="true">查詢</span>
+                                        </button>
+                                    }
+                                </td>
+                                <td>
+                                    <button id="but_template" type="button" class="btn btn-primary" onclick="fun_but_download_template();">
+                                        下載範例檔
+                                    </button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div id="div_import" class="form-horizontal">
+            <table style="width:100%; ">
+                <tr>
+                    <td style="width:122px;" rowspan="2">
+                        @Html.Label("選擇檔案：", new { style = "padding-left:40px;" })
+                    </td>
+                    <td style="text-align:left;">
+                        <input id="file_import" type="file" name="file" accept=".xlsx" multiple="multiple">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button id="but_import" type="button" class="btn btn-primary" onclick="fun_but_import(this);">
+                            匯入
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+@* Alert訊息 *@
+<div id="div_Alert" class="alert alert-danger" role="alert" style="display:none;">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <div id="div_AlertMsg"></div>
+</div>
+@* 查詢結果 *@
+<div id="div_QueryResult">
+</div>

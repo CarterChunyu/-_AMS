@@ -1,0 +1,452 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@using Newtonsoft.Json;
+@using Domain;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    #tab {
+        width: auto;
+        height: auto;
+    }
+
+        #tab > ul {
+            display: block;
+            margin: 0;
+            list-style: none;
+        }
+
+    .tab-title {
+        list-style: none;
+    }
+
+    #tab > ul > li {
+        display: inline-block;
+        vertical-align: top;
+        font-family: '微軟正黑體';
+        margin: 0 -1px -1px 0;
+        border: 1px solid #BCBCBC;
+        height: 25px;
+        line-height: 25px;
+        background: #cdcdcd;
+        padding: 0 15px;
+        list-style: none;
+        box-sizing: border-box;
+    }
+
+        #tab > ul > li a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        #tab > ul > li.active {
+            border-bottom: 1px solid #fff;
+            background: #fff;
+        }
+
+    #tab > .tab-inner {
+        clear: both;
+        color: #000;
+        border: 1px #BCBCBC solid;
+    }
+
+    .tab-inner {
+        padding: 15px;
+        /*height: 50px;*/
+    }
+
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        /*padding: 0px 0px 0px 8px !important;*/
+        text-align: left;
+        /*border-bottom: 1px solid #d0d0d0;
+        border-top: 1px solid #d0d0d0;
+        border-left: 1px solid #d0d0d0;
+        border-right: 1px solid #d0d0d0;*/
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+
+    .grid td {
+        border-bottom: 1px solid #d0d0d0;
+        border-top: 1px solid #d0d0d0;
+        border-left: 1px solid #d0d0d0;
+        border-right: 1px solid #d0d0d0;
+    }
+
+    .grid th {
+        border-bottom: 1px solid #d0d0d0;
+        border-top: 1px solid #d0d0d0;
+        border-left: 1px solid #d0d0d0;
+        border-right: 1px solid #d0d0d0;
+    }
+
+    #title td {
+        border-bottom: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        height: 35px;
+        background-color: #fff;
+    }
+
+    .btn {
+        text-align: left;
+    }
+
+    .select {
+        width:105px;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {          
+      
+        $("#PAY_TYPE option[value='@ViewBag.PAY_TYPE']").prop("selected", "selected");
+        $('#DATE').datepicker({ dateFormat: 'yymmdd' });
+
+        $("#COUPON_TYPE").change(function () {
+            //alert($("#PAY_TYPE").val());
+            var pay_type_name = "";
+            if ($("#PAY_TYPE").val() == "T00004") {
+                pay_type_name = "Icash 2.0";
+            } else {
+                pay_type_name = "ICP";
+            }
+            var coupon_type_name = "";
+            switch (this.value) {
+                case "0":
+                    coupon_type_name = "五倍券+好食券";
+                    break;
+                case "1":
+                    coupon_type_name = "五倍券";
+                    break;
+                case "2":
+                    coupon_type_name = "好食券";
+                    break;
+            }
+            $("#TitleName").text("《" + coupon_type_name + "》" + pay_type_name+" 消費者實際靠卡回饋統計報表");
+            $("#H2Name").text("《" + coupon_type_name + "》" + pay_type_name+" 消費者實際靠卡回饋統計報表");
+        });
+
+        $("#PAY_TYPE").change(function () {
+            var pay_type_name = "";
+            if (this.value == "T00004") {
+                pay_type_name = "Icash 2.0";
+            } else {
+                pay_type_name = "ICP";
+            }
+            var coupon_type_name = "";
+            switch ($("#COUPON_TYPE").val()) {
+                case "0":
+                    coupon_type_name = "五倍券+好食券";
+                    break;
+                case "1":
+                    coupon_type_name = "五倍券";
+                    break;
+                case "2":
+                    coupon_type_name = "好食券";
+                    break;
+            }
+            $("#TitleName").text("《" + coupon_type_name + "》" + pay_type_name + " 消費者實際靠卡回饋統計報表");
+            $("#H2Name").text("《" + coupon_type_name + "》" + pay_type_name + " 消費者實際靠卡回饋統計報表");
+        });
+
+        $(function () {
+            var $li = $('ul.tab-title li');
+            $($li.eq(0).addClass('active').find('a').attr('href')).siblings('.tab-inner').hide();
+
+            $li.click(function () {
+                $($(this).find('a').attr('href')).show().siblings('.tab-inner').hide();
+                $(this).addClass('active').siblings('.active').removeClass('active');
+            });
+        });
+    })
+
+    function OpenDetail(list) {
+        var td = '';
+        $.each(list, function () {
+            td += '<tr>';
+            $.each(this, function (name, value) {
+                if (name != 'DBNO') {
+                        td += '<td>' + value + '</td>';
+                    //console.log(`${name} = ${value}`);
+                }
+            });
+            td += '</tr>'
+        });
+
+        var myWindow = window.open("明細表", "newwindow","scrollbars=yes");
+        var css = '<link href="~/css/jquery.dataTables.css" rel="stylesheet"><link rel="stylesheet" type="text/css" href="/css/result-light.css" >\
+    <style type="text/css"> \
+    .dataTables_scrollBody thead {\
+        visibility: hidden;\
+    }\
+    .group {\
+        background-color: #333 !important;\
+        font-size: 15px;\
+        color: #fff !important;\
+        opacity: 0.7;\
+    }\
+    .hidden {\
+        display: none;\
+    }\
+    tr:hover th, tr:hover td {\
+        background-color: #ebebeb;\
+        background-image: none;\
+    }\
+    th {\
+        text-align: right;\
+    }\
+    td {\
+        height: 26px;\
+        padding: 0px 0px 0px 8px !important;\
+        text-align: left;\
+        vertical-align: middle;\
+        color: #555555;\
+        background-color: #ffffff;\
+        text-align: right;\
+    }\
+        .grid td {\
+        border-bottom: 1px solid #d0d0d0;\
+        border-top: 1px solid #d0d0d0;\
+        border-left: 1px solid #d0d0d0;\
+        border-right: 1px solid #d0d0d0;\
+    }\
+    .grid th {\
+        text-align:center;\
+        border-bottom: 1px solid #d0d0d0;\
+        border-top: 1px solid #d0d0d0;\
+        border-left: 1px solid #d0d0d0;\
+        border-right: 1px solid #d0d0d0;\
+    }\
+</style>';
+        var table = css + '<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" /><table class="grid" style="width:100%;border:1px solid gray;">';
+        table += '<thead><tr>';
+        table += '<th style="text-align:center">序</th>';
+        table += '<th style="text-align:center">UUID</th>';
+        table += '<th style="text-align:center">交易店鋪名稱</th>';
+        table += '<th style="text-align:center">交易日期</th>';
+        table += '<th style="text-align:center">交易序號或流水編號</th>';
+        table += '<th style="text-align:center">交易金額</th>';
+        table += '<th style="text-align:center">統編或特店編號</th>';
+        table += '<th style="text-align:center">交易店家行業別</th>';
+        table += '<th style="text-align:center">五倍券實際靠卡回饋總額</th>';
+        table += '<th style="text-align:center">提報檔名</th>';
+        table += '</tr></thead>';
+    table += td;
+    table += '</table>';
+        myWindow.document.write(table);
+    }
+
+
+</script>
+<meta name="viewport" content="width=device-width" />
+
+@{
+    var coupon_type_name = "《五倍券+好食券》";
+    var pay_type_name = "";
+    var titlename = " 消費者實際靠卡回饋統計報表";
+    if (ViewBag.COUPON_TYPE == "1")
+    {
+        coupon_type_name = "《五倍券》消費者實際靠卡回饋統計報表";
+    }
+    if (ViewBag.COUPON_TYPE == "2")
+    {
+        coupon_type_name = "《好食券》消費者實際靠卡回饋統計報表";
+    }
+    if (ViewBag.PAY_TYPE == "T00004")
+    {
+        pay_type_name = "Icash 2.0";
+    }
+    else
+    {
+        pay_type_name = "ICP";
+    }
+    titlename = coupon_type_name + pay_type_name + titlename;
+}
+
+
+<title id="TitleName">@titlename</title>
+<h2 id="H2Name">@titlename</h2>
+
+@using (Html.BeginForm("ACInvoiceRewardReport2021", "ACInvoice", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div class="form-group">
+        <table id="title" style="width:200px">
+            <tr>
+                <td style="text-align:right">
+                    <label for="DATE">日期：</label>
+                </td>
+                <td style="text-align:left">
+                    <input type="text" name="DATE" id="DATE" value="@ViewBag.DATE" style="width:105px;" />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right">
+                    <label>支付類型：</label>
+                </td>
+                <td style="text-align:left">
+                    @Html.DropDownList("PAY_TYPE", (IEnumerable<SelectListItem>)ViewBag.PAY_TYPE_DDL, new { @class = "btn btn-default dropdown-toggle select" })
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right">
+                    <label>券種類型：</label>
+                </td>
+                <td style="text-align:left">
+                    @Html.DropDownList("COUPON_TYPE", (IEnumerable<SelectListItem>)ViewBag.COUPON_TYPE_DDL, new { @class = "btn btn-default dropdown-toggle select" })
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left">
+                    <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+                </td>
+                <td style="text-align:right">
+                    
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="tab">
+        <ul class="tab-title">
+            <li><a href="#tab01">總表</a></li>
+            <li><a href="#tab02">明細表</a></li>
+        </ul>
+        <div id="tab01" class="tab-inner">          
+            <table id="mytable" class="grid" style="width:100%;border:1px solid gray;">
+                <thead>
+                    <tr id="exceltr">
+                        <th colspan="8" style="text-align:right">
+                            <input type="submit" name="excelConfirm" value="匯出EXCEL" class="btn btn-default" />
+                        </th>
+                    </tr>
+                    <tr style="background-color: lightgray;vertical-align:central">
+                        <th style="text-align:center">序</th>
+                        <th style="text-align:center">消費者 UUID</th>
+                        <th style="text-align:center">綁定日</th>
+                        <th style="text-align:center">綁定序號</th>
+                        <th style="text-align:center">交易筆數</th>
+                        <th style="text-align:center">交易總額</th>
+                        <th style="text-align:center">實際靠卡回饋總額</th>
+                        <th style="text-align:center">註記</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        List<ACInvoiceRewardReport2021.Detail> details = ViewBag.DETAILdt;
+
+                        if (ViewBag.REPORTdt != null)
+                        {
+                            foreach (var item in ViewBag.REPORTdt)
+                            {
+                                <tr>
+                                    <td style="text-align:center">@item.TW_ID</td>
+                                    <td style="text-align:left">@item.CUS_UUID</td>
+                                    <td style="text-align:center">@item.AUTH_TIME</td>
+                                    <td style="text-align:center">@item.TXN_NO</td>
+                                    <td style="text-align:right">@item.TRANS_CNT</td>
+                                    <td style="text-align:right">@item.TRANS_AMT</td>
+                                    <td style="text-align:right">@item.REWARD_AMT</td>
+                                    <td style="text-align:center">
+                                        @item.REMARK
+                                        <input type="button" name="DetailButton" id="DetailButton" value="明細" onclick="OpenDetail(@JsonConvert.SerializeObject(details.Where(x => x.CUS_UUID == item.CUS_UUID).ToArray()));" class="btn btn-default" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+            <span id='table_page'></span>
+        </div>
+        <div id="tab02" class="tab-inner">
+            <table class="grid" style="width:100%;border:1px solid gray;">
+                <thead>
+                    <tr style="background-color: lightgray;vertical-align:central">
+                        <th style="text-align:center">序</th>
+                        <th style="text-align:center">UUID</th>
+                        <th style="text-align:center">交易店鋪名稱</th>
+                        <th style="text-align:center">交易日期</th>
+                        <th style="text-align:center">交易序號或流水編號</th>
+                        <th style="text-align:center">交易金額</th>
+                        <th style="text-align:center">統編或特店編號</th>
+                        <th style="text-align:center">交易店家行業別</th>
+                        <th style="text-align:center">實際靠卡回饋總額</th>
+                        <th style="text-align:center">提報檔名</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (ViewBag.DETAILdt != null)
+                        {
+                            foreach (var item in ViewBag.DETAILdt)
+                            {
+                                <tr>
+                                    <td style="text-align:center">@item.TW_ID</td>
+                                    <td style="text-align:left">@item.CUS_UUID</td>
+                                    <td style="text-align:left">@item.STORE_NAME</td>
+                                    <td style="text-align:center">@item.TRANS_DATE</td>
+                                    <td style="text-align:center">@item.TXLOG_ID</td>
+                                    <td style="text-align:right">@item.TRANS_AMT</td>
+                                    <td style="text-align:center">@item.TAX_ID</td>
+                                    <td style="text-align:left">@item.TRANS_STORE_TYPE</td>
+                                    <td style="text-align:right">@item.REWARD_AMT</td>
+                                    <td style="text-align:left">@item.FILE_NAME</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+}
+
+
+
+
+

@@ -1,0 +1,47 @@
+﻿@model AMS.Models.GM_ADJ_APPLICATION
+@{
+    ViewBag.Title = "凍結申請表";
+}
+<script>
+    $(document).ready(
+    function () {
+        $('#RCPT_DATE').change(function () {
+
+            if (new Date($('#RCPT_DATE').val().substr(0, 4) + '-' + $('#RCPT_DATE').val().substr(4, 2) + '-' + $('#RCPT_DATE').val().substr(6, 2)) < new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * 5))
+            { alert('日期須在5天後'); $('#RCPT_DATE').val(''); }
+        });
+    });
+    
+</script>
+
+
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#RCPT_DATE').datepicker({ dateFormat: 'yymmdd' });
+       
+    });
+</script>
+
+
+
+
+<h2>凍結申請表</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(model => model.FORM_ID)
+    
+    @Html.LabelFor(model => model.RCPT_DATE)
+    @Html.Label("(日期須在5天後)")
+    @Html.EditorFor(model => model.RCPT_DATE)
+    
+    <input type="submit" value="儲存" class="btn btn-default" />
+}
+<div>
+    @Html.ActionLink("取消回查詢列表", "Index", new { begin = Session["beginDate"], end = Session["endDate"], merchantNo = Session["merchantNo"] })
+</div>
+

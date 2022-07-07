@@ -1,0 +1,138 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    
+
+}
+
+
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+    <script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+    <script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+
+    <style type='text/css'>
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+
+        th {
+            text-align: right;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            text-align: left;
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            background-color: #ffffff;
+            text-align: right;
+        }
+    </style>
+
+    <link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+    <script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+    <script type="text/javascript">
+        $(function () {
+            $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+            $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+        });
+
+    </script>
+
+    <h2>@ViewBag.RepName</h2>
+
+
+
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+
+
+    @using (Html.BeginForm("Report151201Result", "Report", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div>
+            <label for="startDate">會計日 :</label>
+            <input type="text" name="StartDate" id="StartDate" value="@ViewBag.Start" style="width:100px;" /> ~
+            <input type="text" name="EndDate" id="EndDate" value="@ViewBag.End" style="width:100px;" />
+            
+            <input type="radio" name="src" value="AMUSEMENT_PARK" @ViewBag.ch1> 遊樂園
+            <input type="radio" name="src" value="TRADITION_CENTER" @ViewBag.ch2> 傳藝中心　
+            <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+            <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+        </div>
+    }
+    <table class="grid" width="100%">
+        <thead>
+            <tr style ="background-color: lightgray">
+                <th>
+                    門市名稱
+                </th>
+                <th>
+                    交易日
+                </th>
+                <th>
+                    購貨總金額
+                </th>
+                <th>
+                    購貨取消總金額
+                </th>
+                <th>
+                    購貨淨額
+                </th>
+                <th>
+                    自動加值總額
+                </th>
+                <th>
+                    清分日
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+           
+        
+            @foreach (DataRow row in Model.Rows)
+            {  
+                <tr>
+                @for(int i=0; i<row.ItemArray.Length ;i++)
+                {
+                    <td>@row.ItemArray[i].ToString()</td>
+                }
+                </tr>
+            }
+
+        </tbody>
+</table>
+
+

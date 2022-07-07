@@ -1,0 +1,149 @@
+﻿@model IEnumerable<AMS.Models.TM_ADJ_APPLICATION>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+   $(function () {
+   $('#begin').datepicker({ dateFormat: 'yymmdd' });
+   $('#end').datepicker({ dateFormat: 'yymmdd' });
+   });
+</script>
+<script type="text/javascript">
+    $(function () {
+        $('#end').blur(function () { var diff = Date.parse($('#end').val().substr(0, 4) + '-' + $('#end').val().substr(4, 2) + '-' + $('#end').val().substr(6, 2)) - Date.parse($('#begin').val().substr(0, 4) + '-' + $('#begin').val().substr(4, 2) + '-' + $('#begin').val().substr(6, 2)); if (diff / 1000 / 3600 / 24 > 365) alert(diff / 1000 / 3600 / 24 + 'days > 365 days'); });
+        
+    });
+</script>
+<script type="text/javascript" src="~/Scripts/jquery.validate.min.js"> </script>
+<script>
+     $(function () {
+      // Initialize form validation on the registration form.
+      // It has the name attribute "registration"
+     $("form[name='frm1']").validate({
+                                  errorClass: "my-error-class",
+                                  
+                                  // Specify validation rules
+                                  rules: {
+                                      // The key name on the left side is the name attribute
+                                      // of an input field. Validation rules are defined
+                                      // on the right side
+                                      begin:
+                                      {
+                                          required: true,
+                                          minlength: 8,
+                                          maxlength: 8
+                                      },
+                                      end:
+                                          {
+                                              required: true,
+                                              minlength: 8,
+                                              maxlength: 8
+                                          }
+                                  },
+                                  // Specify validation error messages
+                                  messages:
+                                  {
+                                      begin:
+                                      {
+                                          required: "請輸入申請日期",
+                                          minlength: "最小長度為8",
+                                          maxlength: "最大長度為8"
+                                      },
+                                      end:
+                                      {
+                                          required: "請輸入營運日起",
+                                          minlength: "最小長度為8",
+                                          maxlength: "最大長度為8"
+                                      }
+                                  },
+                                  // Make sure the form is submitted to the destination defined
+                                  // in the "action" attribute of the form when valid
+                                  submitHandler: function (form) {
+                                      form.submit();
+                                  }
+                              });
+                          });
+
+</script>
+<style>
+    .my-error-class {
+        color: red;
+    }
+
+    
+</style>
+
+<h2>台鐵調帳申請表查詢</h2>
+
+@using (Html.BeginForm("Index", "TRAADJ", FormMethod.Get, new { name = "frm1", id = "frm1" }))
+{
+    <h4>申請日期</h4>  @Html.TextBox("begin") @: - @Html.TextBox("end")
+<input type="submit" value="搜尋">
+}
+
+<p>
+    @Html.ActionLink("新增帳務調整申請表", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.APP_DATE)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OPP_DATE_START)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OPP_DATE_END)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FORM_SERIAL)
+        </th>
+
+
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.APP_DATE)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OPP_DATE_START)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OPP_DATE_END)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FORM_SERIAL)
+        </td>
+
+        @if(item.MODIFIABLE=="Y")
+        {
+          <td>
+            @Html.ActionLink("編輯申請表", "Edit", new { id=item.FORM_ID }) |
+            @Html.ActionLink("刪除", "Delete", new { id = item.FORM_ID }, new { onClick = "return confirm('確定要刪除?');"}) |
+            @Html.ActionLink("凍結", "Freeze", new { id = item.FORM_ID } )
+            <!--
+            @Html.ActionLink("Details", "Details", new { id=item.FORM_ID }) |
+            -->
+          </td>
+        }
+        else
+        {
+          <td>
+            @Html.ActionLink("檢視申請表", "Viewing", new { id=item.FORM_ID })
+          </td>
+        }
+
+
+    </tr>
+}
+
+</table>

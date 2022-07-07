@@ -1,0 +1,81 @@
+﻿@model AMS.Models.MenuModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>選單列表</h2>
+<p>
+    選擇狀態
+    @Html.DropDownList("MainMenu")
+</p>
+<p>
+    @Html.ActionLink("新增選單", "Create")
+</p>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Roles)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Path)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ParentId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Rank)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.MenuList)
+    {
+        <tr>
+            <td>
+                <font>@item.Id</font>
+            </td>
+            <td>
+                <font> @item.Name</font>
+            </td>
+            <td>
+                <font> @item.Roles</font>
+            </td>
+            <td>
+                <font> @item.Path</font>
+            </td>
+            <td>
+                <font> @item.ParentId</font>
+            </td>
+            <td>
+                <font> @item.Status</font>
+            </td>
+            <td>
+                <font> @item.Rank</font>
+            </td>
+            <td>
+                   @Html.ActionLink("編輯 | ", "Edit", new { id = item.Id })
+                   @Html.ActionLink("刪除", "Delete", new { id = item.Id }, new { onclick = "return confirm('確定要刪除嗎?');" })
+            </td>
+        </tr>
+    }
+</table>
+
+<script>
+
+    $("#MainMenu").change(function () {
+        @*location = "http://" + '@Request.Url.Authority' + '@Request.ApplicationPath' + '/Menu/Index?pid=' + this.value;*@
+        location = '@Request.ApplicationPath' + '/Menu/Index?pid=' + this.value;
+    });
+
+</script>

@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "特約機構維護";
+}
+
+<h2>特約機構維護</h2>
+
+@using (Html.BeginForm("StoreCreate"))
+{
+    @Html.ValidationSummary(true)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">可建立門市主檔的特約機構</h3>
+        </div>
+        <div class="panel-body">
+            @if (ViewBag.hasError)
+            {
+                <div id="div_ErrMsg" class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    儲存失敗
+                    <ul>
+                        @if (ViewBag.errMsg != null)
+                        {
+                            foreach (string err_msg in ViewBag.errMsg)
+                            {
+                                <li>@Html.DisplayFor(m => err_msg)</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+            <div class="form-horizontal">
+                <div class="form-group row">
+                    @Html.Label("特約機構：", new { @class = "control-label col-md-2" })
+                    <div class="col-md-8">
+                        @Html.Partial("_Merchant")
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row text-center">
+                <button type="submit" value="CreateSave" class="btn btn-primary">儲存</button>
+                &nbsp&nbsp
+                <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("MerchantList", "Merchant")'">取消</button>
+            </div>
+        </div>
+    </div>
+}

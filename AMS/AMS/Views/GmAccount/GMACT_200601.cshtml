@@ -1,0 +1,299 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+
+
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+<link href="~/js/bootstrap-select.min.css" rel="stylesheet">
+<script src="~/js/bootstrap-select.min.js"></script>
+@*<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.12/dist/css/bootstrap-select.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.12/dist/js/bootstrap-select.min.js"></script>*@
+<style>
+    .ui-select-wrap .dropdown-box {
+        border: 1px dotted #E5E5E5;
+        border-top: none;
+        display: none;
+        position: absolute;
+        top: 30px;
+        z-index: 2;
+        background-color: #66B0B0;
+        padding: 5px 0;
+        left: -1px;
+    }
+
+    .ui-select-wrap ul li.over {
+        background-color: #EEEEEE;
+        color: #004080;
+        background-color: #CAE3E3;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        $('#SettleDate').datepicker({ dateFormat: 'yymmdd' });
+
+    });
+    $(function () {
+
+        $("#yearMonth").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            calculateWeek: false,
+            showButtonPanel: true,
+            dateFormat: 'yymm',
+
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+
+                $(this).datepicker('setDate', new Date(year, month, 1));
+
+            }
+            
+        });
+        $(".ui-datepicker-calendar").hide();
+    });
+
+    
+    $(document).ready(function () {
+ 
+        $("#yearMonth").focus(function () {
+            $(".ui-datepicker-calendar").hide();
+        });
+        $("#SettleDate").focus(function () {
+            $(".ui-datepicker-calendar").show();
+        });
+        $('.selectpicker').selectpicker({
+            'noneSelectedText': '請選擇'
+        });
+        //$('select').selectpicker();
+        //$("#group option[value='@ViewBag.GROUP_VALUE']").prop("selected", "selected");
+        //$('#group').selectpicker('refresh');
+
+        $('#group').selectpicker('val', @Html.Raw(Json.Encode(@ViewBag.GArray))); //取得回傳值
+        $('#group').selectpicker('refresh');
+
+
+        //$('#group').selectpicker('refresh');
+
+        $("#dateRange option[value='@ViewBag.DateRange_Value']").prop("selected", "selected");
+        $("#invoiceRule option[value='@ViewBag.InvoiceRule_Value']").prop("selected", "selected");
+
+
+        $("#group").change(function () {
+           // alert($("#group").val())
+            if ($("#group").val().includes('ALL')) {
+                $('#group').selectpicker('val', 'ALL');
+                $('#group').selectpicker('refresh');
+
+
+            }
+
+
+        });
+
+
+
+
+
+
+
+    });
+
+
+
+</script>
+
+@*<style>
+        .ui-datepicker-calendar {
+            display: none;
+        }
+    </style>*@
+
+<script type="text/javascript">
+
+    function padding1(num, length) {
+        for (var len = (num + "").length; len < length; len = num.length) {
+            num = "0" + num;
+        }
+        return num;
+    }
+
+</script>
+
+
+<meta name="viewport" content="width=device-width" />
+<title>@ViewBag.RepName</title>
+
+<h2>@ViewBag.RepName</h2>
+
+
+
+@using (Html.BeginForm("GMACT_200601", "GmAccount", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate"> 產出日期:</label>
+        <input type="text" name="SettleDate" id="SettleDate" value="@ViewBag.SettleDate" style="width:100px;" />
+        <label for="yearMonth"> 報表年月:</label>
+        <input type="text" name="yearMonth" id="yearMonth" value="@ViewBag.YearMonth" style="width:100px;" />
+        <label for="Date"> 清分區間:</label>
+        @Html.DropDownList("dateRange", (IEnumerable<SelectListItem>)ViewBag.DateRange, "--請選擇--")
+        <label for="MerchantGroup"> 開立方式:</label>
+        @Html.DropDownList("invoiceRule", (IEnumerable<SelectListItem>)ViewBag.InvoiceRule, "--請選擇--")
+        <label for="MerchantGroup"> 特店群組:</label>
+        @Html.DropDownList("group", (IEnumerable<SelectListItem>)ViewBag.GROUP, new { @class = "selectpicker", @multiple = true })
+        @*<select id="group" class="selectpicker" multiple data-live-search="true">
+
+            </select>*@
+        <div>
+            <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+            <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+            <input type="submit" name="ExportDat" value="匯出DAT" class="btn btn-default" />
+        </div>
+    </div>
+}
+<div><label></label></div>
+@if (Model.Rows.Count > 0)
+{
+    <table class="grid" width="100%">
+        <thead>
+            @*傳票單別	傳票日期	底稿批號	底稿序號	序號	科目代號	空白格式	借貸(D/C)	金額	立沖代號	空白格式	貨幣符號	匯率	空白格式	摘要*@
+            <tr style="background-color: lightgray">
+                <th>
+                    單據編號
+                </th>
+                <th>
+                    日期
+                </th>
+                <th>
+                    客戶代號
+                </th>
+                <th>
+                    未稅
+                </th>
+                <th>
+                    稅額
+                </th>
+                <th>
+                    預計收款日
+                </th>
+                <th>
+                    發票號碼
+                </th>
+                <th>
+                    列號
+                </th>
+                <th>
+                    類別
+                </th>
+                <th>
+                    未稅
+                </th>
+                <th>
+                    稅額
+                </th>
+                <th style="text-align:left">
+                    品名
+                </th>
+                <th>
+                    會計科目
+                </th>
+                <th>
+                    部門代號
+                </th>
+                <th>
+                    預計兌現日
+                </th>
+                <th>
+                    專案代號
+                </th>
+                <th>
+                    備註
+                </th>
+                <th>
+                    B2C統編
+                </th>
+                <th>
+                    數量
+                </th>
+                <th>
+                    單別代號
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        if (j == 11)
+                        {
+                            <td style="text-align:left">@row.ItemArray[j].ToString()</td>
+                        }
+                        else
+                        {
+                            <td>@row.ItemArray[j].ToString()</td>
+                        }
+                    }
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+
+
+

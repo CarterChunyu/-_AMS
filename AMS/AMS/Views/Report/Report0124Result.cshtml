@@ -1,0 +1,258 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@{
+    ViewBag.Title = "Report0124Result";
+}
+
+<!DOCTYPE html>
+<head>
+    <title>@ViewBag.RepName</title>
+    <link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+    <script src="~/js/jquery.dataTables.js"></script>
+
+    <script language="javascript">
+        var StartB = "";
+        var EndB = "";
+        function radselected() {
+            var radObj = document.getElementsByName("condition2");
+            for (var i = 0; i < radObj.length; i++) {
+                if (radObj[i].checked) {
+                    //alert(radObj[i].value);
+                    document.getElementById("spancondi2").style.visibility = "hidden";
+                    if (radObj[i].value == "1") {
+                        StartB = document.getElementsByName("StartB").value;
+                        EndB = document.getElementsByName("EndB").value;
+                        document.getElementsByName("StartB").value = "";
+                        document.getElementsByName("EndB").value = "";
+                    }
+                    else if (radObj[i].value == "2") {
+                        document.getElementsByName("StartB").value = StartB;
+                        document.getElementsByName("EndB").value = EndB;
+                        document.getElementById("spancondi2").style.visibility = "visible";
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+    <style type='text/css'>
+        /*.ui-datepicker-calendar {
+            display: none;
+        }*/
+
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+
+        th {
+            text-align: right;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            text-align: left;
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            background-color: #ffffff;
+            text-align: right;
+        }
+    </style>
+
+    <link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+    <script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#StartA').datepicker({ dateFormat: 'yymmdd' });
+            $('#EndA').datepicker({ dateFormat: 'yymmdd' });
+            $('#StartB').datepicker({ dateFormat: 'yymmdd' });
+            $('#EndB').datepicker({ dateFormat: 'yymmdd' });
+        });
+        $(function validateForm() {
+            var startA = $('#StartA').val();
+            var EndA = $('#EndA').val();
+            var startB = $('#StartB').val();
+            var EndB = $('#EndB').val();
+            //alert("startA:" + startA + "\nEndA:" + EndA);
+            if ((startA != "" && EndA == "") || (startA == "" && EndA != "")) {
+                alert("交易區間起迄不可缺一空白");
+                return false;
+            }
+            if ((startB != "" && EndB == "") || (startB == "" && EndB != "")) {
+                alert("清分區間起迄不可缺一空白");
+                return false;
+            }
+        });
+    </script>
+</head>
+
+<body>
+
+    <h2>@ViewBag.RepName</h2>
+    @*<input type="hidden" value="@ViewBag.totalCnt" />*@
+    @using (Html.BeginForm("Report0124Result", "Report", FormMethod.Post, new { id = "searchForm", onsubmit = "validateForm()" }))
+    {
+        <div>
+            <table>
+                <tr>
+                    <td>條件一、</td>
+                    <td>
+                        <label for="yearMonth"> 交易區間:</label>
+                        <input type="text" name="StartA" id="StartA" value="@ViewBag.StartA" style="width:100px;" autocomplete="off"/> -
+                        <input type="text" name="EndA" id="EndA" value="@ViewBag.EndA" style="width:100px;" autocomplete="off"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>條件二、</td>
+                    <td>
+                        <input type="radio" name="condition2" value="1" onclick="radselected();" @ViewBag.condition2_val_1 />
+                        無
+                        <input type="radio" name="condition2" value="2" onclick="radselected();" @ViewBag.condition2_val_2 />
+                        <label for="yearMonth"> 清分區間:</label>
+                        <span id="spancondi2" style="visibility:@ViewBag.spancondi2_visibility">
+                            <input type="text" name="StartB" id="StartB" value="@ViewBag.StartB" style="width:100px;" autocomplete="off" /> -
+                            <input type="text" name="EndB" id="EndB" value="@ViewBag.EndB" style="width:100px;" autocomplete="off" />
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+                        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    }
+    @*<table border="1" width="100%">
+            <tr>
+                <td align="left">共計筆數:@ViewBag.totalCnt</td>
+                <td align="right">每頁筆數<input type="text" id="PageSize" name="PageSize" value="@ViewBag.PageSize" class="btn btn-default" style="width:50px;"/></td>
+            </tr>
+        </table>*@
+    共計筆數:@ViewBag.totalCnt
+    <table id="report0103" class="grid">
+        <thead>
+            <tr style="background-color: lightgray">
+                <th colspan="10" style="text-align: center;border-top:1px #000 solid;border-bottom:1px #000 solid;border-left:1px #000 solid;border-right:1px #000 solid;">
+                    電支
+                </th>
+                <th colspan="7" style="text-align: center;border-top:1px #000 solid;border-bottom:1px #000 solid;border-right:1px #000 solid;">
+                    電票
+                </th>
+            </tr>
+            <tr style="background-color: lightgray">
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;border-left:1px #000 solid;">
+                    交易類型
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;text-align:center;">
+                    訂單日期
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;text-align:center;">
+                    收款方電支帳號
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;text-align:center;">
+                    付款方電支帳號
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;text-align:center;">
+                    特店訂單編號
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    付款方式
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    款項來源(銀行)
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    信託<br />金額
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    付款狀態
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    人工沖正狀態
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;border-left:1px #000 solid;">
+                    特約機構
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    清算日期
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    門市名稱
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    卡機交易時間
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    卡號
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;">
+                    RRN
+                </th>
+                <th style="border-top:1px #000 solid;border-bottom:1px #000 solid;border-right:1px #000 solid;">
+                    交易金額
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        @*if ((j >= 3 && j <= 6) || (j >= 8 && j <= 11) || (j >= 13 && j <= 16) || (j >= 18 && j <= 21) || (j >= 23 && j <= 26))
+                            {
+                                <td>@Convert.ToInt64(row.ItemArray[j]).ToString("n0")</td>
+                            }
+                            else if (j == 7 || j == 12 || j == 17 || j == 22)
+                            {
+                                <td>@Convert.ToDecimal(row.ItemArray[j]).ToString("n3")</td>
+                            }
+                            else
+                            {
+                                <td>@row.ItemArray[j].ToString()</td>
+                            }*@
+                        if (j == 0 || j == 10)
+                        {
+                            <td style="border-left:1px #000 solid;">@row.ItemArray[j].ToString()</td>
+                        }
+                        else if (j == 16)
+                        {
+                            <td style="border-right:1px #000 solid;">@row.ItemArray[j].ToString()</td>
+                        }
+                        else
+                        {
+                            <td>@row.ItemArray[j].ToString()</td>
+                        }
+                    }
+                </tr>
+            }
+
+        </tbody>
+    </table>
+
+</body>

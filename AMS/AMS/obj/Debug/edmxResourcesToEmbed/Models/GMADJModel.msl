@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="AMSModelsStoreContainer" CdmEntityContainer="GMADJEntities">
+    <EntitySetMapping Name="GM_ADJ_APPLICATION">
+      <EntityTypeMapping TypeName="AMS.Models.GM_ADJ_APPLICATION">
+        <MappingFragment StoreEntitySet="GM_ADJ_APPLICATION">
+          <ScalarProperty Name="FORM_ID" ColumnName="FORM_ID" />
+          <ScalarProperty Name="APP_DATE" ColumnName="APP_DATE" />
+          <ScalarProperty Name="OPP_DATE_START" ColumnName="OPP_DATE_START" />
+          <ScalarProperty Name="OPP_DATE_END" ColumnName="OPP_DATE_END" />
+          <ScalarProperty Name="FORM_SERIAL" ColumnName="FORM_SERIAL" />
+          <ScalarProperty Name="RCPT_DATE" ColumnName="RCPT_DATE" />
+          <ScalarProperty Name="MODIFIABLE" ColumnName="MODIFIABLE" />
+          <ScalarProperty Name="ADJ_REMARK" ColumnName="ADJ_REMARK" />
+          <ScalarProperty Name="REPLY_REMARK" ColumnName="REPLY_REMARK" />
+          <ScalarProperty Name="MERCHANT_NO" ColumnName="MERCHANT_NO" />
+          <ScalarProperty Name="CREATE_DATETIME" ColumnName="CREATE_DATETIME" />
+          <ScalarProperty Name="UPDATE_DATETIME" ColumnName="UPDATE_DATETIME" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GM_ADJ_APPLICATION_ITEM">
+      <EntityTypeMapping TypeName="AMS.Models.GM_ADJ_APPLICATION_ITEM">
+        <MappingFragment StoreEntitySet="GM_ADJ_APPLICATION_ITEM">
+          <ScalarProperty Name="APP_ITEM_ID" ColumnName="APP_ITEM_ID" />
+          <ScalarProperty Name="ARAP" ColumnName="ARAP" />
+          <ScalarProperty Name="TRANS_TYPE" ColumnName="TRANS_TYPE" />
+          <ScalarProperty Name="FORM_ID" ColumnName="FORM_ID" />
+          <ScalarProperty Name="REMARK" ColumnName="REMARK" />
+          <ScalarProperty Name="TRANS_CNT" ColumnName="TRANS_CNT" />
+          <ScalarProperty Name="TRANS_AMT" ColumnName="TRANS_AMT" />
+          <ScalarProperty Name="CREATE_DATETIME" ColumnName="CREATE_DATETIME" />
+          <ScalarProperty Name="UPDATE_DATETIME" ColumnName="UPDATE_DATETIME" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

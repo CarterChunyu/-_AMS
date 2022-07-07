@@ -1,0 +1,191 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+
+
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#SettleDate').datepicker({ dateFormat: 'yymmdd' });
+
+    });
+    function padding1(num, length) {
+        for (var len = (num + "").length; len < length; len = num.length) {
+            num = "0" + num;
+        }
+        return num;
+    }
+
+</script>
+@*<script type="text/javascript">
+        window.onload = timedMsg;
+        function timedMsg()
+        {
+            var t=setTimeout("alert('5 seconds!')",5000)
+        }
+    </script>*@
+
+
+<meta name="viewport" content="width=device-width" />
+<title>@ViewBag.RepName</title>
+
+<h2>@ViewBag.RepName</h2>
+
+
+
+@*@using (Html.BeginForm("GMACT_INDEX", "GmAccount", FormMethod.Post, new { id = "searchForm" }))*@
+@using (Html.BeginForm("Index", "GmAccount", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        @Html.Partial("_Merchant")
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+
+}
+
+@if (Model.Rows.Count > 0)
+{
+    <table class="grid" width="100%">
+        <thead>
+            @*傳票單別	傳票日期	底稿批號	底稿序號	序號	科目代號	空白格式	借貸(D/C)	金額	立沖代號	空白格式	貨幣符號	匯率	空白格式	摘要*@
+            <tr style="background-color: lightgray">
+                <th>
+                    特約機構代碼
+                </th>
+                <th>
+                    AMS名稱
+                </th>
+                <th>
+                    門市代號對應值
+                </th>
+                <th>
+                    摘要欄位
+                </th>
+                <th>
+                    類別
+                </th>
+                <th>
+                    撥付類別
+                </th>
+                <th>
+                    關係人
+                </th>
+                <th>門市代號對應值(手續費)</th>
+                @*<th>開立方式(手續費)</th>
+                <th>關係人(手續費)</th>
+                <th>性質</th>
+                <th>特店簡稱</th>
+                <th>結算週期</th>
+                <th>結算方式</th>
+                <th>手續費收款日</th>
+                <th>來源表格&規則</th>
+                <th>預設開立(顯示/不顯示)</th>
+                <th>部門</th>
+                <th>專案代號</th>
+                <th>會計科目</th>
+                <th>單別代號</th>*@
+
+                @*<th width ="80px">
+                        加值借方科目(正數)
+                    </th>
+                    <th width="80px">
+                        購貨貸方科目(正數)
+                    </th>
+                    <th width="80px">
+                        加值貸方科目(負數)
+                    </th>
+                    <th width="80px">
+                        購貨借方科目(負數)
+                    </th>*@
+                <th>
+
+                </th>
+
+
+
+            </tr>
+        </thead>
+        <tbody>
+
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        if (j < 8)
+                        {
+                            <td>@row.ItemArray[j].ToString()</td>
+                        }
+                        if (j == row.ItemArray.Length - 1)
+                        {
+
+                            var editLink = Url.Action("Edit", new { merchant = row["MERCHANT_NO"] });
+                            <td><a href="@editLink" title="編輯">編輯</a></td>
+
+                            //<td>@Html.ActionLink("編輯", "Edit", new { merchant = row["MERCHANT_NO"] }) </td>
+                        }
+                    }
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+
+
+
+

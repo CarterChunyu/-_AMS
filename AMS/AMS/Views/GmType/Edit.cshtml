@@ -1,0 +1,58 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+}
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#group_id option[value='@ViewBag.GROUP_ID_VALUES']").prop("selected", "selected");
+    })
+</script>
+
+<meta name="viewport" content="width=device-width" />
+<title>@ViewBag.RepName</title>
+<h2>@ViewBag.RepName</h2>
+
+
+<div class="form-horizontal">
+
+    @using (Html.BeginForm("Update", "GmType", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div class="form-group">
+            <label for="mno" class="control-label col-md-2">特約機構 :</label>
+            <div class="col-md-10">
+                @ViewBag.MERCHANT_NAME
+            </div>
+            <input type="hidden" name="MERCHANT_NO" id="MERCHANT_NO" value="@ViewBag.MERCHANT_NO" readonly class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">群組 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("group_id", (IEnumerable<SelectListItem>)ViewBag.GROUP_ID, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">順序 :</label>
+            <div class="col-md-10">
+                <input type="number" name="SHOW_ORDER" id="SHOW_ORDER" min="1" max="999" value="@ViewBag.SHOW_ORDER" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <input type="submit" name="searchConfirm" value="更新" class="btn btn-default" />
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <label for="mname" class="control-label col-md-2"></label>
+        <div class="col-md-10">
+            <input type="submit" name="back" value="取消" class="btn btn-default" onclick="history.back()" />
+        </div>
+    </div>
+</div>
+

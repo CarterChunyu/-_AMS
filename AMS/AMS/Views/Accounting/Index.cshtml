@@ -1,0 +1,41 @@
+﻿@model AMS.Models.AmEntReceDModel
+@{
+    ViewBag.Title = "收款明細查詢";
+}
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yy-mm-dd' });
+        $('#EndDate').datepicker({ dateFormat: 'yy-mm-dd' });
+    });
+</script>
+
+<h2>收款明細查詢</h2>
+
+@using (Html.BeginForm("Result", "Accounting", FormMethod.Post, new { id = "searchForm" }))
+{
+    @Html.AntiForgeryToken()
+    <div>
+        @Html.LabelFor(model => model.ActDate)
+        <input type="text" name="StartDate" id="StartDate" value="" style="width:100px;" /> -
+        <input type="text" name="EndDate" id="EndDate" value="" style="width:100px;" />
+
+        @Html.LabelFor(model => model.ReceType)
+        @Html.DropDownList("ReceTypeSearch")
+
+        @Html.LabelFor(model => model.CaseNo)<input type="text" name="CaseNoSearch" value="" maxlength="20" style="width:120px;" />
+
+        @Html.LabelFor(model => model.CheckStatus)
+        @Html.DropDownList("CheckStatusSearch")
+
+        @Html.LabelFor(model => model.AcctCheckStatus)
+        @Html.DropDownList("AcctCheckStatusSearch")
+        <input type="submit" value="搜尋" class="btn btn-default" />
+    </div>
+}
+
+
+

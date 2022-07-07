@@ -1,0 +1,39 @@
+﻿body {
+    font-family: 微軟正黑體, Helvetica, Arial,sans-serif;
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-family: 微軟正黑體, Helvetica, Arial,sans-serif;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.msg {
+    color: blue;
+}

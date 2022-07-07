@@ -1,0 +1,161 @@
+﻿@*@model Domain.Entities.GmMerInput*@
+@model AMS.Models.GmMerModel
+
+@{
+    ViewBag.Title = "CheckCreation";
+}
+
+<h2>新增確認</h2>
+
+<div>
+    <h4>請再次確認內容正確</h4>
+	<hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MERCHANT_NO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MERCHANT_NO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MERC_GROUP)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MERC_GROUP)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MERCHANT_NAME)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MERCHANT_NAME)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MERCHANT_STNAME)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MERCHANT_STNAME)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.INVOICE_NO)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.INVOICE_NO)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MERCH_TMID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MERCH_TMID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OL_TYPE)
+        </dt>
+
+
+        @if (@Model.OL_TYPE == "1")
+        {<dd>僅加值</dd>}
+        @if (@Model.OL_TYPE == "2")
+        {<dd>僅自動加值</dd>}
+        @if (@Model.OL_TYPE == "3")
+        {<dd>加值&自動加值</dd>}
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PUR_FEE_RATE)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PUR_FEE_RATE)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LOAD_FEE_RATE)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LOAD_FEE_RATE)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AUTO_LOAD_FEE_RATE)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AUTO_LOAD_FEE_RATE)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.REM_TYPE)
+        </dt>
+
+       @* <dd>*@
+            @if (@Model.REM_TYPE=="D") {<dd>日</dd>}  
+            @if (@Model.REM_TYPE=="W") {<dd>周</dd>}
+            @if (@Model.REM_TYPE=="M") {<dd>月</dd>}
+            
+        @*</dd>*@
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DAYLY_REM_DAY)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DAYLY_REM_DAY)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.REM_FEE_TYPE)
+        </dt>
+
+
+        @if (@Model.REM_FEE_TYPE == "D")
+        {
+        <dd>日</dd>}
+        @if (@Model.REM_FEE_TYPE == "W")
+        {
+        <dd>周</dd>}
+        @if (@Model.REM_FEE_TYPE == "M")
+        {
+        <dd>月</dd>}
+                  
+        <dt>
+            @Html.DisplayNameFor(model => model.DAYLY_REM_FEE_DAY)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DAYLY_REM_FEE_DAY)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.GROUP_ID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.GROUP_ID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BUILD_USER)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BUILD_USER)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("確定送出", "InsertToDB", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("取消", "Index")
+</p>

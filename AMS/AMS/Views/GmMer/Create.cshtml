@@ -1,0 +1,166 @@
+﻿@*@model Domain.Entities.GmMerInput*@
+@model AMS.Models.GmMerModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>新增特約機構</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @*<h4>GmMerInput</h4>*@
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MERCHANT_NO, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBox("MERCHANT_NO", TempData["MERCHANT_NO"], new { @class = "form-control",@readonly = "readonly" })
+                @Html.ValidationMessageFor(model => model.MERCHANT_NO, "", new { @class = "text-danger" })     
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MERC_GROUP, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("MERC_GROUP")
+                @Html.ValidationMessageFor(model => model.MERC_GROUP, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MERCHANT_NAME, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.MERCHANT_NAME, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.MERCHANT_NAME, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MERCHANT_STNAME, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.MERCHANT_STNAME, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.MERCHANT_STNAME, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.INVOICE_NO, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.INVOICE_NO, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.INVOICE_NO, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MERCH_TMID, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.MERCH_TMID, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.MERCH_TMID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OL_TYPE, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("OL_TYPE")
+                @Html.ValidationMessageFor(model => model.OL_TYPE, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PUR_FEE_RATE, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.PUR_FEE_RATE, new { @class = "form-control", @placeholder = "EX:1.5% 請輸入1.5" })
+                @Html.ValidationMessageFor(model => model.PUR_FEE_RATE, "", new { @class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LOAD_FEE_RATE, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.LOAD_FEE_RATE, new { @class = "form-control", @placeholder = "EX:1.5% 請輸入1.5" })
+                @Html.ValidationMessageFor(model => model.LOAD_FEE_RATE, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AUTO_LOAD_FEE_RATE, new { @class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.AUTO_LOAD_FEE_RATE, new { @class = "form-control", @placeholder = "EX:1.5% 請輸入1.5" })
+                @Html.ValidationMessageFor(model => model.AUTO_LOAD_FEE_RATE, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.REM_TYPE, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("REM_TYPE")
+                @Html.ValidationMessageFor(model => model.REM_TYPE, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DAYLY_REM_DAY, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.DAYLY_REM_DAY, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DAYLY_REM_DAY, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.REM_FEE_TYPE, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("REM_FEE_TYPE")
+                @Html.ValidationMessageFor(model => model.REM_FEE_TYPE, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.DAYLY_REM_FEE_DAY, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.DAYLY_REM_FEE_DAY, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.DAYLY_REM_FEE_DAY, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.GROUP_ID, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("GROUP_ID")
+                @Html.ValidationMessageFor(model => model.GROUP_ID, "", new {@class="text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BUILD_USER, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.BUILD_USER, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.BUILD_USER, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="新增" class="btn btn-default"  />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("返回", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+}
+
+
+

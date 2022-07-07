@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "門市主檔維護";
+}
+
+<h2>門市主檔維護</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">@string.Format(@"{0}門市主檔", ViewBag.ACTION_TYPE)</h3>
+        </div>
+        <div class="panel-body">
+            @if (ViewBag.hasError)
+            {
+                <div id="div_ErrMsg" class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    儲存失敗
+                    <ul>
+                        @if (ViewBag.errMsg != null)
+                        {
+                            foreach (string err_msg in ViewBag.errMsg)
+                            {
+                                <li>@Html.DisplayFor(m => err_msg)</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+            <div class="form-horizontal">
+                <div class="form-group row">
+                    @Html.Label(@"特約機構", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @{
+                            string group_id = ViewBag.GROUP_ID;
+                            string merchant_no = ViewBag.MERCHANT_NO;
+                            string merchant_name = ViewBag.MERCHANT_NAME;
+                            string name = string.Format(string.Format(@"{0}({1})", ViewBag.MERCHANT_NAME, ViewBag.MERCHANT_NO));
+                         }
+                        @Html.Label("Label_Merchant", @name, new { @class = "control-label" })
+                        @Html.Hidden("Hidden_Group_ID", @group_id)
+                        @Html.Hidden("Hidden_Merchant_Name", @merchant_name)
+                        @Html.Hidden("Hidden_Merchant_No", @merchant_no)
+                    </div>
+                </div>
+                @if (ViewBag.STORE_TYPE == @"RETAIL_1")
+                { @Html.Partial("_Store_Retail_1"); }
+                else if (ViewBag.STORE_TYPE == @"TRACK_1")
+                { @Html.Partial("_Store_Track_1"); }
+                else if (ViewBag.STORE_TYPE == @"TRAFFIC_1")
+                { @Html.Partial("_Store_Traffic_1"); }
+                else
+                { @Html.Label(@"※ 此特約機構未提供維護門市主檔", new { @class = "text-danger" }); }
+            </div>
+            <hr />
+            <div class="row text-center">
+                @if (ViewBag.STORE_TYPE == @"RETAIL_1" || ViewBag.STORE_TYPE == @"TRACK_1" || ViewBag.STORE_TYPE == @"TRAFFIC_1")
+                { <button type="submit" value="CreateSave" class="btn btn-primary">儲存</button> }
+                &nbsp&nbsp
+                <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("StoreList", "Merchant", new { group_id = @ViewBag.GROUP_ID, merchant_no = @ViewBag.MERCHANT_NO })'">取消</button>
+            </div>
+        </div>
+    </div>
+}

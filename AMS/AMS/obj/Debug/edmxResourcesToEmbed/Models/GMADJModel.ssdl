@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="AMS.Models.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="GM_ADJ_APPLICATION">
+    <Key>
+      <PropertyRef Name="FORM_ID" />
+    </Key>
+    <Property Name="FORM_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="APP_DATE" Type="varchar" MaxLength="8" Nullable="false" />
+    <Property Name="OPP_DATE_START" Type="varchar" MaxLength="8" Nullable="false" />
+    <Property Name="OPP_DATE_END" Type="varchar" MaxLength="8" Nullable="false" />
+    <Property Name="FORM_SERIAL" Type="varchar" MaxLength="15" Nullable="false" />
+    <Property Name="RCPT_DATE" Type="varchar" MaxLength="8" />
+    <Property Name="MODIFIABLE" Type="char" MaxLength="1" Nullable="false" />
+    <Property Name="ADJ_REMARK" Type="varchar" MaxLength="100" />
+    <Property Name="REPLY_REMARK" Type="varchar" MaxLength="100" />
+    <Property Name="MERCHANT_NO" Type="varchar" MaxLength="8" Nullable="false" />
+    <Property Name="CREATE_DATETIME" Type="varchar" MaxLength="14" />
+    <Property Name="UPDATE_DATETIME" Type="varchar" MaxLength="14" />
+  </EntityType>
+  <EntityType Name="GM_ADJ_APPLICATION_ITEM">
+    <Key>
+      <PropertyRef Name="APP_ITEM_ID" />
+    </Key>
+    <Property Name="APP_ITEM_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ARAP" Type="char" MaxLength="2" Nullable="false" />
+    <Property Name="TRANS_TYPE" Type="varchar" MaxLength="7" Nullable="false" />
+    <Property Name="FORM_ID" Type="int" Nullable="false" />
+    <Property Name="REMARK" Type="varchar" MaxLength="100" />
+    <Property Name="TRANS_CNT" Type="int" />
+    <Property Name="TRANS_AMT" Type="numeric" Precision="13" Scale="5" />
+    <Property Name="CREATE_DATETIME" Type="varchar" MaxLength="14" />
+    <Property Name="UPDATE_DATETIME" Type="varchar" MaxLength="14" />
+  </EntityType>
+  <EntityContainer Name="AMSModelsStoreContainer">
+    <EntitySet Name="GM_ADJ_APPLICATION" EntityType="Self.GM_ADJ_APPLICATION" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="GM_ADJ_APPLICATION_ITEM" EntityType="Self.GM_ADJ_APPLICATION_ITEM" Schema="dbo" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

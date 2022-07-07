@@ -1,0 +1,165 @@
+﻿@model AMS.Models.CrBankAdjcaseMTmpModel
+@using Domain.Entities;
+@using PagedList;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "調帳查詢";
+}
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+        $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+</script>
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<script type="text/javascript" language="javascript" class="init">
+
+    $(document).ready(function () {
+        $('#example').dataTable({
+
+            "order": [[1, "asc"]],
+            "paging": false
+        });
+    });
+
+
+</script>
+
+
+<h2>調帳查詢</h2>
+
+@if (TempData["message"] != null)
+{
+    <script type="text/javascript">
+        var message = @Html.Raw(Json.Encode(TempData["message"]))
+        alert(message);
+    </script>
+}
+
+@using (Html.BeginForm("BankAdjIndex", "BankAdj", FormMethod.Post, new { id = "searchForm" }))
+{
+    @Html.AntiForgeryToken()
+    <div>
+        @Html.LabelFor(model => model.AdjDate)
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" style="width:100px;" /> -
+        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" style="width:100px;" />
+
+        @Html.LabelFor(model => model.Status)
+        @Html.DropDownList("StatusSearch")
+
+        <input type="submit" name="SearchConfirm" value="搜尋" class="btn btn-default" />
+    </div>
+}
+@if (ViewBag.UserRole == "Sales")
+{
+<p>
+    @Html.ActionLink("新增帳務調整", "CreateBankAdj")
+</p>
+}
+@if (Model.CrBankAdjcaseMTmpList != null)
+{
+    if (Model.CrBankAdjcaseMTmpList.Count() > 0)
+    {
+        <font>共 @Model.CrBankAdjcaseMTmpList.Count() 筆</font>
+        <table class="table" id="example">
+            <thead>
+                <tr>
+                    <th>
+                        項次
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AdjCaseNo)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AdjCaseInfo)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AdjCaseContext)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AdjDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CptDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.RemittanceDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AdjFlag)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UpdateUser)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UptDatetime)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{int iCount = 0;}
+                @foreach (var item in Model.CrBankAdjcaseMTmpList)
+                {
+                    iCount++;
+                    <tr>
+                        <td>
+                            <font>@iCount</font>
+                        </td>
+                        <td>
+                            <font>@item.AdjCaseNo</font>
+                        </td>
+                        <td>
+                            <font> @item.AdjCaseInfo</font>
+                        </td>
+                        <td>
+                            <font> @item.AdjCaseContext</font>
+                        </td>
+                        <td>
+                            <font> @item.AdjDate</font>
+                        </td>
+                        <td>
+                            <font> @item.CptDate</font>
+                        </td>
+                        <td>
+                            <font>@item.RemittanceDate</font>
+                        </td>
+                        <td>
+                            <font> @item.AdjFlag</font>
+                        </td>
+                        <td>
+                            <font> @item.Status</font>
+                        </td>
+                        <td>
+                            <font> @item.UpdateUser</font>
+                        </td>
+                        <td>
+                            <font>@item.UptDatetime</font>
+                        </td>
+                        <td width="50">
+                            @Html.ActionLink("明細", "CreateBankAdjD", new { adjCaseNo = item.AdjCaseNo, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, statusSearch = ViewBag.StatusSel }) <br />
+                            @Html.ActionLink("編輯", "EditBankAdj", new { adjCaseNo = item.AdjCaseNo, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, statusSearch = ViewBag.StatusSel })
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <font color="red">查無資料</font>
+    }
+}
+

@@ -1,0 +1,74 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+}
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('.date-picker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'yymm',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).datepicker('setDate', new Date(year, month, 1));
+            }
+        });
+    });
+</script>
+<style>
+    .ui-datepicker-calendar {
+        display: none;
+    }
+</style>
+<h2>儲值餘額明細查詢</h2>
+
+@using (Html.BeginForm("Report0111Detail", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    @Html.AntiForgeryToken()
+    <div>
+        <label for="startDate">年月 :</label>
+        <input name="startDate" id="startDate" class="date-picker" value="@ViewBag.StartYMD" style="width:100px;" />
+        <input type="submit" value="搜尋" class="btn btn-default" />
+    </div>
+}
+
+<table class="table table-hover table-bordered">
+    <tr class="active">
+        @foreach (DataColumn col in Model.Columns)
+        {
+            <td>@col.ColumnName</td>
+        }
+    </tr>
+    
+    @foreach (DataRow row in Model.Rows)
+    {
+        int j = 0;
+        <tr class="warning">
+            @foreach (DataColumn col in Model.Columns)
+            {
+                string colValue = row[col.ColumnName].ToString();
+                j++;
+                if (j > 5)
+                {
+                    Int32 t = Int32.Parse(row[col.ColumnName].ToString());
+                    colValue = t.ToString("N", nfi);
+                }
+                <td align="right">@colValue</td>
+            }
+        </tr>
+    }
+</table>
+
+@using (Html.BeginForm("Report0111Result", "Report", FormMethod.Post))
+{
+    <input type="hidden" name="startDate" value="@ViewBag.StartYM" />
+    <button class="btn btn-success" type="submit">回查詢列表</button>
+}

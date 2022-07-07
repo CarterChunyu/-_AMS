@@ -1,0 +1,176 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+@*<style type='text/css'>
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            text-align: left;
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            background-color: #ffffff;
+            text-align: right;
+        }
+    </style>*@
+
+<style>
+    body {
+        white-space: nowrap;
+    }
+    .ui-datepicker-calendar {
+        display: none;
+    }
+</style>
+
+
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('.date-picker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'yymm',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).datepicker('setDate', new Date(year, month, 1));
+            }
+        });
+    });
+</script>
+
+
+
+<title>每日代墊款資料</title>
+
+<h2>每日代墊款資料</h2>
+
+@using (Html.BeginForm("Index", "ICASHOPOverdraft", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">報表年月：</label>
+        <input type="text" name="REPORT_YM" id="REPORT_YM" value="@ViewBag.REPORT_YM" style="width:100px;" class="date-picker" />
+        @*<label for="group">機構群組：</label>
+            <input type="checkbox" name="MerchantGroup" id="TaiYa" value="TaiYa" @ViewBag.CH_TAIYA /><label for="TaiYa">台亞</label>
+            <input type="checkbox" name="MerchantGroup" id="TaiSu" value="TaiSu" @ViewBag.CH_TAISU /><label for="TaiSu">台塑</label>
+            <input type="checkbox" name="MerchantGroup" id="XiOu" value="XiOu" @ViewBag.CH_XIOU /><label for="XiOu">西歐</label>
+            <input type="checkbox" name="MerchantGroup" id="FuMou" value="FuMou" @ViewBag.CH_FUMOU /><label for="FuMou">福懋</label>
+            <input type="checkbox" name="MerchantGroup" id="TongYiDuJiaCun" value="TongYiDuJiaCun" @ViewBag.CH_TONGYIDUJIACUN /><label for="TongYiDuJiaCun">統一渡假村</label>
+            <label>日期類別：</label>*@
+
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" onclick="Excel();" />
+    </div>
+}
+
+@if (ViewBag.OverdraftList != null)
+{
+    <table  class="table table-hover table-bordered">
+        @*<thead>
+            <tr class="active">
+                <th>點數日結日期</th>
+                <th>通路代號</th>
+                <th>店號</th>
+                <th>機號</th>
+                <th>交易序號</th>
+                <th>交易時間</th>
+                <th>卡別</th>
+                <th>卡號</th>
+                <th>點別</th>
+                <th>OP代墊負點數</th>
+                <th>用戶補正負點數</th>
+                <th>銷帳編號</th>
+                <th>建立日期</th>
+                <th>檔案名稱</th>
+            </tr>
+        </thead>*@
+        <tbody>
+            <tr class="active">
+                <th class="text-center">點數日結日期</th>
+                <th class="text-center">通路代號</th>
+                <th class="text-center">店號</th>
+                <th class="text-center">機號</th>
+                <th class="text-center">交易序號</th>
+                <th class="text-center">交易時間</th>
+                <th class="text-center">卡別</th>
+                <th class="text-center">卡號</th>
+                <th class="text-center">點別</th>
+                <th class="text-center">OP代墊負點數</th>
+                <th class="text-center">用戶補正負點數</th>
+                <th class="text-center">銷帳編號</th>
+                <th class="text-center">建立日期</th>
+                <th class="text-center">檔案名稱</th>
+            </tr>
+            @foreach(var item in ViewBag.OverdraftList)
+            {
+            <tr class="warning">
+                <td class="text-center">@item.CptDate</td>
+                <td class="text-center">@item.UnifiedBusinessNo</td>
+                <td class="text-center">@item.StoreNo</td>
+                <td class="text-center">@item.PosNo</td>
+                <td class="text-center">@item.TransNo</td>
+                <td class="text-center">@item.TransDate</td>
+                <td class="text-center">@item.CardType</td>
+                <td class="text-center">@item.CardNo</td>
+                <td class="text-center">@item.PointType</td>
+                <td class="text-right">@item.OverdraftPoint</td>
+                <td class="text-right">@item.CorrectionPoint</td>
+                <td class="text-center">@item.WriteOffNo</td>
+                <td class="text-center">@item.CreateDate</td>
+                <td class="text-center">@item.FileName</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+
+    <table class="table table-hover table-bordered">
+        <tbody>
+            <tr class="active">
+                <td style="width:15%;text-align:center">OP代墊總點數</td>
+                <td class="warning" style="text-align:right">@ViewBag.OverdraftPointTotal</td>
+                <td style="width:15%;text-align:center">用戶補正總點數</td>
+                <td class="warning" style="text-align:right">@ViewBag.CorrectionPointTotal</td>
+                <td style="width:15%;text-align:center">代墊+補正總點數</td>
+                <td class="warning" style="text-align:right">@ViewBag.OverdraftAndCorrectionTotal</td>
+            </tr>
+        </tbody>
+    </table>
+        }

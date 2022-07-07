@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{098926D8-2C07-460F-9831-EF636843D19D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Domain</RootNamespace>
+    <AssemblyName>Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACInvoiceData.cs" />
+    <Compile Include="ACInvoiceData2021.cs" />
+    <Compile Include="ACInvoiceRewardReport2021.cs" />
+    <Compile Include="AmAccountRole.cs" />
+    <Compile Include="BmStoreM.cs" />
+    <Compile Include="BmStoreno.cs" />
+    <Compile Include="CoBrandedSellSponsorship\QueryBankDataReq.cs" />
+    <Compile Include="CoBrandedSellSponsorship\QueryYearBankDetailReq.cs" />
+    <Compile Include="CoBrandedSellSponsorship\QueryYearBankDetailRes.cs" />
+    <Compile Include="CoBrandedSellSponsorship\QueryYearBankReq.cs" />
+    <Compile Include="CoBrandedSellSponsorship\QueryYearBankRes.cs" />
+    <Compile Include="CoBrandedSellSponsorship\SaveBankDataReq.cs" />
+    <Compile Include="CoBrandedSellSponsorship\SaveDetailQuotaReq.cs" />
+    <Compile Include="CoBrandedSellSponsorship\SaveDetailTrackReq.cs" />
+    <Compile Include="CoBrandedSellSponsorship\SavePayTargetReq.cs" />
+    <Compile Include="CoBrandedSellSponsorship\SaveRangeDataReq.cs" />
+    <Compile Include="Common\CustomException.cs" />
+    <Compile Include="Common\ExecInfo.cs" />
+    <Compile Include="Common\PageCountViewModel.cs" />
+    <Compile Include="Common\TaskInfo.cs" />
+    <Compile Include="Entities\AbstractDO.cs" />
+    <Compile Include="Entities\AmChoice.cs" />
+    <Compile Include="Entities\AmEntAccountD.cs" />
+    <Compile Include="Entities\AmEntAcctD.cs" />
+    <Compile Include="Entities\AmEntReceD.cs" />
+    <Compile Include="Entities\AmEntReceLogD.cs" />
+    <Compile Include="Entities\AmRoles.cs" />
+    <Compile Include="Entities\AmUsers.cs" />
+    <Compile Include="Entities\AmMenu.cs" />
+    <Compile Include="Entities\BmTransType.cs" />
+    <Compile Include="Entities\CmBankD.cs" />
+    <Compile Include="Entities\CrBankAdjcaseD.cs" />
+    <Compile Include="Entities\CrBankAdjcaseDTmp.cs" />
+    <Compile Include="Entities\CrBankAdjcaseM.cs" />
+    <Compile Include="Entities\CrBankAdjcaseMTmp.cs" />
+    <Compile Include="Entities\GmMerInput.cs" />
+    <Compile Include="Entities\GM_BUILD_MERCHANT_LOG.cs" />
+    <Compile Include="Entities\GM_MERC_GROUP_SETTING_M.cs" />
+    <Compile Include="Entities\IbonActivity.cs" />
+    <Compile Include="Entities\Report0112.cs" />
+    <Compile Include="GmAccountActStore.cs" />
+    <Compile Include="GmCodeMapping.cs" />
+    <Compile Include="GmMerchant.cs" />
+    <Compile Include="GmMerchantStore.cs" />
+    <Compile Include="GmType.cs" />
+    <Compile Include="GmMerchTM.cs" />
+    <Compile Include="GmSchemaObj.cs" />
+    <Compile Include="ICASHOPMerchantStore\DownloadReq.cs" />
+    <Compile Include="ICASHOPMerchantStore\ImportFileInfo.cs" />
+    <Compile Include="ICASHOPMerchantSynchronize\SynchronizeRequest.cs" />
+    <Compile Include="ICASHOPMerchant\EditReq.cs" />
+    <Compile Include="ICASHOPMerchant\EditSaveReq.cs" />
+    <Compile Include="ICASHOPMerchant\QueryReq.cs" />
+    <Compile Include="ICASHOPOverdraft\OverdraftData.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebPasswordLog.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

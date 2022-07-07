@@ -1,0 +1,24 @@
+﻿@{
+    ViewBag.Title = "收款明細查詢";
+}
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+</script>
+
+<h2>收款明細查詢</h2>
+
+@using (Html.BeginForm("Report0811Export", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    @Html.AntiForgeryToken()
+    <div>
+        <label for="startDate">年月日 :</label>
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartYMD" style="width:100px;" /> 
+        <input type="submit" value="匯出檔案" class="btn btn-default" />
+    </div>
+}

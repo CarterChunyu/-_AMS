@@ -1,0 +1,523 @@
+
+
+--DECLARE @EXEC_CPT_DATE_B VARCHAR(8) = '20200501' 
+--DECLARE @EXEC_CPT_DATE_E VARCHAR(8) = '20200531' 
+--DECLARE @EXEC_MERCHANT_NO VARCHAR(8) = '82838821'
+--DECLARE @EXEC_CPT_DATE VARCHAR(8) = '20200501'
+--DECLARE @YEARMONTH VARCHAR(8) = '20200601'
+DECLARE @EXEC_YM VARCHAR(8) = CONVERT(VARCHAR, DATEADD(MONTH,1,CONVERT(datetime,@YEARMONTH,112)),112)
+--DECLARE @DATE_RANGE VARCHAR(3) = 'ALL'
+
+DECLARE @EXEC_CPT_DATE_B VARCHAR(8)
+DECLARE @EXEC_CPT_DATE_E VARCHAR(8)
+
+SELECT @EXEC_CPT_DATE_B = GET_SUM_DATE.SDATE,
+       @EXEC_CPT_DATE_E = GET_SUM_DATE.EDATE
+FROM
+(
+	SELECT
+		CASE WHEN SUM_DAY_S = '99' THEN CONVERT(VARCHAR(8), DATEADD(DAY, -1				, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (SUM_MON_S + 1), '')), 112)
+								   ELSE CONVERT(VARCHAR(8), DATEADD(DAY, -1 + SUM_DAY_S	, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (SUM_MON_S + 0), '')), 112) END AS 'SDATE',
+		CASE WHEN SUM_DAY_E = '99' THEN CONVERT(VARCHAR(8), DATEADD(DAY, -1				, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (SUM_MON_E + 1), '')), 112)
+								   ELSE CONVERT(VARCHAR(8), DATEADD(DAY, -1 + SUM_DAY_E	, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (SUM_MON_E + 0), '')), 112) END AS 'EDATE'
+		,SUM_DAY_S,SUM_DAY_E
+	FROM	GM_CONTRACT_M
+	WHERE	MERCHANT_NO = @EXEC_MERCHANT_NO
+		AND	@EXEC_CPT_DATE BETWEEN EFF_DATE_FROM AND EFF_DATE_TO
+)GET_SUM_DATE
+
+
+DECLARE @T TABLE(
+MERCHANT_NO VARCHAR(20),
+MERCHANT_NAME VARCHAR(50),
+MERCHANT_STNAME VARCHAR(50),
+P_NET BIGINT,
+SP1 VARCHAR(1),
+SP2 VARCHAR(1),
+P_RATE DECIMAL(15,5),
+P_FEE BIGINT,
+P_UNTAX BIGINT,
+P_TAX BIGINT,
+LOAD_NET BIGINT,
+SP3 VARCHAR(1),
+SP4 VARCHAR(1),
+LOAD_RATE DECIMAL(10,5),
+LOAD_FEE BIGINT,
+LOAD_UNTAX BIGINT,
+LOAD_TAX BIGINT,
+ALOAD_NET BIGINT,
+SP5 VARCHAR(1),
+SP6 VARCHAR(1),
+ALOAD_RATE DECIMAL(10,5),
+ALOAD_FEE BIGINT,
+ALOAD_UNTAX BIGINT,
+ALOAD_TAX BIGINT)
+
+
+
+
+
+DECLARE @TAX_NO VARCHAR(8) --TAX_NO 用來判斷含稅和未稅的依據，Y 含稅，同原來計算方法，N未稅，未稅同消費手續費，稅金為手續費乘0.05(5%)
+
+
+
+if (@EXEC_MERCHANT_NO in (SELECT MERCHANT_NO FROM GM_MERCHANT WHERE MERCHANT_TYPE = 'MUTI_MERC'))
+BEGIN
+SELECT @TAX_NO = TAX_NO FROM GM_CONTRACT_MUTI_MERC_D WHERE MERCHANT_NO = @EXEC_MERCHANT_NO AND CONTRACT_TYPE = 'P1' AND FEE_KIND = 'CM' AND FEE_CAL_FLG = 'AM'
+INSERT INTO @T
+select  M1.MERCHANT_NO '特店編號',
+		Case when M2.MERCHANT_SUB_STNAME is null then M1.MERCHANT_NAME else M2.MERCHANT_SUB_STNAME end '特約機構名稱',
+		M1.MERCHANT_STNAME '簡稱',
+		ISNULL((DATA.sumPCHA-DATA.sumPCHRA),0) as '購貨淨額', 
+		'' AS "購貨重複",
+		'' AS "購貨調帳",
+		Convert(FLOAT(50),ISNULL(DATA.P_CM_AM * 100,0)) as			'購貨手續費率', 
+		CASE WHEN @TAX_NO = 'N' THEN ISNULL(cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(20,5))* 0.05,0) as bigint),0) + ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint),0) ELSE ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint),0) END	as '消費手續費', --未稅+上稅金 2019.8.7
+		CASE WHEN @TAX_NO = 'N' THEN ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint),0) ELSE 	ISNULL(cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(20,5))/1.05,0) as bigint),0) END   as '消費手續費未稅',
+		CASE WHEN @TAX_NO = 'N' THEN ISNULL(cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(20,5))* 0.05,0) as bigint),0) ELSE ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint)-cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(15,5))/1.05,0) as bigint),0) END as '消費手續費稅金',
+		ISNULL((DATA.sumLOADA-DATA.sumLOADRA),0) '加值淨額', 
+		'' AS "加值重複",
+		'' AS "加值調帳",
+		Convert(FLOAT(50),ISNULL(DATA.L_CM_AM * 100,0)) as			'加值手續費率', 
+		ISNULL(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as bigint),0) as '加值手續費',
+		ISNULL(cast(ROUND(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '加值手續費未稅',
+		ISNULL(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as bigint)-cast(ROUND(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '加值手續費稅金',
+		ISNULL(DATA.sumLOAD_AMT,0)									'自動加值額',
+		'' AS "自動加值重複",
+		'' AS "自動加值調帳",
+		Convert(FLOAT(50),ISNULL(DATA.A__AM * 100,0)) as			'自動加值手續費率', 
+		ISNULL(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as bigint),0) as	'自動加值手續費',
+		ISNULL(cast(ROUND(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '自動加值手續費未稅',
+		ISNULL(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as bigint)-cast(ROUND(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '自動加值手續費稅金'
+		
+from (
+	SELECT MERCHANT_NO,MERCHANT_SUB_NO,SUM(sumPCHA) AS sumPCHA,SUM(sumPCHRA) AS sumPCHRA,P_CM_AM,SUM(sumLOADA) AS sumLOADA,SUM(sumLOADRA) AS sumLOADRA,L_CM_AM,SUM(sumLOAD_AMT) AS sumLOAD_AMT,A__AM FROM 
+	(
+	select	DATA1.CPT_DATE, DATA1.MERCHANT_NO, DATA1.SEQ_NO, DATA1.MERCHANT_SUB_NO,
+			ISNULL(sum(DATA1.sumPCHA),0) sumPCHA,
+			ISNULL(sum(DATA1.sumPCHRA),0) sumPCHRA,
+						(select C.FEE_RATE from GM_CONTRACT_MUTI_MERC_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+													  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+													  and C.CONTRACT_TYPE = 'P1' AND FEE_KIND = 'CM' AND FEE_CAL_FLG = 'AM'
+													  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO
+													  ) P_CM_AM,
+			ISNULL(sum(DATA1.sumLOADA),0) sumLOADA,
+			ISNULL(sum(DATA1.sumLOADRA),0) sumLOADRA,
+			(select C.FEE_RATE from GM_CONTRACT_MUTI_MERC_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+													  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+													  and C.CONTRACT_TYPE = 'L1' AND FEE_CAL_FLG = 'AM'
+													  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) L_CM_AM,
+			--ISNULL(sum(DATA1.sumUTUT3_AMTA),0) sumUTUT3_AMTA,
+			--ISNULL(sum(DATA1.sumUTUT3_AMTRA),0) sumUTUT3_AMTRA,
+			--(select C.FEE_RATE from GM_CONTRACT_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+			--										  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+			--										  and C.SETTLE_TYPE = 'P' and C.FEE_KIND = 'UT' and FEE_CAL_FLG = 'AM'
+			--										  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) P_UT_AM,
+			ISNULL(sum(LOAD74_AMT),0) + ISNULL(sum(LOAD75_AMT),0) + ISNULL(sum(LOAD77_AMT),0) sumLOAD_AMT,  --(add by 20160415 rita 新增 77離線自動加值)
+			(select C.FEE_RATE from GM_CONTRACT_MUTI_MERC_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+													  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+													  and C.CONTRACT_TYPE = 'L2' AND FEE_CAL_FLG = 'AM'
+													  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) A__AM
+			--ISNULL(sum(LOAD79_AMT),0) sumLOAD79_AMT,
+			--(select C.FEE_RATE from GM_CONTRACT_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+			--										  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+			--										  and C.SETTLE_TYPE = 'B' and FEE_CAL_FLG = 'AM'
+			--										  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) B__AM
+	from 
+	(
+		--購貨、購貨取消、加值、加值取消
+		select	D1.CPT_DATE, D1.MERCHANT_NO, 
+				Case when D2.MERCHANT_SUB_NO = 'POS' then 'FS1' 
+					 when D2.MERCHANT_SUB_NO IS NULL then 'FS1' 
+					 else '0' end SEQ_NO,
+				D2.MERCHANT_SUB_NO,
+				ISNULL(sum(D1.PCHA),0) - ISNULL(sum(D1.UTUT3_AMTA),0) sumPCHA, 
+				ISNULL(sum(D1.PCHRA),0) - ISNULL(sum(D1.UTUT3_AMTRA),0) sumPCHRA, 
+				ISNULL(sum(D1.LOADA),0) sumLOADA, 
+				ISNULL(sum(D1.LOADRA),0) sumLOADRA, 
+				ISNULL(sum(D1.UTUT3_AMTA),0) sumUTUT3_AMTA, 
+				ISNULL(sum(D1.UTUT3_AMTRA),0) sumUTUT3_AMTRA,
+				NULL LOAD74_CNT,
+				NULL LOAD74_AMT,
+				NULL LOAD75_CNT,
+				NULL LOAD75_AMT,
+				NULL LOAD77_CNT,
+				NULL LOAD77_AMT,
+				NULL LOAD79_CNT,
+				NULL LOAD79_AMT
+		from (
+			SELECT	CPT_DATE,
+					MERCHANT_NO,
+					'POS' MERCHANT_SUB_NO,
+					SUM(isnull(PCH_AMT  ,0)) PCHA,		--購貨總額
+					SUM(isnull(PCHR_AMT ,0)) PCHRA,		--退貨總額
+					SUM(isnull(LOAD_AMT ,0)) LOADA,		--加值額
+					SUM(isnull(LOADR_AMT,0)) LOADRA,	--加值取消額
+					NULL UTUT3_AMTA,					--代收售總額
+					NULL UTUT3_AMTRA					--代收售取消
+				FROM AM_ISET_MERC_TRANS_LOG_D 
+				where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+				  and SRC_FLG = 'TXLOG'
+				  and MERCHANT_NO = @EXEC_MERCHANT_NO
+				GROUP BY CPT_DATE, MERCHANT_NO
+			union all 
+			SELECT	CPT_DATE,
+					MERCHANT_NO,
+					'POS' MERCHANT_NO_SUB,
+					NULL PCHA,		--購貨總額
+					NULL PCHRA,		--退貨總額
+					NULL LOADA,		--加值額
+					NULL LOADRA,	--加值取消額
+					SUM(isnull(UT_AMT ,0) + isnull(UT3_AMT ,0)) UTUT3_AMTA,	--代收售總額
+					NULL UTUT3_AMTRA	--代收售取消
+				FROM AM_ISET_MERC_TRANS_UTLOG_D  
+				where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+				  and SRC_FLG = 'TXLOG'
+				  and TRANS_TYPE = '21'
+				  and MERCHANT_NO = @EXEC_MERCHANT_NO
+				GROUP BY CPT_DATE, MERCHANT_NO
+			union all 
+			SELECT	CPT_DATE,
+					MERCHANT_NO,
+					'POS' MERCHANT_NO_SUB,
+					NULL PCHA,		--購貨總額
+					NULL PCHRA,		--退貨總額
+					NULL LOADA,		--加值額
+					NULL LOADRA,	--加值取消額
+					NULL UTUT3_AMTA,--代收售總額
+					SUM(isnull(UT_AMT ,0) + isnull(UT3_AMT ,0)) UTUT3_AMTRA	--代收售取消
+				FROM AM_ISET_MERC_TRANS_UTLOG_D  
+				where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+				  and SRC_FLG = 'TXLOG'
+				  and TRANS_TYPE = '23'
+				  and MERCHANT_NO = @EXEC_MERCHANT_NO
+				GROUP BY CPT_DATE, MERCHANT_NO
+		)D1 
+		left join GM_MERCHANT_SUB D2 on D1.MERCHANT_NO = D2.MERCHANT_NO
+									and D1.MERCHANT_SUB_NO = D2.MERCHANT_SUB_NO
+		GROUP BY D1.CPT_DATE, D1.MERCHANT_NO, D2.MERCHANT_SUB_NO
+		union all 
+		--自動加值、自動加值取消、離線自動加值
+		--且在GM_BANK_CPT_SUM_SUB 沒有值，代表該特約機構沒有往下一階層
+		SELECT	A1.CPT_DATE,
+				A1.MERCHANT_NO,
+				'FS1' SEQ_NO, 
+				NULL MERCHANT_SUB_NO,
+				NULL sumPCHA, 
+				NULL sumPCHRA, 
+				NULL sumLOADA, 
+				NULL sumLOADRA, 
+				NULL sumUTUT3_AMTA, 
+				NULL sumUTUT3_AMTRA,
+				SUM(A1.LOAD74_CNT) LOAD74_CNT,
+				SUM(A1.LOAD74_AMT) LOAD74_AMT,
+				SUM(A1.LOAD75_CNT) LOAD75_CNT,
+				SUM(A1.LOAD75_AMT) LOAD75_AMT,
+				SUM(A1.LOAD77_CNT) LOAD77_CNT, -- (add by 20160415 rita 新增 77離線自動加值)
+				SUM(A1.LOAD77_AMT) LOAD77_AMT, -- (add by 20160415 rita 新增 77離線自動加值)
+				NULL LOAD79_CNT,
+				NULL LOAD79_AMT
+			FROM GM_BANK_CPT_SUM A1
+			left join (
+						select distinct MERCHANT_NO, CPT_DATE, SETTLE_DATE
+						from GM_BANK_CPT_SUM_SUB
+						where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E	
+			) A2 on A1.MERCHANT_NO = A2.MERCHANT_NO
+				and A1.CPT_DATE = A2.CPT_DATE
+				and A1.SETTLE_DATE = A2.SETTLE_DATE
+			where A1.CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+			  and A2.MERCHANT_NO is null
+			GROUP BY A1.CPT_DATE, A1.MERCHANT_NO
+		union all 
+		--自動加值、自動加值取消、離線自動加值
+		--且在GM_BANK_CPT_SUM_SUB 有值，代表該特約機構有往下一階層
+		--則以設定哪一筆要對到購貨、購貨取消
+		SELECT	A1.CPT_DATE,
+				A1.MERCHANT_NO,
+				Case when A2.MERCHANT_SUB_NO = 'POS' then 'FS1' else '' end SEQ_NO,
+				A2.MERCHANT_SUB_NO,
+				NULL sumPCHA, 
+				NULL sumPCHRA, 
+				NULL sumLOADA, 
+				NULL sumLOADRA, 
+				NULL sumUTUT3_AMTA, 
+				NULL sumUTUT3_AMTRA,
+				SUM(A2.LOAD74_CNT) LOAD74_CNT,
+				SUM(A2.LOAD74_AMT) LOAD74_AMT,
+				SUM(A2.LOAD75_CNT) LOAD75_CNT,
+				SUM(A2.LOAD75_AMT) LOAD75_AMT,
+				SUM(A2.LOAD77_CNT) LOAD77_CNT, -- (add by 20160415 rita 新增 77離線自動加值)
+				SUM(A2.LOAD77_AMT) LOAD77_AMT, -- (add by 20160415 rita 新增 77離線自動加值)
+				SUM(A2.LOAD79_CNT) LOAD79_CNT,
+				SUM(A2.LOAD79_AMT) LOAD79_AMT
+			FROM GM_BANK_CPT_SUM A1
+			inner join GM_BANK_CPT_SUM_SUB A2 on A1.MERCHANT_NO = A2.MERCHANT_NO
+											and A1.BANK_MERCHANT = A2.BANK_MERCHANT
+											and A1.CPT_DATE = A2.CPT_DATE
+											and A1.SETTLE_DATE = A2.SETTLE_DATE
+			where A1.CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+			GROUP BY A1.CPT_DATE, A1.MERCHANT_NO, A2.MERCHANT_SUB_NO
+	)DATA1
+	GROUP BY DATA1.CPT_DATE, DATA1.MERCHANT_NO, DATA1.SEQ_NO, DATA1.MERCHANT_SUB_NO
+	) DATA0 
+	GROUP BY DATA0.MERCHANT_NO, DATA0.MERCHANT_SUB_NO,P_CM_AM,L_CM_AM,A__AM
+)DATA
+inner join GM_MERCHANT M1 on DATA.MERCHANT_NO = M1.MERCHANT_NO
+							and M1.MERCHANT_NO = case when @EXEC_MERCHANT_NO = 'ALL' then M1.MERCHANT_NO else @EXEC_MERCHANT_NO end 
+left join GM_MERCHANT_SUB M2 on DATA.MERCHANT_SUB_NO = M2.MERCHANT_SUB_NO
+--WHERE DATA.MERCHANT_SUB_NO IS NULL OR (DATA.MERCHANT_SUB_NO<>'IBN' AND DATA.MERCHANT_SUB_NO<>'POS') 
+order by M1.MERCHANT_NO--, DATA.CPT_DATE
+END
+--非委外
+ELSE
+BEGIN
+SELECT @TAX_NO = TAX_NO FROM GM_CONTRACT_D WHERE MERCHANT_NO = @EXEC_MERCHANT_NO AND SETTLE_TYPE = 'P' and FEE_KIND = 'CM' and FEE_CAL_FLG = 'AM'
+INSERT INTO @T
+select  M1.MERCHANT_NO '特店編號',
+		Case when M2.MERCHANT_SUB_STNAME is null then M1.MERCHANT_NAME else M2.MERCHANT_SUB_STNAME end '特約機構名稱',
+		M1.MERCHANT_STNAME '簡稱',
+		
+		ISNULL((DATA.sumPCHA-DATA.sumPCHRA),0) as '購貨淨額', 
+		'' AS "購貨重複",
+		'' AS "購貨調帳",
+		Convert(FLOAT(50),ISNULL(DATA.P_CM_AM * 100,0)) as			'購貨手續費率', 
+		CASE WHEN @TAX_NO = 'N' THEN ISNULL(cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(20,5))* 0.05,0) as bigint),0) + ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint),0) ELSE ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint),0) END	as '消費手續費',--2019.8.7 增加
+		CASE WHEN @TAX_NO = 'N' THEN ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint),0) ELSE 
+		ISNULL(cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(20,5))/1.05,0) as bigint),0) END   as '消費手續費未稅',
+		CASE WHEN @TAX_NO = 'N' THEN ISNULL(cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(20,5))* 0.05,0) as bigint),0) ELSE
+		ISNULL(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as bigint)-cast(ROUND(cast(ROUND((DATA.sumPCHA-DATA.sumPCHRA)*DATA.P_CM_AM,0) as decimal(15,5))/1.05,0) as bigint),0) END as '消費手續費稅金',
+		ISNULL((DATA.sumLOADA-DATA.sumLOADRA),0) '加值淨額', 
+		'' AS "加值重複",
+		'' AS "加值調帳",
+		Convert(FLOAT(50),ISNULL(DATA.L_CM_AM * 100,0)) as			'加值手續費率', 
+		ISNULL(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as bigint),0) as '加值手續費',
+		ISNULL(cast(ROUND(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '加值手續費未稅',
+		ISNULL(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as bigint)-cast(ROUND(cast(ROUND((DATA.sumLOADA-DATA.sumLOADRA)*DATA.L_CM_AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '加值手續費稅金',
+		ISNULL(DATA.sumLOAD_AMT,0)									'自動加值額',
+		'' AS "自動加值重複",
+		'' AS "自動加值調帳",
+		Convert(FLOAT(50),ISNULL(DATA.A__AM * 100,0)) as			'自動加值手續費率', 
+		ISNULL(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as bigint),0) as	'自動加值手續費',
+		ISNULL(cast(ROUND(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '自動加值手續費未稅',
+		ISNULL(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as bigint)-cast(ROUND(cast(ROUND(sumLOAD_AMT*DATA.A__AM,0) as decimal(20,5))/1.05,0) as bigint),0) as '自動加值手續費稅金'
+		
+from (
+	SELECT MERCHANT_NO,MERCHANT_SUB_NO,SUM(sumPCHA) AS sumPCHA,SUM(sumPCHRA) AS sumPCHRA,P_CM_AM,SUM(sumLOADA) AS sumLOADA,SUM(sumLOADRA) AS sumLOADRA,L_CM_AM,SUM(sumLOAD_AMT) AS sumLOAD_AMT,A__AM FROM 
+	(
+	select	DATA1.CPT_DATE, DATA1.MERCHANT_NO, DATA1.SEQ_NO, DATA1.MERCHANT_SUB_NO,
+			ISNULL(sum(DATA1.sumPCHA),0) sumPCHA,
+			ISNULL(sum(DATA1.sumPCHRA),0) sumPCHRA,
+			(select C.FEE_RATE from GM_CONTRACT_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+													  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+													  and C.SETTLE_TYPE = 'P' and C.FEE_KIND = 'CM' and FEE_CAL_FLG = 'AM'
+													  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) P_CM_AM,
+			ISNULL(sum(DATA1.sumLOADA),0) sumLOADA,
+			ISNULL(sum(DATA1.sumLOADRA),0) sumLOADRA,
+			(select C.FEE_RATE from GM_CONTRACT_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+													  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+													  and C.SETTLE_TYPE = 'L' and FEE_CAL_FLG = 'AM'
+													  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) L_CM_AM,
+			--ISNULL(sum(DATA1.sumUTUT3_AMTA),0) sumUTUT3_AMTA,
+			--ISNULL(sum(DATA1.sumUTUT3_AMTRA),0) sumUTUT3_AMTRA,
+			--(select C.FEE_RATE from GM_CONTRACT_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+			--										  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+			--										  and C.SETTLE_TYPE = 'P' and C.FEE_KIND = 'UT' and FEE_CAL_FLG = 'AM'
+			--										  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) P_UT_AM,
+			ISNULL(sum(LOAD74_AMT),0) + ISNULL(sum(LOAD75_AMT),0) + ISNULL(sum(LOAD77_AMT),0) sumLOAD_AMT,  --(add by 20160415 rita 新增 77離線自動加值)
+			(select C.FEE_RATE from GM_CONTRACT_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+													  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+													  and C.SETTLE_TYPE = 'A' and FEE_CAL_FLG = 'AM'
+													  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) A__AM--,
+			--ISNULL(sum(LOAD79_AMT),0) sumLOAD79_AMT,
+			--(select C.FEE_RATE from GM_CONTRACT_D C where C.MERCHANT_NO = DATA1.MERCHANT_NO
+			--										  and DATA1.CPT_DATE between C.EFF_DATE_FROM and C.EFF_DATE_TO
+			--										  and C.SETTLE_TYPE = 'B' and FEE_CAL_FLG = 'AM'
+			--										  and @EXEC_CPT_DATE_B between C.EFF_DATE_FROM and C.EFF_DATE_TO) B__AM
+	from 
+	(
+		--購貨、購貨取消、加值、加值取消
+		select	D1.CPT_DATE, D1.MERCHANT_NO, 
+				Case when D2.MERCHANT_SUB_NO = 'POS' then 'FS1' 
+					 when D2.MERCHANT_SUB_NO IS NULL then 'FS1' 
+					 else '0' end SEQ_NO,
+				D2.MERCHANT_SUB_NO,
+				ISNULL(sum(D1.PCHA),0) - ISNULL(sum(D1.UTUT3_AMTA),0) sumPCHA, 
+				ISNULL(sum(D1.PCHRA),0) - ISNULL(sum(D1.UTUT3_AMTRA),0) sumPCHRA, 
+				ISNULL(sum(D1.LOADA),0) sumLOADA, 
+				ISNULL(sum(D1.LOADRA),0) sumLOADRA, 
+				ISNULL(sum(D1.UTUT3_AMTA),0) sumUTUT3_AMTA, 
+				ISNULL(sum(D1.UTUT3_AMTRA),0) sumUTUT3_AMTRA,
+				NULL LOAD74_CNT,
+				NULL LOAD74_AMT,
+				NULL LOAD75_CNT,
+				NULL LOAD75_AMT,
+				NULL LOAD77_CNT,
+				NULL LOAD77_AMT,
+				NULL LOAD79_CNT,
+				NULL LOAD79_AMT
+		from (
+			SELECT	CPT_DATE,
+					MERCHANT_NO,
+					'POS' MERCHANT_SUB_NO,
+					SUM(isnull(PCH_AMT  ,0)) PCHA,		--購貨總額
+					SUM(isnull(PCHR_AMT ,0)) PCHRA,		--退貨總額
+					SUM(isnull(LOAD_AMT ,0)) LOADA,		--加值額
+					SUM(isnull(LOADR_AMT,0)) LOADRA,	--加值取消額
+					NULL UTUT3_AMTA,					--代收售總額
+					NULL UTUT3_AMTRA					--代收售取消
+				FROM AM_ISET_MERC_TRANS_LOG_D 
+				where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+				  and SRC_FLG = 'TXLOG'
+				  and MERCHANT_NO = @EXEC_MERCHANT_NO
+				GROUP BY CPT_DATE, MERCHANT_NO
+			union all 
+			SELECT	CPT_DATE,
+					MERCHANT_NO,
+					'POS' MERCHANT_NO_SUB,
+					NULL PCHA,		--購貨總額
+					NULL PCHRA,		--退貨總額
+					NULL LOADA,		--加值額
+					NULL LOADRA,	--加值取消額
+					SUM(isnull(UT_AMT ,0) + isnull(UT3_AMT ,0)) UTUT3_AMTA,	--代收售總額
+					NULL UTUT3_AMTRA	--代收售取消
+				FROM AM_ISET_MERC_TRANS_UTLOG_D  
+				where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+				  and SRC_FLG = 'TXLOG'
+				  and TRANS_TYPE = '21'
+				  and MERCHANT_NO = @EXEC_MERCHANT_NO
+				GROUP BY CPT_DATE, MERCHANT_NO
+			union all 
+			SELECT	CPT_DATE,
+					MERCHANT_NO,
+					'POS' MERCHANT_NO_SUB,
+					NULL PCHA,		--購貨總額
+					NULL PCHRA,		--退貨總額
+					NULL LOADA,		--加值額
+					NULL LOADRA,	--加值取消額
+					NULL UTUT3_AMTA,--代收售總額
+					SUM(isnull(UT_AMT ,0) + isnull(UT3_AMT ,0)) UTUT3_AMTRA	--代收售取消
+				FROM AM_ISET_MERC_TRANS_UTLOG_D  
+				where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+				  and SRC_FLG = 'TXLOG'
+				  and TRANS_TYPE = '23'
+				  and MERCHANT_NO = @EXEC_MERCHANT_NO
+				GROUP BY CPT_DATE, MERCHANT_NO
+		)D1 
+		left join GM_MERCHANT_SUB D2 on D1.MERCHANT_NO = D2.MERCHANT_NO
+									and D1.MERCHANT_SUB_NO = D2.MERCHANT_SUB_NO
+		GROUP BY D1.CPT_DATE, D1.MERCHANT_NO, D2.MERCHANT_SUB_NO
+		union all 
+		--自動加值、自動加值取消、離線自動加值
+		--且在GM_BANK_CPT_SUM_SUB 沒有值，代表該特約機構沒有往下一階層
+		SELECT	A1.CPT_DATE,
+				A1.MERCHANT_NO,
+				'FS1' SEQ_NO, 
+				NULL MERCHANT_SUB_NO,
+				NULL sumPCHA, 
+				NULL sumPCHRA, 
+				NULL sumLOADA, 
+				NULL sumLOADRA, 
+				NULL sumUTUT3_AMTA, 
+				NULL sumUTUT3_AMTRA,
+				SUM(A1.LOAD74_CNT) LOAD74_CNT,
+				SUM(A1.LOAD74_AMT) LOAD74_AMT,
+				SUM(A1.LOAD75_CNT) LOAD75_CNT,
+				SUM(A1.LOAD75_AMT) LOAD75_AMT,
+				SUM(A1.LOAD77_CNT) LOAD77_CNT, -- (add by 20160415 rita 新增 77離線自動加值)
+				SUM(A1.LOAD77_AMT) LOAD77_AMT, -- (add by 20160415 rita 新增 77離線自動加值)
+				NULL LOAD79_CNT,
+				NULL LOAD79_AMT
+			FROM GM_BANK_CPT_SUM A1
+			left join (
+						select distinct MERCHANT_NO, CPT_DATE, SETTLE_DATE
+						from GM_BANK_CPT_SUM_SUB
+						where CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E	
+			) A2 on A1.MERCHANT_NO = A2.MERCHANT_NO
+				and A1.CPT_DATE = A2.CPT_DATE
+				and A1.SETTLE_DATE = A2.SETTLE_DATE
+			where A1.CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+			  and A2.MERCHANT_NO is null
+			GROUP BY A1.CPT_DATE, A1.MERCHANT_NO
+		union all 
+		--自動加值、自動加值取消、離線自動加值
+		--且在GM_BANK_CPT_SUM_SUB 有值，代表該特約機構有往下一階層
+		--則以設定哪一筆要對到購貨、購貨取消
+		SELECT	A1.CPT_DATE,
+				A1.MERCHANT_NO,
+				Case when A2.MERCHANT_SUB_NO = 'POS' then 'FS1' else '' end SEQ_NO,
+				A2.MERCHANT_SUB_NO,
+				NULL sumPCHA, 
+				NULL sumPCHRA, 
+				NULL sumLOADA, 
+				NULL sumLOADRA, 
+				NULL sumUTUT3_AMTA, 
+				NULL sumUTUT3_AMTRA,
+				SUM(A2.LOAD74_CNT) LOAD74_CNT,
+				SUM(A2.LOAD74_AMT) LOAD74_AMT,
+				SUM(A2.LOAD75_CNT) LOAD75_CNT,
+				SUM(A2.LOAD75_AMT) LOAD75_AMT,
+				SUM(A2.LOAD77_CNT) LOAD77_CNT, -- (add by 20160415 rita 新增 77離線自動加值)
+				SUM(A2.LOAD77_AMT) LOAD77_AMT, -- (add by 20160415 rita 新增 77離線自動加值)
+				SUM(A2.LOAD79_CNT) LOAD79_CNT,
+				SUM(A2.LOAD79_AMT) LOAD79_AMT
+			FROM GM_BANK_CPT_SUM A1
+			inner join GM_BANK_CPT_SUM_SUB A2 on A1.MERCHANT_NO = A2.MERCHANT_NO
+											and A1.BANK_MERCHANT = A2.BANK_MERCHANT
+											and A1.CPT_DATE = A2.CPT_DATE
+											and A1.SETTLE_DATE = A2.SETTLE_DATE
+			where A1.CPT_DATE between @EXEC_CPT_DATE_B and @EXEC_CPT_DATE_E
+			GROUP BY A1.CPT_DATE, A1.MERCHANT_NO, A2.MERCHANT_SUB_NO
+	)DATA1
+	GROUP BY DATA1.CPT_DATE, DATA1.MERCHANT_NO, DATA1.SEQ_NO, DATA1.MERCHANT_SUB_NO
+	) DATA0 
+	GROUP BY DATA0.MERCHANT_NO, DATA0.MERCHANT_SUB_NO,P_CM_AM,L_CM_AM,A__AM
+)DATA
+inner join GM_MERCHANT M1 on DATA.MERCHANT_NO = M1.MERCHANT_NO
+							and M1.MERCHANT_NO = case when @EXEC_MERCHANT_NO = 'ALL' then M1.MERCHANT_NO else @EXEC_MERCHANT_NO end 
+left join GM_MERCHANT_SUB M2 on DATA.MERCHANT_SUB_NO = M2.MERCHANT_SUB_NO
+--WHERE DATA.MERCHANT_SUB_NO IS NULL OR (DATA.MERCHANT_SUB_NO<>'IBN' AND DATA.MERCHANT_SUB_NO<>'POS') 
+order by M1.MERCHANT_NO--, DATA.CPT_DATE
+END
+
+
+INSERT INTO GM_MERCHANT_ACT_DATA_TEMP
+SELECT 
+		'0001' as num,
+		@EXEC_CPT_DATE as CPT_DATE,
+		B.MERCHANT_NO_ACT_M,
+		P_UNTAX,
+		P_TAX,
+		CASE WHEN B.FEE_DAY = '99' THEN CONVERT(VARCHAR(8), DATEADD(DAY, -1, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (-1), '')), 112)
+		WHEN B.FEE_DAY IS NULL OR B.FEE_DAY = '' THEN '' 
+		ELSE CONVERT(VARCHAR(8), DATEADD(DAY, -1 + B.FEE_DAY	, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (0), '')), 112) END AS FEE_DAY_1, --預計兌現日
+		'' invoce_num, --發票號碼 預設空白
+		'0001' AS TYPE_NUM, --列號
+		'9' as NUM_TYPE, --類別 固定9
+		P_UNTAX,
+		P_TAX,
+		LEFT(CONVERT(VARCHAR ,DATEADD (MONTH , -1 , CONVERT(DATE,@EXEC_YM,112) ),112),6) +' 消費手續費-'+ 
+		CASE WHEN B.MERCHANT_NO_ACT IS NULL THEN '***' + C.MERCHANT_STNAME  WHEN B.MERCHANT_STNAME IS NULL OR B.MERCHANT_STNAME = '' THEN C.MERCHANT_STNAME ELSE B.MERCHANT_STNAME END AS NAME_1 , --品名
+		B.ACCOUNTING, --會科
+		B.DEPARTMENT, --部門
+		CASE WHEN B.FEE_DAY = '99' THEN CONVERT(VARCHAR(8), DATEADD(DAY, -1, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (-1), '')), 112)
+		WHEN B.FEE_DAY IS NULL OR B.FEE_DAY = '' THEN '' 
+		ELSE CONVERT(VARCHAR(8), DATEADD(DAY, -1 + B.FEE_DAY	, DATEADD(MONTH, DATEDIFF(MONTH, '', @EXEC_YM) + (0), '')), 112) END FEE_DATE_2,
+		B.PROJECT_NO, --專案代號
+		'' AS FREE_SPACE, --備註2
+		'' AS B2C_NUM , --B2C統一編號
+		'1' AS CNT , --數量
+		CASE 
+		WHEN ORDER_NO = 'Y' AND B.SET_GROUP_M = 'Y' THEN '6116' 
+		WHEN ORDER_NO = 'Y' AND B.SET_GROUP_M = 'N' THEN '6112'
+		WHEN ORDER_NO = 'N' AND B.SET_GROUP_M = 'Y' THEN '6106'
+		WHEN ORDER_NO = 'N' AND B.SET_GROUP_M = 'N' THEN '6102'
+		END AS SNO,
+		0
+		 FROM  @T A
+INNER JOIN GM_MERCHANT_ACT B
+ON A.MERCHANT_NO = B.MERCHANT_NO
+LEFT JOIN GM_MERCHANT C
+ON A.MERCHANT_NO = C.MERCHANT_NO
+WHERE B.INVOICE_RULE = @INVOICE_RULE 
+AND P_FEE <> 0
+ORDER BY MERCHANT_NO_ACT_M

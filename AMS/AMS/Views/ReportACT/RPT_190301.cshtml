@@ -1,0 +1,444 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+
+<style type='text/css'>
+    .ui-datepicker-calendar {
+        display: none;
+    }
+
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+
+
+
+
+
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#yearMonth').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'yymm',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).datepicker('setDate', new Date(year, month, 1));
+            }
+        });
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(function () {
+
+    var groups = "@ViewBag.groups";
+    $("#park option[value='@ViewBag.parks']").prop("selected", "selected");
+
+
+
+    })
+
+</script>
+@*<script>    jQuery.fn.rowspan = function (colIdx) { 
+        return this.each(function () {
+            var that;
+            $('tr', this).each(function (row) {
+                $('td:eq(' + colIdx + ')', this).filter(':visible').each(function (col) {
+                    if (that != null && $(this).html() == $(that).html()) {
+                        rowspan = $(that).attr("rowSpan");
+                        if (rowspan == undefined) {
+                            $(that).attr("rowSpan", 1);
+                            rowspan = $(that).attr("rowSpan");
+                        }
+                        rowspan = Number(rowspan) + 1;
+                        $(that).attr("rowSpan", rowspan);
+                        $(this).hide();
+                    } else {
+                        that = this;
+                    }
+                });
+            });
+        });
+    }
+    $(function () {
+        $("#t1").rowspan(0);//传入的参数是对应的列数从0开始  第一列合并相同
+        // $("#table1").rowspan(1);//传入的参数是对应的列数从0开始  第二列合并相同
+    });
+   </script>*@
+@*<script>
+        $(document).ready(function () {
+            var table = $('.grid1').DataTable({
+                "columnDefs": [
+                    { "visible": false, "targets": 0 },
+                    { "orderable": false, "targets": '_all' }
+                ],
+                "order": [[0, 'asc']],
+                "sInfoEmpty": "沒有資料",
+                "bInfo": false,
+                "sProcessing": "處理中...",
+                "oPaginate": {
+                    "sFirst": "「首頁」",
+                    "sPrevious": "「前一頁」",
+                    "sNext": "「後一頁」",
+                    "sLast": "「尾頁」"
+                },
+                "sZeroRecords": "查無符合資料",
+                "bFilter": false,
+                "stateSave": false,
+                "stateDuration": 60 * 60 * 24 * 365,
+                "bPaginate": false,
+                "dom": 'lfTrtip',
+                "displayLength": 25,
+                "drawCallback": function (settings) {
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    var colonne = api.row(0).data().length;
+                    var totale = new Array();
+                    totale['Totale'] = new Array();
+                    var groupid = -1;
+                    var subtotale = new Array();
+                    var merchant_name = new Array();
+
+                    api.column(0, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            groupid++;
+                            $(rows).eq(i).before(
+                                '<tr class="group"><td>' + group + '</td></tr>'
+                            );
+
+                            last = group;
+                        }
+
+
+                        val = api.row(api.row($(rows).eq(i)).index()).data();      //current order index
+                        $.each(val, function (index2, val2) {
+                            if (typeof subtotale[groupid] == 'undefined') {
+                                subtotale[groupid] = new Array();
+                            }
+                            if (typeof subtotale[groupid][index2] == 'undefined') {
+                                subtotale[groupid][index2] = 0;
+                            }
+                            if (typeof totale['Totale'][index2] == 'undefined') { totale['Totale'][index2] = 0; }
+
+                            if (index2 > 2 && index2 < 8) {
+                                //var s = s.replace(/\你要置換的字串/g, 'AA');
+                                var s = val2.replace(/\,/g, '');
+                                s = s.replace(/font/g, '');
+                                s = s.replace(/[<>]/g, '');
+                                s = s.replace(/\\>/g, '');
+                                s = s.replace(/\//g, '');
+                                s = s.replace(/\=/g, '');
+                                s = s.replace(/\"/g, '');
+                                s = s.replace(/color/g, '');
+                                s = s.replace(/red/g, '');
+                                s = s.replace(/\(/g, '-');
+                                s = s.replace(/\)/g, '');
+
+                                valore = Number(s);
+                                subtotale[groupid][index2] += valore;
+
+                                totale['Totale'][index2] += valore;
+
+                            }
+                        });
+
+                    });
+                    $('tbody').find('.group').each(function (i, v) {
+                        //var rowCount = $(this).nextUntil('.group').length;
+                        $(this).find('td:first').append($('<img src="../images/plus.jpg"  id="chgicon' + i + '" ><span />', { 'class': 'rowCount-grid' }).append($('<b />', { 'text': ' ' + '' + '' })));
+                        var subtd = '<td></td><td></td>';
+                        for (var a = 4; a < colonne; a++) {
+                            //subtd += '<td>' + subtotale[i][a] + ' OUT OF ' + totale['Totale'][a] + ' (' + Math.round(subtotale[i][a] * 100 / totale['Totale'][a], 2) + '%) ' + '</td>';
+                            if (a == 5) {
+                                subtd += '<td Style="text-align:right">' + '</td>';
+                            } else {
+                                subtd += '<td Style="text-align:right">' + formatThousands(subtotale[i][a]) + '</td>';
+                            }
+                        }
+                        $(this).append(subtd);
+
+                        //預設不展開
+                        var rowsCollapse = $(this).nextUntil('.group');
+                        $(rowsCollapse).toggleClass('hidden');
+                    });
+
+                    $(this).append('<td>總計</td><td></td>');
+                    subtd = '<td></td>';
+
+                    //決定頁面顯示前幾欄位 0112
+                    for (var a = 4; a < colonne; a++) {
+                        //subtd += '<td Style="text-align:right" >' + formatThousands(totale['Totale'][a]) + '</td>';
+                        if (a == 5)
+                        {
+                            subtd += '<td Style="text-align:right">' + '</td>';
+                        }
+                        else
+                        {
+                            subtd += '<td Style="text-align:right">' + formatThousands(totale['Totale'][a]) + '</td>';
+                        }
+                    }
+                    $(this).append(subtd);
+
+                }
+            });
+
+            $('.grid1 tbody').on('click', 'tr.group', function () {
+                var rowsCollapse = $(this).nextUntil('.group');
+                $(rowsCollapse).toggleClass('hidden');
+            });
+
+            $('tbody').find('.group').each(function (i, v) {
+                $('.grid1 tbody').on('click', 'tr.group', function () {
+                    //改收合/展開圖示
+                    $(this).find('#chgicon' + i).each(function (j, v) {
+                        var imgObj = $("#chgicon" + i).attr('src');
+                        if (imgObj == "../images/plus.jpg") {
+                            $("#chgicon" + i).attr("src", "../images/minus.jpg");
+                        }
+                        else
+                            $("#chgicon" + i).attr("src", "../images/plus.jpg");
+                    });
+                });
+            });
+        });
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+            <script>
+                function formatThousands(n, dp) {
+                    var s = '' + (Math.floor(n)), d = n % 1, i = s.length, r = '';
+                    s = s.replace(/-/g, '');
+                    i = s.length;
+                    while ((i -= 3) > 0) { r = ',' + s.substr(i, 3) + r; }
+                    if (n >= 0)
+                        return s.substr(0, i + 3) + r + (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '');
+                    else {
+                        return "<font color='red'>(" + s.substr(0, i + 3) + r + (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '') + ")</font>";
+                    }
+                }
+            </script>*@
+
+
+
+
+
+
+
+<title>@ViewBag.RepName</title>
+
+<h2>@ViewBag.RepName</h2>
+
+@using (Html.BeginForm("RPT_190301", "ReportACT", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">報表年月 :</label>
+        <input type="text" name="yearMonth" id="yearMonth" value="@ViewBag.YearMonth" style="width:100px;" />
+        @Html.Partial("_Merchant_0301")
+        @*@Html.DropDownList("park", (IEnumerable<SelectListItem>)ViewBag.PARK, "--請選擇--")
+        <label for="group">特約機構:</label>
+            @Html.DropDownList("retail", (IEnumerable<SelectListItem>)ViewBag.RETAIL, "--請選擇--")*@
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+
+    </div>
+}
+
+@if (Model.Rows.Count > 0)
+{
+    int rowCount = 1;
+    <table class="grid1" width="100%" id="t1">
+        <thead>
+            <tr>
+                @if (1 == 1)
+                {
+                    int j = 0;
+                    
+                    var list = ViewBag.COL;
+                    
+                    for (int i = 0; i < list.Length;i++ )
+                    {
+                        //決定頁面顯示前幾欄位 0112
+                        
+                            <th style="text-align: right; max-width: 60px">@list[i].ToString()</th>
+                            j++;
+                        
+                    }
+                }
+            </tr>
+
+        </thead>
+        <tbody>
+             
+            @foreach (DataRow row in Model.Rows)
+            {
+                if (Model.Rows.Count > 0)
+                {
+                    int i = 1;
+                <tr>
+                    
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        if (j == 4 || j == 5 || j == 11 || j == 12 || j == 18 || j == 19) { }
+                        else if ( j == 3 || (j >= 7 & j <= 10) || (j >= 14 & j <= 17) || j >=21 )
+                        {
+                            <td>@Convert.ToDecimal(row.ItemArray[j]).ToString("#,##0")</td>
+                        }
+                        else if (j == 6 || j== 13 || j== 20)
+                        {
+                            <td>@Convert.ToDecimal(row.ItemArray[j]).ToString("0.00")</td>
+                        }
+                        else     
+                        { 
+                            <td>@row.ItemArray[j].ToString()</td>
+                        }
+                        @*if (j == 1) { }
+                        else
+                        {
+                            if (row.ItemArray[2].Equals("小計"))
+                            {
+                                if (j == 4 || (j >= 6 & j <= 9 & j != 7))
+                                { 
+                                   <td style="border-bottom: 3px solid #d0d0d0; ">@Convert.ToDouble(row.ItemArray[j]).ToString("#,##0")</td>
+                                }
+                                else
+                                {
+                                   <td style="border-bottom: 3px solid #d0d0d0; ">@row.ItemArray[j].ToString()</td> 
+                                }
+
+                            }
+                            else
+                            {
+                                if (j == 4 || (j >= 6 & j <= 9 & j != 7))
+                                { 
+                                   <td>@Convert.ToDouble(row.ItemArray[j]).ToString("#,##0")</td>
+                                }
+                                else if (j == 7)
+                                { 
+                                    <td>@Convert.ToDouble(row.ItemArray[j]).ToString("0.00")%</td>
+                                }
+                                else
+                                {<td>@row.ItemArray[j].ToString()</td> }
+                            }*@
+
+                        }
+                        @*if (j == 3 || j == 6 || j == 9)
+                        {
+                            <td>@Convert.ToDecimal(row.ItemArray[j]).ToString("0.###")%</td>
+                        }
+                        else if (j > 1)
+                        {
+                            <td> @Convert.ToDecimal(row.ItemArray[j]).ToString("#,##0")</td>
+                        }
+                        else
+                        {
+                            <td>@row.ItemArray[j].ToString()</td>
+                        }*@
+                    
+                </tr>
+
+                }
+            }
+    <tr>
+       
+        
+        @{
+            var c = ViewBag.TOTAL;
+            <td />
+            for (int ax = 0; ax < c.Length; ax++)
+            {
+                if (ax == 4 || ax == 5 || ax == 11 || ax == 12 || ax == 18 || ax == 19) {}
+                else if( ax == 1) 
+                {<td>總計</td>}
+                else if ( ax == 2 || (ax >= 6 & ax<= 9) || (ax >= 13 & ax <= 16) || ax >=20 )        
+                { <td> @Convert.ToDecimal(c[ax]).ToString("#,##0")</td> }
+                else { <td />}
+            }
+
+        }
+    </tr>
+            
+        </tbody>
+        <tfoot>
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    //<th style="text-align:right">@col.ColumnName</th>
+                }
+            </tr>
+        </tfoot>
+    </table>
+}

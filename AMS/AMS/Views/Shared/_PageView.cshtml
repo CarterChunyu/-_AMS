@@ -1,0 +1,97 @@
+﻿@model Domain.Common.PageCountViewModel
+
+@if (Model.PageSize > 0)
+{
+    <ul class="pagination">
+
+        <li>
+            <a>共@(Model.TotolCount.ToString())筆資料</a>
+        </li>
+
+        @* 第一頁 *@
+        @if (Model.Pages.Count > 1)
+        {
+            <li>
+                <a title="第一頁" onclick="getData(1);" style="cursor:pointer;">&laquo;</a>
+            </li>
+        }
+
+        @* 上一頁 *@
+        @if (Model.Pages.Count > 1 && Model.CurrentPage > 1)
+        {
+            <li>
+                <a title="上一頁" onclick="getData(@(Model.CurrentPage-1));" style="cursor:pointer;">&lsaquo;</a>
+            </li>
+        }
+
+        @* 中間頁碼區塊 *@
+        @if (Model.CurrentPage < 10)
+        {
+            foreach (int item in Model.Pages)
+            {
+                if (item > 10)
+                {
+                    break;
+                }
+                if (item == Model.CurrentPage)
+                {
+                    <li class="active">
+                        <a title="第@(item.ToString())頁" style="cursor:pointer;">@item</a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a title="第@(item.ToString())頁" onclick="getData(@item);" style="cursor:pointer;">@item</a>
+                    </li>
+                }
+            }
+        }
+        else
+        {
+            foreach (int item in Model.Pages)
+            {
+                if (Model.Pages.Count > 10 && item < Model.Pages.Count - 9 && item < Model.CurrentPage)
+                {
+                    continue;
+                }
+                if (Model.Pages.Count > 10 && item > Model.CurrentPage + 9)
+                {
+                    break;
+                }
+                if (item == Model.CurrentPage)
+                {
+                    <li class="active">
+                        <a title="第@(item.ToString())頁" style="cursor:pointer;">@item</a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a title="第@(item.ToString())頁" onclick="getData(@item);" style="cursor:pointer;">@item</a>
+                    </li>
+                }
+            }
+        }
+
+        @* 下一頁 *@
+        @if (Model.Pages.Count > 1 && Model.CurrentPage != Model.Pages.Count)
+        {
+            <li>
+                <a title="下一頁" onclick="getData(@(Model.CurrentPage+1));" style="cursor:pointer;">&rsaquo;</a>
+            </li>
+        }
+
+        @* 最後一頁 *@
+        @if (Model.Pages.Count > 1)
+        {
+            <li>
+                <a title="最後一頁" onclick="getData(@Model.Pages.Count);" style="cursor:pointer;">&raquo;</a>
+            </li>
+        }
+
+        <li>
+            <a>共@(Math.Ceiling((decimal)Model.TotolCount / Model.PageSize).ToString())頁</a>
+        </li>
+    </ul>
+}

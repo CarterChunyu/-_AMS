@@ -1,0 +1,233 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    ViewBag.Title = "手續費彙總表";
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+        font-size: 13px;
+    }
+</style>
+
+
+
+
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('.date-picker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'yymm',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).datepicker('setDate', new Date(year, month, 1));
+            }
+        });
+    });
+    //$(function () {
+    //    $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+    //    $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    //});
+</script>
+<style>
+    .ui-datepicker-calendar {
+        display: none;
+    }
+
+    th.aright {
+        text-align: right;
+        font-size: 13px;
+    }
+
+
+</style>
+<body>
+<h2>手續費彙總表</h2>
+
+@using (Html.BeginForm("RPT_170501", "ReportACT", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="yearMonth"> 報表年月:</label>
+        <input type="text" name="yearMonth" id="yearMonth" class="date-picker" value="@ViewBag.YearMonth" style="width:100px;" />
+        
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+}
+
+
+    <table class="grid" width="100%">
+        <thead>
+            <tr style="background-color: lightgray">
+                <th class="aright">
+                    序號
+                </th>
+                <th class="aright">
+                    統編
+                </th>
+
+                <th class="aright" nowrap="nowrap">
+                    特店代碼
+                </th>
+                <th class="aright" >
+                    門市代號對應值(手續費)
+                </th>
+                <th class="aright" nowrap="nowrap">
+                    特店性質
+                </th>
+                <th class="aright" >
+                    單別代號
+                </th>
+
+
+                <th class="aright" wrap="wrap">
+                    特約機構
+                </th>
+                <th class="aright" wrap="wrap">
+                    簡稱
+                </th>
+                <th class="aright">
+                    購貨淨額
+                </th>
+                <th class="aright">
+                    購貨手續費率
+                </th>
+                <th class="aright">
+                    消費手續費
+                </th>
+                <th class="aright">
+                    未稅
+                </th>
+                <th class="aright">
+                    稅金
+                </th>
+                <th class="aright">
+                    加值淨額
+                </th>
+                <th class="aright">
+                    加值手續費率
+                </th>
+                <th class="aright">
+                    加值手續費
+                </th>
+                <th class="aright">
+                    未稅
+                </th>
+                <th class="aright">
+                    稅金
+                </th>
+                <th class="aright">
+                    自動加值額
+                </th>
+                <th class="aright">
+                    自動加值手續費率
+                </th>
+                <th class="aright">
+                    自動加值手續費
+                </th>
+                <th class="aright">
+                    未稅
+                </th>
+                <th class="aright">
+                    稅金
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        if (DBNull.Value.Equals(row.ItemArray[j]))
+                        {
+                        <td></td>}
+                        else
+                        {
+                            //if (j==3 || j==4 || j==10 || j==11 || j==17 || j==18)
+                            //if (j == 5 || j == 6 || j == 12 || j == 13 || j == 19 || j == 20)
+                            if (j == 9 || j == 10 || j == 16 || j == 17 || j == 23 || j == 24)
+                            {
+
+                            }
+                            //else if (j == 2 || (j >= 6 && j <= 9) || (j >= 13 && j <= 16) || (j >= 20 && j <= 22))
+                            //else if (j == 4 || (j >= 8 && j <= 11) || (j >= 15 && j <= 18) || (j >= 22 && j <= 24))
+                            else if (j == 8 || (j >= 12 && j <= 15) || (j >= 19 && j <= 22) || (j >= 26 && j <= 30))
+                            {
+                                <td>@Convert.ToInt64(row.ItemArray[j]).ToString("n0")</td>
+
+
+                            }
+                            //else if (j==5 || j==12 || j==19)
+                            //else if (j==7 || j==14 || j==21)
+                            else if (j == 11 || j == 18 || j == 25)
+                            {
+                                <td>@Convert.ToDecimal(row.ItemArray[j]).ToString("n2")%</td>
+                            }
+                            else
+                            {
+                                <td>@row.ItemArray[j].ToString()</td>
+                            }
+                        }
+                    }
+                </tr>
+            }
+
+        </tbody>
+    </table>
+   
+</body>

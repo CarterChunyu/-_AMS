@@ -1,0 +1,98 @@
+﻿@model Domain.BmStoreM
+
+@Html.Hidden(@"Hidden_Store_Layout", @"RETAIL_1")
+<div class="form-group row">
+    @Html.Label(@"門市代號", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @if (ViewBag.ACTION_TYPE == @"新增")
+        { @Html.TextBoxFor(model => model.STORE_NO, new { @class = "form-control", @maxlength = "8" }); }
+        else
+        { 
+            string store_no = ViewBag.STORE_NO;
+            @Html.HiddenFor(model => model.STORE_NO); 
+            @Html.Label("Label_Store", @store_no, new { @class = "control-label" })
+        }
+        @Html.ValidationMessageFor(model => model.STORE_NO, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div class="form-group row">
+    @Html.Label(@"門市全名", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.STO_NAME_LONG, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.STO_NAME_LONG, "", new { @class = "text-danger" })
+        @Html.Label(@"※ 若此特約機構在簡碼維護設定是顯示【特店+站名】，則門市全名會顯示在ibon！", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"門市簡稱", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.STO_NAME_SHORT, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.STO_NAME_SHORT, "", new { @class = "text-danger" })
+    </div>
+</div>
+@Html.HiddenFor(model => model.EFF_DATE_FROM) 
+@Html.HiddenFor(model => model.EFF_DATE_TO)
+@*<div id="div_account" class="form-group row">
+    @Html.Label(@"生效起日", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.EFF_DATE_FROM, new { @class = "form-control", @maxlength = "8" })
+        @Html.ValidationMessageFor(model => model.EFF_DATE_FROM, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"生效迄日", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.EFF_DATE_TO, new { @class = "form-control", @maxlength = "8" })
+        @Html.ValidationMessageFor(model => model.EFF_DATE_TO, "", new { @class = "text-danger" })
+    </div>
+</div>*@
+<div id="div_account" class="form-group row">
+    @Html.Label(@"開幕日", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.OPEN_DATE, new { @class = "form-control", @maxlength = "8", @Value = DateTime.Today.AddDays(1).ToString("yyyyMMdd") })
+        @Html.ValidationMessageFor(model => model.OPEN_DATE, "", new { @class = "text-danger" })
+        @Html.Label(@"※ 此為OP APP門市主檔生效日期，日期必須在明天之後", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"可販售日", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.SALES_DATE, new { @class = "form-control", @maxlength = "8", @Value = DateTime.Today.AddDays(1).ToString("yyyyMMdd") })
+        @Html.ValidationMessageFor(model => model.SALES_DATE, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"關店日", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.CLOSE_DATE, new { @class = "form-control", @maxlength = "8", @Value = "99991231" })
+        @Html.ValidationMessageFor(model => model.CLOSE_DATE, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"郵遞區號", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.ZIP, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ZIP, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"地址", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.ADDRESS, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.ADDRESS, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"電話區域碼", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.TEL_AREA, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.TEL_AREA, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"電話", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.TEL_NO, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.TEL_NO, "", new { @class = "text-danger" })
+    </div>
+</div>

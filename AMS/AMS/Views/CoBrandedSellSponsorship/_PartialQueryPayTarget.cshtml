@@ -1,0 +1,78 @@
+﻿@using System.Data;
+@using Domain.Common;
+@using Newtonsoft.Json;
+@using Domain.CoBrandedSellSponsorship;
+
+@{
+    Layout = null;
+    ExecInfo ei = ViewBag.ExecInfo;
+    DataTable dt_QueryResult = ViewBag.QueryResult;
+}
+
+@if (ei.RtnResult == false)
+{
+    <script>
+        alert("@(ei.RtnMsg)");
+    </script>
+}
+else
+{
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">支付對象明細清單</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>支付對象統編</th>
+                    <th>支付對象名稱</th>
+                    <th>編輯</th>
+                    <th>刪除</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (dt_QueryResult == null ||
+                     dt_QueryResult.Rows.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4" style="text-align:center;color:red;">
+                            查無資料！！
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (DataRow dr in dt_QueryResult.AsEnumerable().OrderBy(x => x.Field<string>("UnifiedBusinessNo")))
+                    {
+                        <tr>
+                            <td>@dr["UnifiedBusinessNo"].ToString()</td>
+                            <td>@dr["PayTargetName"].ToString()</td>
+                            <td>
+                                <a style="cursor:pointer;"
+                                   PTID="@dr["PTID"].ToString()"
+                                   UnifiedBusinessNo="@dr["UnifiedBusinessNo"].ToString()"
+                                   PayTargetName="@dr["PayTargetName"].ToString()"
+                                   onclick="fun_editlink_click(this)">
+                                    編輯
+                                </a>
+                            </td>
+                            <td>
+                                <a style="cursor:pointer;"
+                                   PTID="@dr["PTID"].ToString()"
+                                   onclick="fun_deletelink_click(this)">
+                                    刪除
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <div class="panel-footer"></div>
+    </div>
+
+    <div id="div_Data">
+        @Html.Hidden("hid_Data_PayTarget")
+    </div>
+}

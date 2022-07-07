@@ -1,0 +1,454 @@
+﻿
+@section scripts {
+    @*引用此js才可使用Ajax.BeginForm*@
+    <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+}
+
+@{
+    string s_UserData = ViewBag.UserData;
+}
+
+<style>
+    .mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(0,0,0,0.9);
+        display: none;
+    }
+
+    .mask_content {
+        width: 60%;
+        border: 2px solid #ccc;
+        background-color: white;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1001;
+        word-wrap: break-word;
+        padding: 3px;
+        display: inline-block;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function () {
+
+        //觸發查詢年度清單
+        $("#but_QueryRange").click();
+
+        //按下[新增年度]鈕
+        $("#btn_Add").click(function () {
+
+            var json_data_Range = {};
+            json_data_Range["ExecType"] = "Add";
+            json_data_Range["RID"] = -1;
+            json_data_Range["Date_B"] = null;
+            json_data_Range["Date_E"] = null;
+
+            $("#hid_Data_Range").val(JSON.stringify(json_data_Range));
+
+            fun_load_mask_data();
+
+        });//$("#btn_Add").click
+
+        //按下[取消]鈕
+        $("#btn_Cancle").click(function () {
+            var obj_div_mask = $("#div_mask");
+            obj_div_mask.css("display", "none");
+        });//$("#btn_Cancle").click
+
+    });//$(document).ready
+
+    //Ajax成功查詢[年度清單]
+    function fun_ajax_OnSuccess() {
+        //設定控制項權限
+        fun_set_control_authority();
+    }//fun_ajax_OnSuccess
+
+    //控制訊息框
+    //IsShow(是否顯示訊息框)，true=顯示、flase=不顯示
+    //Msg(訊息)
+    function fun_AlertCtrl(IsShow, Msg) {
+        var obj_div_Alert = $("#div_Alert");
+        var obj_msg = obj_div_Alert.find("#div_AlertMsg");
+
+        obj_div_Alert.css("display", (IsShow == true ? "block" : "none"));
+        obj_msg.html((IsShow == true ? Msg : ""));
+    }//fun_AlertCtrl
+
+    //按下[年度清單]的[編輯]鈕
+    function fun_editlink_click(obj_link) {
+
+        var json_data_Range = {};
+        json_data_Range["ExecType"] = "Modify";
+        json_data_Range["RID"] = fun_set_value($(obj_link).attr("RID"));
+        json_data_Range["Date_B"] = fun_set_value($(obj_link).attr("Date_B"));
+        json_data_Range["Date_E"] = fun_set_value($(obj_link).attr("Date_E"));
+
+        $("#hid_Data_Range").val(JSON.stringify(json_data_Range));
+
+        fun_load_mask_data();
+
+    }//fun_editlink_click
+
+    //載入遮罩資料
+    function fun_load_mask_data() {
+
+        //設定變數
+        var obj_div_mask = $("#div_mask");
+        var obj_title = obj_div_mask.find("h3:first");
+        var json_data_Range = JSON.parse($("#hid_Data_Range").val());
+
+        //設定抬頭
+        switch (json_data_Range.ExecType) {
+            case "Add":
+                obj_title.text("新增年度");
+                break;
+            case "Modify":
+                obj_title.text("編輯年度");
+                break;
+        }//switch
+
+        //將資料寫入控制項
+        $("#txt_Date_B").val(json_data_Range.Date_B);
+        $("#txt_Date_E").val(json_data_Range.Date_E);
+
+        //開啟遮罩
+        obj_div_mask.css("display", "block");
+
+    }//fun_load_mask_data
+
+    //存檔資料
+    function fun_save_mask_data(obj_id) {
+
+        //設定變數
+        var obj_trigger_control = $(obj_id);//觸發function控制項
+        var obj_div_mask = $("#div_mask");
+        var json_data_Range = JSON.parse($("#hid_Data_Range").val());
+
+        //將頁面上的值寫入Json物件
+        json_data_Range.Date_B = fun_set_value(fun_set_date_str($("#txt_Date_B").val()));//年度起始日
+        json_data_Range.Date_E = fun_set_value(fun_set_date_str($("#txt_Date_E").val()));//年度結束日
+
+        //檢核資料
+        $("#hid_Data_Range").val(JSON.stringify(json_data_Range));
+        if (fun_chk_mask_save() == false) {
+            return;
+        }
+        else {
+            //檢核成功，鎖定觸發控制項
+            obj_trigger_control.prop("disabled", true);
+        }
+
+        $.ajax({
+            type: "POST",
+            url: $("#hid_script_url_SaveRangeData").val(),
+            data: json_data_Range,
+            async: true,
+            timeout: (1000 * 30),//30秒timeout
+            cache: false,
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(["ajax發生異常：", "。Status：", textStatus, "。ErrMsg：", errorThrown].join(""));
+                obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+            }, //error結束
+            success: function (ajax_rtn_data) {
+
+                if (ajax_rtn_data.ExecInfo.RtnResult == false) {
+                    //顯示訊息
+                    alert(ajax_rtn_data.ExecInfo.RtnMsg);
+                }
+                else {
+                    //顯示訊息
+                    alert("存檔成功");
+
+                    //觸發查詢年度清單
+                    $("#but_QueryRange").click();
+
+                    //關閉遮罩
+                    obj_div_mask.css("display", "none");
+                }
+
+                //解除鎖定觸發控制項
+                obj_trigger_control.prop("disabled", false);
+
+            } //success結束
+        }); //ajax結束
+    }//fun_save_mask_data
+
+    //設定值
+    function fun_set_value(v_value) {
+        if (!v_value) {
+            return null;
+        }
+        else {
+            return (jQuery.trim(v_value) == "" ? null : jQuery.trim(v_value));
+        }
+    }//fun_set_value
+
+    //設定控制項權限
+    function fun_set_control_authority() {
+
+        var v_UserData = $("#hid_UserData").val();//使用者所屬部門
+
+        //true=>失效、false=>生效
+        var json_control_authority = [];
+        //Button類
+        json_control_authority.push({ "Like": false, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "btn_Add" });
+
+        //清單列表的Link
+        json_control_authority.push({ "Like": true, "System": false, "Sales": false, "Accounting": true, "Other": true, "Control_Id": "a_link_edit_" });//年度清單-[編輯]鈕
+
+        for (var index in json_control_authority) {
+
+            var json_detl = json_control_authority[index];
+            var v_control;
+
+            switch (json_detl.Like) {
+                case true:
+                    v_control = $(["a[id^='", json_detl.Control_Id, "']"].join(""));
+                    break;
+                case false:
+                    v_control = $(["#", json_detl.Control_Id].join(""));
+                    break;
+            }
+
+            var b_IsDisabled;
+
+            switch (v_UserData) {
+                case "System":
+                    b_IsDisabled = json_detl.System;
+                    break;
+                case "Sales":
+                    b_IsDisabled = json_detl.Sales;
+                    break;
+                case "Accounting":
+                    b_IsDisabled = json_detl.Accounting;
+                    break;
+                default:
+                    b_IsDisabled = json_detl.Other;
+                    break;
+            }
+
+            if (json_detl.Like == true) {
+                if (b_IsDisabled == true) {
+                    v_control.css("pointer-events", "none").css("color", "gray");
+                }
+            }
+            else {
+                v_control.prop("disabled", b_IsDisabled);
+            }
+
+        }//for
+
+    }//fun_set_control_authority
+
+    //設定值
+    function fun_set_value(v_value) {
+        if (!v_value) {
+            return null;
+        }
+        else {
+            return (jQuery.trim(v_value) == "" ? null : jQuery.trim(v_value));
+        }
+    }//fun_set_value
+
+    //設定日期字串
+    function fun_set_date_str(v_date_str) {
+
+        var v_rtn_date_str = "";
+
+        if (v_date_str.length == 8) {
+            v_rtn_date_str = [
+                v_date_str.substr(0, 4), "/",
+                v_date_str.substr(4, 2), "/",
+                v_date_str.substr(6, 2)].join("");
+        }
+        else {
+            v_rtn_date_str = v_date_str;
+        }
+
+        return v_rtn_date_str;
+
+    }//fun_set_date_str
+
+    //遮罩[年度]，按下[確定]鈕，檢核存檔資料
+    function fun_chk_mask_save() {
+
+        var v_Rtn_Msg = "";
+        var json_data_Range = JSON.parse($("#hid_Data_Range").val());
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Range.Date_B, "欄位[年度起始日]為必填欄位")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Range.Date_E, "欄位[年度結束日]為必填欄位")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date(json_data_Range.Date_B, "欄位[年度起始日]日期格式錯誤")].join("");
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date(json_data_Range.Date_E, "欄位[年度結束日]日期格式錯誤")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        var d_Date_B = fun_ParseDateType("yyyy/mm/dd", json_data_Range.Date_B);
+        var d_Date_E = fun_ParseDateType("yyyy/mm/dd", json_data_Range.Date_E);
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_date_compare(d_Date_B, d_Date_E, "欄位[年度結束日]不可小於欄位[年度開始日]")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        //都沒錯誤，回傳true
+        return true;
+    }//fun_chk_mask_save
+
+    //檢核必填欄位
+    function fun_chk_required(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+        v_value = fun_set_value(v_value);
+
+        if (!v_value) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_required
+
+    //檢核日期型態
+    function fun_chk_date(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+
+        if (fun_ParseDateType("yyyy/mm/dd", v_value) == "Wrong Date Format") {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_date
+
+    //檢核開始結束日期
+    function fun_chk_date_compare(d_b, d_e, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+
+        if (d_e < d_b) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_date_compare
+
+    //字串轉型日期
+    function fun_ParseDateType(DateStringType, DateString) {
+
+        var i_Year = 0;
+        var i_Month = 0;
+        var i_Date = 0;
+
+        switch (DateStringType) {
+            case "yyyymmdd":
+                i_Year = parseInt(DateString.substring(0, 4), 10);
+                i_Month = parseInt(DateString.substring(4, 6), 10) - 1;
+                i_Date = parseInt(DateString.substring(6, 8), 10);
+                break;
+            case "yyyy/mm/dd":
+                i_Year = parseInt(DateString.substring(0, 4), 10);
+                i_Month = parseInt(DateString.substring(5, 7), 10) - 1;
+                i_Date = parseInt(DateString.substring(8, 10), 10);
+                break;
+        }
+
+        var d_Return = new Date(i_Year, i_Month, i_Date);
+
+        if (i_Year != d_Return.getFullYear() ||
+            i_Month != d_Return.getMonth() ||
+            i_Date != d_Return.getDate()) {
+
+            d_Return = "Wrong Date Format";
+            return d_Return;
+        }
+
+        return d_Return;
+    }//fun_ParseDateType
+
+</script>
+
+<h2>聯名卡行銷贊助金</h2>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">新增年度</h3>
+    </div>
+    <div class="panel-body">
+        <div>
+            <button id="btn_Add" type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true">新增年度</span>
+            </button>
+        </div>
+        @using (Ajax.BeginForm("QueryRange", "CoBrandedSellSponsorship",
+            new AjaxOptions()
+            {
+                HttpMethod = "Post",
+                UpdateTargetId = "div_QueryResult",
+                InsertionMode = InsertionMode.Replace,
+                OnSuccess = "fun_ajax_OnSuccess"
+            }))
+        {
+            <div style="display:none;">
+                <button id="but_QueryRange" type="submit" />
+            </div>
+        }
+    </div>
+</div>
+
+@* Alert訊息 *@
+<div id="div_Alert" class="alert alert-danger" role="alert" style="display:none;">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <div id="div_AlertMsg"></div>
+</div>
+
+@* 查詢結果 *@
+<div id="div_QueryResult">
+</div>
+
+<div id="div_Data">
+    @Html.Hidden("hid_UserData", s_UserData)
+    @Html.Hidden("hid_script_url_SaveRangeData", Url.Action("SaveRangeData", "CoBrandedSellSponsorship"))
+</div>
+
+@* 新增、編輯年度 *@
+<div id="div_mask" class="mask" style="display:none;">
+    <div class="mask_content">
+        <div class="panel panel-default" style="margin:auto;">
+            <div class="panel-heading">
+                <h3 class="panel-title"></h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group row">
+                        @Html.Label("年度起始日：", new { @class = "control-label col-md-2" })
+                        <div class="col-md-1">
+                            @Html.TextBox("txt_Date_B", "", new { id = "txt_Date_B", maxlength = "8", style = "width:100px;", @class = "form-control" })
+                        </div>
+                        @Html.Label("(格式：YYYYMMDD)", new { @class = "control-label col-md-2", style = "text-align:left;margin-left:15px;" })
+                    </div>
+                    <div class="form-group row">
+                        @Html.Label("年度結束日：", new { @class = "control-label col-md-2" })
+                        <div class="col-md-1">
+                            @Html.TextBox("txt_Date_E", "", new { id = "txt_Date_E", maxlength = "8", style = "width:100px;", @class = "form-control" })
+                        </div>
+                        @Html.Label("(格式：YYYYMMDD)", new { @class = "control-label col-md-2", style = "text-align:left;margin-left:15px;" })
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="text-right col-md-8" style="text-align:left;">
+                            <button id="btn_Save" type="button" class="btn btn-primary" onclick="fun_save_mask_data(this);">
+                                <span class="glyphicon" aria-hidden="true">確定</span>
+                            </button>
+                            <button id="btn_Cancle" type="button" class="btn btn-primary">
+                                <span class="glyphicon" aria-hidden="true">取消</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

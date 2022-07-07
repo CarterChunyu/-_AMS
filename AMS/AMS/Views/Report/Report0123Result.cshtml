@@ -1,0 +1,445 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    ViewBag.Title = "月別特約機構每日消費明細表";
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+ 
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align:right;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        $("#group option[value='@ViewBag.groups']").prop("selected", "selected");
+        $("#retail").hide();
+        $("#bus").hide();
+        $("#bike").hide();
+        $("#track").hide();
+        $("#parking").hide();
+        $("#outsourcing").hide();
+        var groups = "@ViewBag.groups";
+        var groupSelected;
+        if (groups == "PARKING_LOT")
+        { groupSelected = "parking"; }
+        else if (groups == "BANK_OUTSOURCING")
+        { groupSelected = "outsourcing"; }
+        else
+        { groupSelected = groups.toLowerCase(); }
+
+        $("#"+groupSelected).show();
+
+        var testVar="@ViewBag.groups";
+        switch(testVar)
+        {
+            case "RETAIL":
+                $("#retail option[value='@ViewBag.retails']").prop("selected", "selected");
+                break;
+
+            case "BUS":
+                $("#bus option[value='@ViewBag.buses']").prop("selected", "selected");
+                break;
+
+            case "BIKE":
+                $("#bike option[value='@ViewBag.bikes']").prop("selected", "selected");
+                break;
+
+            case "TRACK":
+                $("#track option[value='@ViewBag.tracks']").prop("selected", "selected");
+                break;
+
+            case "PARKING_LOT":
+                $("#parking option[value='@ViewBag.parkings']").prop("selected", "selected");
+                break;
+
+            case "BANK_OUTSOURCING":
+                $("#outsourcing option[value='@ViewBag.outsourcings']").prop("selected", "selected");
+                break;
+        }
+
+
+        $("#group").on("change", function () {
+            switch ($(this).val()) {
+                case "RETAIL":
+                    $("#retail").show();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "BUS":
+                    $("#retail").hide();
+                    $("#bus").show();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "BIKE":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").show();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "TRACK":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").show();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "PARKING_LOT":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").show();
+                    $("#outsourcing").hide();
+                    break;
+                case "BANK_OUTSOURCING":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").show();
+                    break;
+                default:
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+            }
+        })
+    })
+
+</script>
+
+
+<script type='text/javascript'>
+//<![CDATA[
+    window.onload = function () {
+        $(document).ready(function () {
+            var table = $('.grid').not('.initialized').addClass('initialized').show().DataTable({
+                "columnDefs": [
+                    { "visible": false, "targets": 0 }
+                ],
+                "order": [[0, 'asc']],
+                "bSort": false,
+                "bFilter": false,
+                "sProcessing": "處理中...",
+                "bInfo": false,
+                "stateSave": false,
+                "stateDuration": 60 * 60 * 24 * 365,
+                "displayLength": 100,
+                "bPaginate": false,
+                "sScrollX": "100%",
+                "dom": 'lfTrtip',
+                "drawCallback": function (settings) {
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+                    var colonne = api.row(0).data().length;
+                    var totale = new Array();
+                    totale['Totale'] = new Array();
+                    var groupid = -1;
+                    var subtotale = new Array();
+
+                    var rowCountss = 0;
+                    var rowCounts = new Array();
+                    var totFee6 = 0;
+                    var totFee = 0;
+
+                    api.column(0, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            groupid++;
+
+                            $(rows).eq(i).before(
+                                '<tr class="roupp" style="display:none;height:0px"><td style="display:none;height:-10px">' + group + '</td></tr>'
+                            );
+                            last = group;
+                        }
+                    });
+
+                    
+                    $('tbody').find('.roupp').each(function (i, v) {
+                        rowCounts[i] = $(this).nextUntil('.roupp').length;
+                    });
+
+                    groupid = -1;
+                    last = null;
+                    api.column(0, { page: 'current' }).data().each(function (group, i) {
+
+                        if (last !== group) {
+                            groupid++;
+                            
+                            $(rows).eq(i + rowCounts[groupid] - 1).after(
+                                '<tr class="group"><td style="visibility:hidden">' + group + '</td></tr>'
+                            );
+                            last = group;
+                        }
+
+                        val = api.row(api.row($(rows).eq(i)).index()).data();      //current order index
+                        $.each(val, function (index2, val2) {
+                            if (typeof subtotale[groupid] == 'undefined') {
+                                subtotale[groupid] = new Array();
+                            }
+                            if (typeof subtotale[groupid][index2] == 'undefined') {
+                                subtotale[groupid][index2] = 0;
+                            }
+                            if (typeof totale['Totale'][index2] == 'undefined') { totale['Totale'][index2] = 0; }
+
+                            //valore = Number(val2.replace('€', "").replace('.', "").replace(',', "."));
+                            if (index2 > 2) {
+                                //var s = s.replace(/\你要置換的字串/g, 'AA');
+                                var s = val2.replace(/\,/g, '');
+                                s = s.replace('%', "");
+                                s = s.replace(/font/g, '');
+                                s = s.replace(/[<>]/g, '');
+                                s = s.replace(/\\>/g, '');
+                                s = s.replace(/\//g, '');
+                                s = s.replace(/\=/g, '');
+                                s = s.replace(/\"/g, '');
+                                s = s.replace(/\(/g, '-');
+                                s = s.replace(/\)/g, '');
+                                s = s.replace(/color/g, '');
+                                s = s.replace(/red/g, '');
+
+                                valore = Number(s);
+                                subtotale[groupid][index2] += valore;
+
+                                totale['Totale'][index2] += valore;
+                            }
+
+                            //totale['Totale'][index2] += valore;
+                        });
+
+                    });
+
+                    $('tbody').find('.group').each(function (i, v) {
+                        var rowCount = $(this).nextUntil('.group').length;
+                        $(this).find('td:first').append($('<span />', { 'class': 'rowCount-grid' }).append($('<b />', { 'text': ' (' + rowCounts[i] + ')' })));
+                        var subtd = '<td></td><td>小計</td>';
+                        for (var a = 4; a < colonne; a++) {
+                            //subtd += '<td>' + subtotale[i][a] + ' OUT OF ' + totale['Totale'][a] + ' (' + Math.round(subtotale[i][a] * 100 / totale['Totale'][a], 2) + '%) ' + '</td>';
+                                subtd += '<td Style="text-align:right" >' + formatThousands(subtotale[i][a]) + '</td>';
+                        }
+                        $(this).append(subtd);
+
+                    });
+
+                    $(this).append('<td></td><td></td><td>總計</td>');
+                    subtd = '';
+                    for (var a = 4; a < colonne; a++) {
+                            subtd += '<td Style="text-align:right" >' + formatThousands(totale['Totale'][a]) + '</td>';
+                    }
+                    $(this).append(subtd);
+                }
+            });
+
+
+
+        });
+
+    }//]]>
+
+    function formatThousands(n, dp) {
+        var s = '' + (Math.floor(n)), d = n % 1, i = s.length, r = '';
+        s = s.replace(/-/g, '');
+        i = s.length;
+        while ((i -= 3) > 0) { r = ',' + s.substr(i, 3) + r; }
+        if (n >= 0)
+            return s.substr(0, i + 3) + r + (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '');
+        else
+        {
+            return "<font color='red'>(" + s.substr(0, i + 3) + r + (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '') + ")</font>";
+        }
+    }
+</script>
+
+
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+        $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+
+    $(document).ready(function () {
+        d = new Date();
+        //alert(searchForm.elements["Merchant"].options[Choice].);
+        //searchForm.elements['Merch'].value = "a";
+        //showsel();
+    })
+
+    function showsel() {
+        var sel = "'"
+        var SB = searchForm.elements['Kind']; var Choice = SB.selectedIndex; //alert(Choice);
+        for (var i = 0, len = SB.options.length; i < len; i++) {
+            if (SB.options[i].selected) //alert(SB.options[i].value);
+                //alert(SB.options[i].text);
+                if (sel != "'")
+                    sel = sel + ",'" + SB.options[i].value + "'";
+                else
+                    sel = sel + SB.options[i].value + "'";
+        }
+        //alert(sel);
+        searchForm.elements['Kinds'].value = sel;
+        //alert(searchForm.elements['Kinda'].text);
+        //$("#Merch").attr("text", sel + d.getTime());
+
+    }
+</script>
+
+<h2>月別特約機構每日消費明細表</h2>
+
+@using (Html.BeginForm("Report0123Result", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">交易期間 :</label>
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.Start" style="width:100px;" /> -
+        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.End" style="width:100px;" />
+        <input type="text" name="Kinds" id="Kinds" value="@ViewBag.Kinds" style="display: none" />
+        <label for="group">特約機構:</label>
+        @Html.DropDownList("group", (IEnumerable<SelectListItem>)ViewBag.GROUP, "--請選擇--")
+        @Html.DropDownList("retail", (IEnumerable<SelectListItem>)ViewBag.RETAIL, "--請選擇--")
+        @Html.DropDownList("bus", (IEnumerable<SelectListItem>)ViewBag.BUS, "--請選擇--")
+        @Html.DropDownList("bike", (IEnumerable<SelectListItem>)ViewBag.BIKE, "--請選擇--")
+        @Html.DropDownList("track", (IEnumerable<SelectListItem>)ViewBag.TRACK, "--請選擇--")
+        @Html.DropDownList("parking", (IEnumerable<SelectListItem>)ViewBag.PARKING, "--請選擇--")
+        @Html.DropDownList("outsourcing", (IEnumerable<SelectListItem>)ViewBag.OUTSOURCING, "--請選擇--")
+        卡別<font color="red">(按著[Ctrl]鍵可多選)</font><select id="Kind" name="Kind" multiple onclick="showsel()">
+    <option @ViewBag.ViewBv[0] value="">--全部--</option>
+    <option @ViewBag.ViewBv[1] value="一代卡">一代卡</option>
+    <option @ViewBag.ViewBv[2] value="二代卡">二代卡</option>
+    <option @ViewBag.ViewBv[3] value="聯名卡">聯名卡</option>
+</select>
+
+
+    <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+    <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+</div>
+}
+
+@if (TempData["message"] != null)
+{
+    <script type="text/javascript">
+
+	var message = @Html.Raw(Json.Encode(TempData["message"]))
+	alert(message);
+    </script>
+}
+
+@if (ViewBag.Count > 0) {
+<table class="grid" width="100%">
+    <thead>
+        <tr>
+            @foreach (DataColumn col in Model.Columns)
+            {
+                <th style="text-align:right">@col.ColumnName</th>
+            }
+        </tr>
+
+    </thead>
+    <tbody>
+
+        @foreach (DataRow row in Model.Rows)
+        {
+            int j = 0;
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    string colValue = row[col.ColumnName].ToString();
+                    j++;
+                    if (j > 4 )
+                    {
+                        Int32 t = Int32.Parse(row[col.ColumnName].ToString());
+                        colValue = t.ToString("N", nfi);
+                        colValue = t.ToString("#,##0;#,##0;0");
+                        if (t < 0)
+                        {
+                            <td><font color="red"> (@colValue)</font></td>
+                        }                        
+                        else
+                        {
+                            <td> @colValue</td>
+                        }                        
+
+                    }
+                    else
+                    {
+                        <td>@colValue</td>
+                        
+                    }
+                }
+            </tr>
+        }
+
+
+    </tbody>
+    <tfoot>
+        <tr>
+            @foreach (DataColumn col in Model.Columns)
+            {
+                //<th style="text-align:right">@col.ColumnName</th>
+            }
+        </tr>
+    </tfoot>
+</table>
+}

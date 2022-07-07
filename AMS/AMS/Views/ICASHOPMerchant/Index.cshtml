@@ -1,0 +1,153 @@
+﻿@using Domain.ICASHOPMerchant;
+@using Newtonsoft.Json;
+@model Domain.ICASHOPMerchant.QueryReq
+
+@section scripts {
+    @*引用此js才可使用Ajax.BeginForm*@
+    <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+}
+
+<script>
+
+    //控制訊息框
+    //IsShow(是否顯示訊息框)，true=顯示、flase=不顯示
+    //Msg(訊息)
+    function fun_AlertCtrl(IsShow, Msg) {
+        var obj_div_Alert = $("#div_Alert");
+        var obj_msg = obj_div_Alert.find("#div_AlertMsg");
+
+        obj_div_Alert.css("display", (IsShow == true ? "block" : "none"));
+        obj_msg.html((IsShow == true ? Msg : ""));
+    }//fun_AlertCtrl
+
+    @{
+        bool b_IsTriggerQuery = false;
+
+        if (Model != null)
+        {
+            b_IsTriggerQuery = Model.IsQuery;
+        }
+    }
+
+    $(document).ready(function () {
+        if ("@b_IsTriggerQuery".toUpperCase() == "TRUE") {
+            $("#but_query").submit();
+        }
+    });
+
+    //按下[查詢]鈕，在按鈕送出(submit)之前
+    function fun_QueryBeforeSubmit() {
+        //將使用者在TextBox輸入的值寫入Hidden欄位
+        $("#IsQuery").val(true);//是否觸發查詢
+        $("#CurrentPage").val("1");//設定頁碼，按下查詢鈕一定是從第一頁開始
+        $("#UnifiedBusinessNo").val($("#txt_UnifiedBusinessNo").val());//特店統編
+        $("#MerchantName").val($("#txt_MerchantName").val());//特店名稱
+    }//fun_QueryBeforeSubmit
+
+    //按下[查詢]鈕開始
+    function fun_QueryBegin() {
+        fun_AlertCtrl(false);//隱藏訊息框
+        //鎖定查詢鈕
+        $("#but_query").attr("disabled", true);
+    }//fun_QueryBegin
+
+    //按下[查詢]鈕結束
+    function fun_QueryComplete() {
+        //解除鎖定查詢鈕
+        $("#but_query").attr("disabled", false);
+    }//fun_QueryComplete
+
+    //轉頁至編輯頁面
+    function fun_ToEditPage(button) {
+        var url = ['@Url.Action("Edit","ICASHOPMerchant")','?'].join('');//設定URL的Base路徑
+        var obj_EditReq = JSON.parse($(button).attr("data_EditReq"));//編輯頁面的資料物件
+        //var obj_QryCondition = JSON.parse($("#hid_QryCondition").val());//頁面上記錄的查詢條件狀態物件
+
+        //將[頁面上記錄的查詢條件狀態]寫入傳至[編輯頁面的資料物件]
+        obj_EditReq.Qry_IsQuery = $("#IsQuery").val();
+        obj_EditReq.Qry_CurrentPage = $("#CurrentPage").val();
+        obj_EditReq.Qry_UnifiedBusinessNo = $("#UnifiedBusinessNo").val();
+        obj_EditReq.Qry_MerchantName = $("#MerchantName").val();
+
+        //組合url參數
+        Object.keys(obj_EditReq).forEach(function (key) {
+            if (obj_EditReq[key] != null) {
+                url = [url, key, '=', obj_EditReq[key], '&'].join("");
+            }
+        });
+
+        //轉頁至編輯頁面
+        location.href = url;
+
+    }//fun_ToEditPage
+
+    //換頁，重新查詢
+    function getData(CurrentPage) {
+        $("#CurrentPage").val(CurrentPage);//記錄頁碼
+        $("#but_query").submit();
+    }
+
+</script>
+
+<h2>自串點數特店主檔維護</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">特店主檔查詢</h3>
+    </div>
+    <div class="panel-body">
+        <div>
+            <div id="div_query" class="form-horizontal">
+                <div class="form-group row">
+                    <div class="col-md-8">
+                        @Html.Label("特店統編：", new { @class = "control-label col-md-2" })
+                        @Html.TextBoxFor(m => m.UnifiedBusinessNo, new { id = "txt_UnifiedBusinessNo", maxlength = "8", style = "width:200px;" })
+                    </div>
+                    <div class="col-md-8">
+                        @Html.Label("特店名稱：", new { @class = "control-label col-md-2" })
+                        @Html.TextBoxFor(m => m.MerchantName, new { id = "txt_MerchantName", style = "width:200px;" })
+                    </div>
+                    @using (Ajax.BeginForm("Query", "ICASHOPMerchant", new AjaxOptions()
+                    {
+                        HttpMethod = "Post",
+                        UpdateTargetId = "div_QueryResult",
+                        InsertionMode = InsertionMode.Replace,
+                        OnBegin = "fun_QueryBegin",
+                        OnComplete = "fun_QueryComplete"
+                    }))
+                    {
+                        @Html.Hidden("IsQuery", false)
+                        @Html.Hidden("CurrentPage", 1)
+                        @Html.Hidden("UnifiedBusinessNo")
+                        @Html.Hidden("MerchantName")
+                        <div class="text-right col-md-2">
+                            <button id="but_query" type="submit" class="btn btn-primary" onclick="fun_QueryBeforeSubmit();">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true">查詢</span>
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div>
+            @{
+                string jsonstr_EditReq = JsonConvert.SerializeObject(new EditReq
+                {
+                    EditType = EditReq.en_EditType.Add
+                });
+            }
+            <button type="button" class="btn btn-primary" onclick="fun_ToEditPage(this);" data_EditReq="@jsonstr_EditReq">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true">新增</span>
+            </button>
+        </div>
+    </div>
+</div>
+@* Alert訊息 *@
+<div id="div_Alert" class="alert alert-danger" role="alert" style="display:none;">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <div id="div_AlertMsg"></div>
+</div>
+@* 查詢結果 *@
+<div id="div_QueryResult">
+</div>

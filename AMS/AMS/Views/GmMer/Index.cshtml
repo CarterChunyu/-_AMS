@@ -1,0 +1,24 @@
+﻿@model Domain.Entities.GmMerInput
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>特約機構建檔</h2>
+<h4></h4>
+@using (Html.BeginForm())
+{
+    <p><label>特約機構編號 </label>
+        @Html.TextBox("Input", "", new { @style = "width:auto;display:inline", @required = "required" })
+        <input type="submit" name="CheckExistBtn" id="CheckExistBtn" value="新增" class="btn btn-default" />
+  </p>
+}
+
+@if (TempData["message"] != null)
+{
+    <script type="text/javascript">
+        var message = @Html.Raw(Json.Encode(TempData["message"]))
+        alert(message);
+    </script>
+}
+

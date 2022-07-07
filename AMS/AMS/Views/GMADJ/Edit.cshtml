@@ -1,0 +1,283 @@
+﻿@model AMS.ViewModels.ApplicationItemSums
+
+@using DataAccess;
+@{
+    ViewBag.Title = "編輯申請表";
+}
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#APP_DATE').datepicker({ dateFormat: 'yymmdd' });
+        $('#OPP_DATE_START').datepicker({ dateFormat: 'yymmdd' });
+        $('#OPP_DATE_END').datepicker({ dateFormat: 'yymmdd' });
+    });
+</script>
+<script type="text/javascript" src="~/Scripts/jquery.validate.min.js"> </script>
+<script>
+    $(function () {
+        // Initialize form validation on the registration form.
+        // It has the name attribute "registration"
+        $("form[name='frm1']").validate({
+            errorClass: "my-error-class",
+           
+            // Specify validation rules
+            rules: {
+                // The key name on the left side is the name attribute
+                // of an input field. Validation rules are defined
+                // on the right side
+                APP_DATE: 
+                {   required:true,
+                    minlength: 8,
+                    maxlength : 8
+                },
+                OPP_DATE_START:
+                    {   required:true,
+                        minlength: 8,
+                        maxlength : 8
+                    },
+                OPP_DATE_END: 
+                    {
+                        required: true,
+                        minlength: 8,
+                        maxlength: 8
+
+                    },
+                FORM_SERIAL:
+                    {
+                        required: true,
+                        maxlength: 15
+                    }
+
+            },
+            // Specify validation error messages
+            messages: 
+            {
+                APP_DATE: 
+                { 
+                    required: "請輸入申請日期",
+                    minlength: "最小長度為8",
+                    maxlength : "最大長度為8"
+                },
+                OPP_DATE_START:
+                {  
+                    required: "請輸入營運日起",
+                    minlength: "最小長度為8",
+                    maxlength : "最大長度為8"
+                },
+                OPP_DATE_END:
+                {
+                    required: "請輸入營運日迄",
+                    minlength: "最小長度為8",
+                    maxlength: "最大長度為8"
+                },
+                FORM_SERIAL: 
+                {
+                    required: "請輸入本表編號",
+                    maxLength: "最大長度15"
+                }
+            },
+            // Make sure the form is submitted to the destination defined
+            // in the "action" attribute of the form when valid
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+    });
+
+</script>
+
+<style>
+
+    .my-error-class {
+        color: red;
+    }
+
+  
+    .all {
+        display: inline-block;
+    }
+
+    .under td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+
+    #ADJ_REMARK {
+        
+        border: 1px solid #808080;
+    }
+
+    #REPLY_REMARK {
+        
+        border: 1px solid #808080;
+    }
+</style>
+
+<h2>編輯申請表</h2>
+<div class="all">
+    @using (Html.BeginForm("Edit", "GMADJ", FormMethod.Post, new { name = "frm1", id = "frm1" }))
+    {
+        @Html.AntiForgeryToken()
+
+
+
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.ADJApplication.FORM_ID, new { id="FORM_ID" , Name="FORM_ID"})
+
+
+
+        <table>
+        <tr class="top-row">
+
+            <td class="item">
+
+                @Html.LabelFor(model => model.ADJApplication.APP_DATE)
+            </td>
+            <td>
+                    @Html.TextBoxFor(model => model.ADJApplication.APP_DATE, new { id = "APP_DATE", Name = "APP_DATE" })
+                    @Html.ValidationMessageFor(model => model.ADJApplication.APP_DATE)
+                
+            </td>
+
+
+            <td class="item">
+                @Html.LabelFor(model => model.ADJApplication.OPP_DATE_START)
+            </td>
+                <td >
+                    @Html.TextBoxFor(model => model.ADJApplication.OPP_DATE_START, new { id = "OPP_DATE_START", Name = "OPP_DATE_START" })
+                    @Html.ValidationMessageFor(model => model.ADJApplication.OPP_DATE_START)
+                </td>
+            
+
+
+            <td class="item">
+
+                @Html.LabelFor(model => model.ADJApplication.OPP_DATE_END)
+            </td>
+                <td>
+                    @Html.TextBoxFor(model => model.ADJApplication.OPP_DATE_END,new { id = "OPP_DATE_END", Name = "OPP_DATE_END" })
+                    @Html.ValidationMessageFor(model => model.ADJApplication.OPP_DATE_END)
+                </td>
+            
+        </tr>
+        <tr class="second-row">
+
+            <td class="item">
+                @Html.LabelFor(model => model.ADJApplication.FORM_SERIAL)
+            </td>
+            <td>
+                    @Html.TextBoxFor(model => model.ADJApplication.FORM_SERIAL, new { id = "FORM_SERIAL", Name = "FORM_SERIAL" })
+                    @Html.ValidationMessageFor(model => model.ADJApplication.FORM_SERIAL)
+                
+            </td>
+            <td class="item">
+                @Html.LabelFor(model => model.ADJApplication.MERCHANT_NO)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.ADJApplication.MERCHANT_NO, new { id = "MERCHANT_NO", Name = "MERCHANT_NO",@readonly="readonly" })
+                @Html.ValidationMessageFor(model => model.ADJApplication.MERCHANT_NO)
+            </td>
+            <td class="item">
+                @Html.Label("特約機構名稱")
+            </td>
+            @{string  name= new GmSchemaObjDAO().FindSchemaObj(Model.ADJApplication.MERCHANT_NO).MerchantName;}
+            <td>
+                @Html.TextBox("MERCHANT_NAME", @name, new { @readonly="readonly" })
+            </td>
+        </tr>
+        </table>
+        @Html.ActionLink("新增應收項目", "NewARItem", new { merchantNo = Model.ADJApplication.MERCHANT_NO })
+            
+         <h3>應收項目</h3>
+        <table>
+            <tr class="under">
+                <td>項次</td>
+                <td>調整項目</td>
+                <td>筆數</td>
+                <td>金額</td>
+                <td>備註</td>
+                <td></td>
+            </tr>
+            @{ 
+        int countr = 0;
+        decimal sumr = 0;
+             }
+            @foreach (var ar in Model.ARCountAmount)
+            {
+                    <tr class ="under">
+                        <td>@ar.Item1</td><td>@ar.Item2</td><td>@ar.Item3</td><td>@ar.Item4</td><td>@ar.Item5</td><td>@Html.ActionLink("項目編輯", "ItemEditing", new { appItemId = @ar.Item6 })|@Html.ActionLink("刪除", "ItemDeleting", new { appItemId = @ar.Item6 }, new { onClick = "return confirm('確定要刪除?');" })</td></tr>
+                countr += ar.Item3;
+                sumr += ar.Item4;
+            }
+            <tr class="under"><td>應收合計</td><td></td><td>@countr</td><td>@sumr</td><td></td><td></td></tr>
+
+        </table>
+                
+        <br/>
+        @Html.ActionLink("新增應付項目", "NewAPItem", new { merchantNo = Model.ADJApplication.MERCHANT_NO })
+        <h3>應付項目</h3>
+        
+        <table>
+            @{
+            int countp = 0;
+            decimal sump = 0;
+             }
+            <tr class="under"><td>項次</td><td>調整項目</td><td>筆數</td><td>金額</td><td>備註</td><td></td></tr>
+            @foreach (var ap in Model.APCountAmount)
+            {
+                
+                <tr class="under"><td>@ap.Item1</td><td>@ap.Item2</td><td>@ap.Item3</td><td>@ap.Item4</td><td>@ap.Item5</td><td>@Html.ActionLink("項目編輯", "ItemEditing", new { appItemId = @ap.Item6 })|@Html.ActionLink("刪除", "ItemDeleting", new { appItemId = @ap.Item6 }, new { onClick = "return confirm('確定要刪除?');" })</td></tr>
+                countp += ap.Item3;
+                sump += ap.Item4;
+            }
+            
+            <tr class="under"><td>應付合計</td><td></td><td>@countp</td><td>@sump</td><td></td><td></td></tr>
+        </table>
+        
+        
+        <br/>
+            { decimal sum = sumr - sump; 
+        <p>應收應付合計: @sum</p>
+            }
+        <br/>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.ADJApplication.ADJ_REMARK, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.ADJApplication.ADJ_REMARK, new { @cols = "200", @rows = "3", id = "ADJ_REMARK", Name = "ADJ_REMARK" })
+                @Html.ValidationMessageFor(model => model.ADJApplication.ADJ_REMARK)
+            </div>
+        </div>
+        <br/>
+        <br/>
+        <div class="form-group">
+            @Html.LabelFor(model => model.ADJApplication.REPLY_REMARK, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.ADJApplication.REPLY_REMARK, new { @cols = "200", @rows = "3", id = "REPLY_REMARK", Name = "REPLY_REMARK" })
+                @Html.ValidationMessageFor(model => model.ADJApplication.REPLY_REMARK)
+            </div>
+        </div>
+
+        <br/>
+        <br/>
+        <div class="form-group" >
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="儲存申請表" class="btn btn-default" />
+            </div>
+        </div>
+
+    }
+
+    <div >
+        @Html.ActionLink("取消回查詢列表", "Index", new { begin = Session["beginDate"], end = Session["endDate"], merchantNo = Session["merchantNo"] })
+    </div>
+</div>

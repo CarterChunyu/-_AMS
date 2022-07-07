@@ -1,0 +1,132 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+
+
+<head>
+    <title>@ViewBag.RepName</title>
+
+    <link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+    <script src="~/js/jquery.dataTables.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+    <style type='text/css'>
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+
+        th {
+            text-align: right;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            text-align: left;
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            background-color: #ffffff;
+            text-align: right;
+        }
+    </style>
+
+    <link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+    <script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+    <script type="text/javascript">
+        $(function () {
+            $('#settleDate').datepicker({ dateFormat: 'yymmdd' });
+
+        });
+
+    </script>
+</head>
+<body>
+
+    <h2>@ViewBag.RepName</h2>
+
+    @using (Html.BeginForm("RPT_170201", "ReportACT", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div>
+            <label for="settleDate"> 清分日期:</label>
+            <input type="text" name="settleDate" id="settleDate" value="@ViewBag.SettleDate" style="width:100px;" />
+
+
+            <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+            <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+        </div>
+    }
+
+    <table class="grid" width="100%">
+        <thead>
+            <tr style="background-color: lightgray">
+                <th>
+                    清算日期
+                </th>
+                <th>
+                    車站代號
+                </th>
+                <th>
+                    車站名稱
+                </th>
+                <th>
+                    卡機代號
+                </th>
+                <th>
+                    卡號
+                </th>
+                <th>
+                    卡機交易時間
+                </th>
+                <th>
+                    交易類型
+                </th>
+                <th>
+                    交易金額
+                </th>
+                <th>
+                    剔退原因
+                </th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        if (j == 7)
+                        {
+                            <td>@Convert.ToInt64(row.ItemArray[j]).ToString("n0")</td>
+                        }
+                        else
+                        {
+                            <td>@row.ItemArray[j].ToString()</td>
+                        }
+                    }
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</body>

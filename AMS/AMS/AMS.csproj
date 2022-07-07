@@ -1,0 +1,938 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F44D1506-69A5-4CEC-8D3A-7AF505AABF82}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AMS</RootNamespace>
+    <AssemblyName>AMS</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CardValidator">
+      <HintPath>..\..\..\Web\Reference\CardValidator.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging, Version=2.1.2.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Reference\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net1211">
+      <HintPath>..\..\..\..\..\Reference\Common.Logging.Log4Net1211.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus">
+      <HintPath>..\..\..\..\..\LIB\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\NPOI.2.0.6\lib\net40\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\..\..\..\Reference\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="NPOI">
+      <HintPath>..\packages\NPOI.2.0.6\lib\net40\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML">
+      <HintPath>..\packages\NPOI.2.0.6\lib\net40\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net">
+      <HintPath>..\packages\NPOI.2.0.6\lib\net40\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats">
+      <HintPath>..\packages\NPOI.2.0.6\lib\net40\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
+    </Reference>
+    <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.DataVisualization" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.1.2\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.1.2\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease">
+      <Private>True</Private>
+      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr3.Runtime">
+      <Private>True</Private>
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.0.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.0.0\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.0.0\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\packages\Microsoft.Owin.2.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.2.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Facebook">
+      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.2.1.0\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.2.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.2.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Google">
+      <HintPath>..\packages\Microsoft.Owin.Security.Google.2.1.0\lib\net45\Microsoft.Owin.Security.Google.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Twitter">
+      <HintPath>..\packages\Microsoft.Owin.Security.Twitter.2.1.0\lib\net45\Microsoft.Owin.Security.Twitter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.MicrosoftAccount">
+      <HintPath>..\packages\Microsoft.Owin.Security.MicrosoftAccount.2.1.0\lib\net45\Microsoft.Owin.Security.MicrosoftAccount.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="Content\IdentityConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AccountingController.cs" />
+    <Compile Include="Controllers\ACInvoiceController.ACInvoiceReport_2021.cs" />
+    <Compile Include="Controllers\ACInvoiceController.ACInvoiceRewardReport2021.cs" />
+    <Compile Include="Controllers\ACInvoiceController.cs" />
+    <Compile Include="Controllers\AmRolesController.cs" />
+    <Compile Include="Controllers\AmUsersController.cs" />
+    <Compile Include="Controllers\BankAdjController.cs" />
+    <Compile Include="Controllers\BankController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\ChoiceController.cs" />
+    <Compile Include="Controllers\CoBrandedSellSponsorshipController.cs" />
+    <Compile Include="Controllers\EntAcctController.cs" />
+    <Compile Include="Controllers\FPCReportController.cs" />
+    <Compile Include="Controllers\GmAccountController.cs" />
+    <Compile Include="Controllers\GmAccountStoreController.cs" />
+    <Compile Include="Controllers\GMADJController.cs" />
+    <Compile Include="Controllers\GmMerController.cs" />
+    <Compile Include="Controllers\GmTypeController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ICASHOPMerchantSynchronizeController.cs" />
+    <Compile Include="Controllers\ICASHOPOverdraftController.cs" />
+    <Compile Include="Controllers\ICASHOPInvoiceFileController.cs" />
+    <Compile Include="Controllers\ICASHOPMerchantController.cs" />
+    <Compile Include="Controllers\ICASHOPMerchantStoreController.cs" />
+    <Compile Include="Controllers\ICASHOPReportController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\MenuController.cs" />
+    <Compile Include="Controllers\MerchantController.cs" />
+    <Compile Include="Controllers\ReportACTController.cs" />
+    <Compile Include="Controllers\ReportBankController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\ReportMarketingController.cs" />
+    <Compile Include="Controllers\ReportSystemController.cs" />
+    <Compile Include="CustomAuthorize.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\AmEntAccountDModel.cs" />
+    <Compile Include="Models\AmEntAcctDModel.cs" />
+    <Compile Include="Models\AmEntReceDModel.cs" />
+    <Compile Include="Models\AmRolesModel.cs" />
+    <Compile Include="Models\AmUsersModel.cs" />
+    <Compile Include="Models\BM_TRANS_TYPE.cs" />
+    <Compile Include="Models\ChoiceModel.cs" />
+    <Compile Include="Models\CrBankAdjcaseDTmpModel.cs" />
+    <Compile Include="Models\CrBankAdjcaseMTmpModel.cs" />
+    <Compile Include="Models\GMADJModel.Context.cs" />
+    <Compile Include="Models\GMADJModel.cs" />
+    <Compile Include="Models\GMADJModel.Designer.cs">
+      <DependentUpon>GMADJModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GMADJModel1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GMADJModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GMADJModel1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GMADJModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GmMerModel.cs" />
+    <Compile Include="Models\GM_ADJ_APPLICATION.cs">
+      <DependentUpon>GMADJModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GM_ADJ_APPLICATION_ITEM.cs">
+      <DependentUpon>GMADJModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\LoginUserModel.cs" />
+    <Compile Include="Models\MenuModel.cs" />
+    <Compile Include="Models\OpenPointMerchantStore\DownloadReq.cs" />
+    <Compile Include="Models\OpenPointMerchant\EditReq.cs" />
+    <Compile Include="Models\OpenPointMerchant\EditSaveReq.cs" />
+    <Compile Include="Models\OpenPointMerchant\QueryReq.cs" />
+    <Compile Include="Models\PasswordModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Items.cs" />
+    <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\ApplicationItemSums.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ajax\custom_data_flat.html" />
+    <Content Include="ajax\custom_data_property.html" />
+    <Content Include="ajax\data\arrays.txt" />
+    <Content Include="ajax\data\arrays_custom_prop.txt" />
+    <Content Include="ajax\data\arrays_subobjects.txt" />
+    <Content Include="ajax\data\objects.txt" />
+    <Content Include="ajax\data\objects_deep.txt" />
+    <Content Include="ajax\data\objects_root_array.txt" />
+    <Content Include="ajax\data\objects_subarrays.txt" />
+    <Content Include="ajax\data\orthogonal.txt" />
+    <Content Include="ajax\deep.html" />
+    <Content Include="ajax\defer_render.html" />
+    <Content Include="ajax\index.html" />
+    <Content Include="ajax\null_data_source.html" />
+    <Content Include="ajax\objects.html" />
+    <Content Include="ajax\objects_subarrays.html" />
+    <Content Include="ajax\orthogonal-data.html" />
+    <Content Include="ajax\simple.html" />
+    <Content Include="bin\AMS.dll" />
+    <Content Include="bin\AMS.dll.VisualState.xml" />
+    <Content Include="bin\AMS.pdb" />
+    <Content Include="bin\Antlr3.Runtime.dll" />
+    <Content Include="bin\Antlr3.Runtime.pdb" />
+    <Content Include="bin\Business.dll" />
+    <Content Include="bin\Business.pdb" />
+    <Content Include="bin\CardValidator.dll" />
+    <Content Include="bin\Common.Logging.dll" />
+    <Content Include="bin\Common.Logging.Log4Net1211.dll" />
+    <Content Include="bin\DataAccess.dll" />
+    <Content Include="bin\DataAccess.pdb" />
+    <Content Include="bin\Domain.dll" />
+    <Content Include="bin\Domain.pdb" />
+    <Content Include="bin\EntityFramework.dll" />
+    <Content Include="bin\EntityFramework.SqlServer.dll" />
+    <Content Include="bin\EntityFramework.SqlServer.xml" />
+    <Content Include="bin\EntityFramework.xml" />
+    <Content Include="bin\Helpers.dll" />
+    <Content Include="bin\Helpers.pdb" />
+    <Content Include="bin\ICSharpCode.SharpZipLib.dll" />
+    <Content Include="bin\log4net.dll" />
+    <Content Include="bin\Microsoft.AspNet.Identity.Core.dll" />
+    <Content Include="bin\Microsoft.AspNet.Identity.Core.xml" />
+    <Content Include="bin\Microsoft.AspNet.Identity.EntityFramework.dll" />
+    <Content Include="bin\Microsoft.AspNet.Identity.EntityFramework.xml" />
+    <Content Include="bin\Microsoft.AspNet.Identity.Owin.dll" />
+    <Content Include="bin\Microsoft.AspNet.Identity.Owin.xml" />
+    <Content Include="bin\Microsoft.Owin.dll" />
+    <Content Include="bin\Microsoft.Owin.Host.SystemWeb.dll" />
+    <Content Include="bin\Microsoft.Owin.Host.SystemWeb.xml" />
+    <Content Include="bin\Microsoft.Owin.Security.Cookies.dll" />
+    <Content Include="bin\Microsoft.Owin.Security.Cookies.xml" />
+    <Content Include="bin\Microsoft.Owin.Security.dll" />
+    <Content Include="bin\Microsoft.Owin.Security.Facebook.dll" />
+    <Content Include="bin\Microsoft.Owin.Security.Facebook.xml" />
+    <Content Include="bin\Microsoft.Owin.Security.Google.dll" />
+    <Content Include="bin\Microsoft.Owin.Security.Google.xml" />
+    <Content Include="bin\Microsoft.Owin.Security.MicrosoftAccount.dll" />
+    <Content Include="bin\Microsoft.Owin.Security.MicrosoftAccount.xml" />
+    <Content Include="bin\Microsoft.Owin.Security.OAuth.dll" />
+    <Content Include="bin\Microsoft.Owin.Security.OAuth.xml" />
+    <Content Include="bin\Microsoft.Owin.Security.Twitter.dll" />
+    <Content Include="bin\Microsoft.Owin.Security.Twitter.xml" />
+    <Content Include="bin\Microsoft.Owin.Security.xml" />
+    <Content Include="bin\Microsoft.Owin.xml" />
+    <Content Include="bin\Microsoft.Web.Infrastructure.dll" />
+    <Content Include="bin\Newtonsoft.Json.dll" />
+    <Content Include="bin\Newtonsoft.Json.xml" />
+    <Content Include="bin\NPOI.dll" />
+    <Content Include="bin\NPOI.OOXML.dll" />
+    <Content Include="bin\NPOI.OOXML.xml" />
+    <Content Include="bin\NPOI.OpenXml4Net.dll" />
+    <Content Include="bin\NPOI.OpenXml4Net.xml" />
+    <Content Include="bin\NPOI.OpenXmlFormats.dll" />
+    <Content Include="bin\NPOI.xml" />
+    <Content Include="bin\Owin.dll" />
+    <Content Include="bin\System.Net.Http.Formatting.dll" />
+    <Content Include="bin\System.Net.Http.Formatting.xml" />
+    <Content Include="bin\System.Web.Helpers.dll" />
+    <Content Include="bin\System.Web.Helpers.xml" />
+    <Content Include="bin\System.Web.Http.dll" />
+    <Content Include="bin\System.Web.Http.WebHost.dll" />
+    <Content Include="bin\System.Web.Http.WebHost.xml" />
+    <Content Include="bin\System.Web.Http.xml" />
+    <Content Include="bin\System.Web.Mvc.dll" />
+    <Content Include="bin\System.Web.Mvc.xml" />
+    <Content Include="bin\System.Web.Optimization.dll" />
+    <Content Include="bin\System.Web.Optimization.xml" />
+    <Content Include="bin\System.Web.Razor.dll" />
+    <Content Include="bin\System.Web.Razor.xml" />
+    <Content Include="bin\System.Web.WebPages.Deployment.dll" />
+    <Content Include="bin\System.Web.WebPages.Deployment.xml" />
+    <Content Include="bin\System.Web.WebPages.dll" />
+    <Content Include="bin\System.Web.WebPages.Razor.dll" />
+    <Content Include="bin\System.Web.WebPages.Razor.xml" />
+    <Content Include="bin\System.Web.WebPages.xml" />
+    <Content Include="bin\WebGrease.dll" />
+    <Content Include="bin\zh-Hant\System.Net.Http.Formatting.resources.dll" />
+    <Content Include="bin\zh-Hant\System.Web.Http.resources.dll" />
+    <Content Include="bin\zh-Hant\System.Web.Http.WebHost.resources.dll" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\themes\base\accordion.css" />
+    <Content Include="Content\themes\base\all.css" />
+    <Content Include="Content\themes\base\autocomplete.css" />
+    <Content Include="Content\themes\base\base.css" />
+    <Content Include="Content\themes\base\button.css" />
+    <Content Include="Content\themes\base\core.css" />
+    <Content Include="Content\themes\base\datepicker.css" />
+    <Content Include="Content\themes\base\dialog.css" />
+    <Content Include="Content\themes\base\draggable.css" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\menu.css" />
+    <Content Include="Content\themes\base\progressbar.css" />
+    <Content Include="Content\themes\base\resizable.css" />
+    <Content Include="Content\themes\base\selectable.css" />
+    <Content Include="Content\themes\base\selectmenu.css" />
+    <Content Include="Content\themes\base\slider.css" />
+    <Content Include="Content\themes\base\sortable.css" />
+    <Content Include="Content\themes\base\spinner.css" />
+    <Content Include="Content\themes\base\tabs.css" />
+    <Content Include="Content\themes\base\theme.css" />
+    <Content Include="Content\themes\base\tooltip.css" />
+    <Content Include="Content\themes\redmond\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\redmond\images\ui-bg_flat_55_fbec88_40x100.png" />
+    <Content Include="Content\themes\redmond\images\ui-bg_glass_75_d0e5f5_1x400.png" />
+    <Content Include="Content\themes\redmond\images\ui-bg_glass_85_dfeffc_1x400.png" />
+    <Content Include="Content\themes\redmond\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\redmond\images\ui-bg_gloss-wave_55_5c9ccc_500x100.png" />
+    <Content Include="Content\themes\redmond\images\ui-bg_inset-hard_100_f5f8f9_1x100.png" />
+    <Content Include="Content\themes\redmond\images\ui-bg_inset-hard_100_fcfdfd_1x100.png" />
+    <Content Include="Content\themes\redmond\images\ui-icons_217bc0_256x240.png" />
+    <Content Include="Content\themes\redmond\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\redmond\images\ui-icons_469bdd_256x240.png" />
+    <Content Include="Content\themes\redmond\images\ui-icons_6da8d5_256x240.png" />
+    <Content Include="Content\themes\redmond\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\redmond\images\ui-icons_d8e7f3_256x240.png" />
+    <Content Include="Content\themes\redmond\images\ui-icons_f9bd01_256x240.png" />
+    <Content Include="Content\themes\redmond\jquery-ui.css" />
+    <Content Include="Content\themes\redmond\jquery-ui.min.css" />
+    <Content Include="Content\themes\redmond\theme.css" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\smoothness\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\smoothness\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\smoothness\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\smoothness\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\smoothness\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\smoothness\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\smoothness\jquery-ui-1.7.2.custom.css" />
+    <Content Include="css\jquery.dataTables.css" />
+    <Content Include="css\jquery.dataTables.min.css" />
+    <Content Include="css\jquery.dataTables_themeroller.css" />
+    <Content Include="favicon.ico" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="Content\Site.css" />
+    <Content Include="images\back_disabled.jpg" />
+    <Content Include="images\back_enabled.jpg" />
+    <Content Include="images\DataTables.jpg" />
+    <Content Include="images\favicon.ico" />
+    <Content Include="images\forward_disabled.jpg" />
+    <Content Include="images\forward_enabled.jpg" />
+    <Content Include="images\Image.jpg" />
+    <Content Include="images\Image_.jpg" />
+    <Content Include="images\minus.jpg" />
+    <Content Include="images\plus.jpg" />
+    <Content Include="images\sort_asc.png" />
+    <Content Include="images\sort_asc_disabled.png" />
+    <Content Include="images\sort_both.png" />
+    <Content Include="images\sort_desc.png" />
+    <Content Include="images\sort_desc_disabled.png" />
+    <Content Include="images\unchecked.gif" />
+    <Content Include="js\bootstrap-select.min.css" />
+    <Content Include="js\bootstrap-select.min.js" />
+    <Content Include="js\jquery.dataTables.js" />
+    <Content Include="js\jquery.dataTables.min.js" />
+    <Content Include="js\jquery.js" />
+    <Content Include="log4net.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="media\css\demo_page.css" />
+    <Content Include="media\css\demo_table.css" />
+    <Content Include="media\css\demo_table_jui.css" />
+    <Content Include="media\css\demo_validation.css" />
+    <Content Include="media\css\site_jui.ccss.css" />
+    <Content Include="media\css\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="media\css\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="media\css\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="media\css\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="media\css\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="media\css\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="media\css\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="media\css\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="media\css\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="media\css\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="media\css\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="media\css\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="media\css\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="media\css\themes\base\jquery-ui.css" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-icons_222222_256x240.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-icons_454545_256x240.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-icons_888888_256x240.png" />
+    <Content Include="media\css\themes\smoothness\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="media\css\themes\smoothness\jquery-ui-1.7.2.custom.css" />
+    <Content Include="media\images\back_disabled.jpg" />
+    <Content Include="media\images\back_enabled.jpg" />
+    <Content Include="media\images\DataTables.jpg" />
+    <Content Include="media\images\favicon.ico" />
+    <Content Include="media\images\forward_disabled.jpg" />
+    <Content Include="media\images\forward_enabled.jpg" />
+    <Content Include="media\images\minus.jpg" />
+    <Content Include="media\images\plus.jpg" />
+    <Content Include="media\images\sort_asc.png" />
+    <Content Include="media\images\sort_asc_disabled.png" />
+    <Content Include="media\images\sort_both.png" />
+    <Content Include="media\images\sort_desc.png" />
+    <Content Include="media\images\sort_desc_disabled.png" />
+    <Content Include="media\images\unchecked.gif" />
+    <Content Include="media\js\complete.js" />
+    <Content Include="media\js\jquery-1.4.4.min.js" />
+    <Content Include="media\js\jquery-ui.js" />
+    <Content Include="media\js\jquery.dataTables.min.js" />
+    <Content Include="media\js\jquery.dataTables.rowGrouping.js" />
+    <Content Include="resources\demo.css" />
+    <Content Include="resources\demo.js" />
+    <Content Include="resources\details_close.png" />
+    <Content Include="resources\details_open.png" />
+    <Content Include="resources\examples.php" />
+    <Content Include="resources\syntax\shCore.css" />
+    <Content Include="resources\syntax\shCore.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="resources\syntax\Syntax Highlighter license" />
+    <Content Include="bin\AMS.dll.config" />
+    <Content Include="Models\GMADJModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GMADJModel.Context1.cs</LastGenOutput>
+    </Content>
+    <EntityDeploy Include="Models\GMADJModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>GMADJModel1.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\GMADJModel.edmx.diagram">
+      <DependentUpon>GMADJModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="Models\GMADJModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>GMADJModel1.cs</LastGenOutput>
+    </Content>
+    <Content Include="App_Data\ICASHOPMerchantStore\FileTemplate\Template.xlsx" />
+    <None Include="Scripts\jquery-2.1.1.intellisense.js" />
+    <Content Include="Scripts\datepicker-zh-TW.js" />
+    <Content Include="Scripts\jquery-2.1.1.js" />
+    <Content Include="Scripts\jquery-2.1.1.min.js" />
+    <Content Include="Scripts\jquery-2.1.1.min.map" />
+    <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-ui-1.11.2.js" />
+    <Content Include="Scripts\jquery-ui-1.11.2.min.js" />
+    <Content Include="Scripts\jquery.dataTables.min.js" />
+    <Content Include="Scripts\jquery.dataTables.rowGrouping.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\modalform.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\respond.js" />
+    <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\_references.js" />
+    <Content Include="Sql\GmAccount\GmAccount190501.sql" />
+    <Content Include="Sql\GmAccount\GmAccount200201.sql" />
+    <Content Include="Sql\GmAccount\GmAccount200601_01.sql" />
+    <Content Include="Sql\GmAccount\GmAccount200601_03.sql" />
+    <Content Include="Sql\GmAccount\GmAccount200601_05.sql" />
+    <Content Include="Sql\GmAccount\GmAccount200601_N.sql" />
+    <Content Include="Sql\GmAccount\GmAccount200601_Y.sql" />
+    <Content Include="Sql\ReportACT\ReportACT160901_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT160901_02.sql" />
+    <Content Include="Sql\ReportACT\ReportACT161101_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT161201_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT161202_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170101_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170102_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170103_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170104_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170105_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170201_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170202_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170401_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170501_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170501_02.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170501_03.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170501_04.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170501_2r.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170501_3r.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170501_4r.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170801_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT170802_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180301_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180301_02.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180301_03.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180301_04.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180401_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180402_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180403_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180701_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT180702_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT181101_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT181101_02.sql" />
+    <Content Include="Sql\ReportACT\ReportACT181201_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT181202_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT181202_02.sql" />
+    <Content Include="Sql\ReportACT\ReportACT190101_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT190701_02.sql" />
+    <Content Include="Sql\ReportACT\ReportACT190901_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT190701_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT190301_01.sql" />
+    <Content Include="Sql\ReportACT\ReportACT191001_01.sql" />
+    <Content Include="Sql\ReportBank\ReportBank161001_01.sql" />
+    <Content Include="Sql\ReportBank\ReportBank161002_01.sql" />
+    <Content Include="Sql\ReportICASHOP\ReportICASHOP_01.sql" />
+    <Content Include="Sql\ReportICASHOP\ReportICASHOP_02.sql" />
+    <Content Include="Sql\ReportICASHOP\ReportICASHOP_03.sql" />
+    <Content Include="Sql\ReportICASHOP\ReportICASHOP_04.sql" />
+    <Content Include="Sql\ReportMarketingHistory\ReportMarketingHistory160101_01.sql" />
+    <Content Include="Sql\ReportMarketing\ReportMarketing160101_01.sql" />
+    <Content Include="Sql\ReportMarketing\ReportMarketing160102.sql" />
+    <Content Include="Sql\ReportSystem\ReportSystem160501_01.sql" />
+    <Content Include="Views\ACInvoice\ACInvoiceRewardReport2021.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Account\_ChangePasswordPartial.cshtml" />
+    <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
+    <Content Include="Views\Account\_RemoveAccountPartial.cshtml" />
+    <Content Include="Views\Account\_SetPasswordPartial.cshtml" />
+    <Content Include="Views\Account\ConfirmEmail.cshtml" />
+    <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
+    <Content Include="Views\Account\ExternalLoginFailure.cshtml" />
+    <Content Include="Views\Account\ForgotPassword.cshtml" />
+    <Content Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
+    <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\Manage.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Login\Login.cshtml" />
+    <Content Include="Views\AmUsers\Index.cshtml" />
+    <Content Include="Views\AmUsers\Create.cshtml" />
+    <Content Include="Views\AmUsers\Edit.cshtml" />
+    <Content Include="Views\AmUsers\ChangePassword.cshtml" />
+    <Content Include="Views\Accounting\Index.cshtml" />
+    <Content Include="Views\Accounting\Result.cshtml" />
+    <Content Include="Views\Accounting\Edit.cshtml" />
+    <Content Include="Views\Bank\Index.cshtml" />
+    <Content Include="Views\Bank\Create.cshtml" />
+    <Content Include="Views\Bank\Edit.cshtml" />
+    <Content Include="Views\Bank\GetRoleListing.cshtml" />
+    <Content Include="Views\Menu\Create.cshtml" />
+    <Content Include="Views\Menu\Edit.cshtml" />
+    <Content Include="Views\Menu\Index.cshtml" />
+    <Content Include="Views\Report\Report0111Index.cshtml" />
+    <Content Include="Views\Report\Report0111Result.cshtml" />
+    <Content Include="Views\Report\Report0111Detail.cshtml" />
+    <Content Include="Views\AmRoles\Index.cshtml" />
+    <Content Include="Views\AmRoles\Create.cshtml" />
+    <Content Include="Views\Report\Report0811Index.cshtml" />
+    <Content Include="Views\Report\ReportA03Index.cshtml" />
+    <Content Include="Views\Report\Report0112Result.cshtml" />
+    <Content Include="Views\Report\Report0117Result.cshtml" />
+    <Content Include="Views\Report\Report0113Result.cshtml" />
+    <Content Include="Views\Report\Report0211Result.cshtml" />
+    <Content Include="Views\Report\Report0115Result.cshtml" />
+    <Content Include="Views\Report\Report0311Result.cshtml" />
+    <Content Include="Views\Report\Report0411Result.cshtml" />
+    <Content Include="Views\Report\Report0412Result.cshtml" />
+    <Content Include="Views\Report\Report0114Result.cshtml" />
+    <Content Include="Views\Report\Report0116Result.cshtml" />
+    <Content Include="Views\Report\Report0312Result.cshtml" />
+    <Content Include="Views\Report\Report0118Result.cshtml" />
+    <Content Include="Views\Report\Report0313Result.cshtml" />
+    <Content Include="Views\Report\Report0314Result.cshtml" />
+    <Content Include="Views\Report\Report0315Result.cshtml" />
+    <Content Include="Views\Report\Report0316Result.cshtml" />
+    <Content Include="Views\Report\Report0317Result.cshtml" />
+    <Content Include="Views\Report\Report0318Result.cshtml" />
+    <Content Include="Views\Report\Report0319Result.cshtml" />
+    <Content Include="Views\Report\Report0320Result.cshtml" />
+    <Content Include="Views\Report\Report0321Result.cshtml" />
+    <Content Include="Views\Report\Report0322Result.cshtml" />
+    <Content Include="Views\Report\Report0323Result.cshtml" />
+    <Content Include="Views\Report\Report0324Result.cshtml" />
+    <Content Include="Views\Report\Report0325Result.cshtml" />
+    <Content Include="Views\Report\Report0326Result.cshtml" />
+    <Content Include="Views\Report\Report0327Result.cshtml" />
+    <Content Include="Views\Report\Report0119Result.cshtml" />
+    <Content Include="Views\Report\Report0120Result.cshtml" />
+    <Content Include="Views\Report\Report0328Result.cshtml" />
+    <Content Include="Views\Report\Report0121Result.cshtml" />
+    <Content Include="Views\Report\Report0212Result.cshtml" />
+    <Content Include="Views\EntAcct\Create.cshtml" />
+    <Content Include="Views\EntAcct\Delete.cshtml" />
+    <Content Include="Views\EntAcct\Edit.cshtml" />
+    <Content Include="Views\EntAcct\Result.cshtml" />
+    <Content Include="Views\Report\Report0122Result.cshtml" />
+    <Content Include="Views\Report\Report0123Result.cshtml" />
+    <Content Include="Views\Report\Report0213Result.cshtml" />
+    <Content Include="Views\Report\Report0214Result.cshtml" />
+    <Content Include="Views\Report\Report0329Result.cshtml" />
+    <Content Include="Views\Report\Report151203Result.cshtml" />
+    <Content Include="Views\Report\Report151204Result.cshtml" />
+    <Content Include="Views\Report\Report151201Result.cshtml" />
+    <Content Include="Views\Report\Report151202Result.cshtml" />
+    <Content Include="Views\BankAdj\BankAdjIndex.cshtml" />
+    <Content Include="Views\BankAdj\CreateBankAdj.cshtml" />
+    <Content Include="Views\BankAdj\CreateBankAdjD.cshtml" />
+    <Content Include="Views\BankAdj\EditBankAdj.cshtml" />
+    <Content Include="Views\Choice\Create.cshtml" />
+    <Content Include="Views\Choice\CreateCode.cshtml" />
+    <Content Include="Views\Choice\Index.cshtml" />
+    <Content Include="Views\Choice\IndexCode.cshtml" />
+    <Content Include="Views\ReportMarketing\RPT_160101.cshtml" />
+    <Content Include="Views\ReportSystem\RPT_160501.cshtml" />
+    <Content Include="Views\Home\ChangePassword.cshtml" />
+    <Content Include="Views\Shared\Message.cshtml" />
+    <Content Include="Views\Login\ForgetPassword.cshtml" />
+    <Content Include="Views\Login\NotifyAdmin.cshtml" />
+    <Content Include="Views\ReportACT\RPT_160901.cshtml" />
+    <Content Include="Views\ReportACT\RPT_161101.cshtml" />
+    <Content Include="Views\ReportACT\RPT_161201.cshtml" />
+    <Content Include="Views\ReportACT\RPT_161202.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170101.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170102.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170103.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170104.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170105.cshtml" />
+    <Content Include="Views\ReportBank\RPT_161001.cshtml" />
+    <Content Include="Views\ReportBank\RPT_161002.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170201.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170202.cshtml" />
+    <Content Include="Views\GMADJ\Create.cshtml" />
+    <Content Include="Views\GMADJ\Delete.cshtml" />
+    <Content Include="Views\GMADJ\Edit.cshtml" />
+    <Content Include="Views\GMADJ\Freeze.cshtml" />
+    <Content Include="Views\GMADJ\Index.cshtml" />
+    <Content Include="Views\GMADJ\ItemEditing.cshtml" />
+    <Content Include="Views\GMADJ\NewAPItem.cshtml" />
+    <Content Include="Views\GMADJ\NewARItem.cshtml" />
+    <Content Include="Views\GMADJ\Viewing.cshtml" />
+    <Content Include="Views\Report\Report151205Result.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Report\Report151206Result.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170401.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170501.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\ReportACT\RPT_170801.cshtml" />
+    <Content Include="Views\ReportACT\RPT_170802.cshtml" />
+    <Content Include="Views\Report\Report170901Result.cshtml" />
+    <Content Include="Views\ReportACT\RPT_180301.cshtml" />
+    <Content Include="Views\ReportACT\RPT_180401.cshtml" />
+    <Content Include="Views\ReportACT\RPT_180402.cshtml" />
+    <Content Include="Views\ReportACT\RPT_180403.cshtml" />
+    <Content Include="Views\Report\_Merchant.cshtml" />
+    <Content Include="Views\ReportMarketing\RPT_160102.cshtml" />
+    <Content Include="Views\ReportACT\_Merchant.cshtml" />
+    <Content Include="Views\ReportACT\RPT_180701.cshtml" />
+    <Content Include="Views\ReportACT\RPT_180702.cshtml" />
+    <Content Include="Views\ReportSystem\_Merchant.cshtml" />
+    <Content Include="Views\ReportMarketing\_Merchant.cshtml" />
+    <Content Include="Views\Merchant\MerchantCreate.cshtml" />
+    <Content Include="Views\Merchant\MerchantList.cshtml" />
+    <Content Include="Views\Merchant\StoreCreate.cshtml" />
+    <Content Include="Views\Merchant\StoreList.cshtml" />
+    <Content Include="Views\Merchant\_Merchant.cshtml" />
+    <Content Include="Views\Merchant\_MerchantStore.cshtml" />
+    <Content Include="Views\Merchant\_Store_Retail_1.cshtml" />
+    <Content Include="Views\Merchant\MerchantTMCreate.cshtml" />
+    <Content Include="Views\Merchant\MerchantTMList.cshtml" />
+    <Content Include="Views\ReportACT\RPT_181101.cshtml" />
+    <Content Include="Views\ReportACT\RPT_181201.cshtml" />
+    <Content Include="Views\ReportACT\RPT_181202.cshtml" />
+    <Content Include="Views\ReportACT\RPT_190101.cshtml" />
+    <Content Include="Views\ReportACT\RPT_190301.cshtml" />
+    <Content Include="Views\GmAccount\GMACT_190501.cshtml" />
+    <Content Include="Views\GmAccount\Edit.cshtml" />
+    <Content Include="Views\GmAccount\Index.cshtml" />
+    <Content Include="Views\GmAccount\_Merchant.cshtml" />
+    <Content Include="Views\GmAccount\Update.cshtml" />
+    <Content Include="Views\ReportACT\RPT_190701.cshtml" />
+    <Content Include="Views\ReportACT\_Merchant_0301.cshtml" />
+    <Content Include="Views\GmAccountStore\Edit_Store.cshtml" />
+    <Content Include="Views\GmAccountStore\Index_Store.cshtml" />
+    <Content Include="Views\GmAccountStore\Update_Store.cshtml" />
+    <Content Include="Views\GmAccountStore\_Merchant_Store.cshtml" />
+    <Content Include="Views\ReportACT\RPT_190901.cshtml" />
+    <Content Include="Views\ReportACT\RPT_191001.cshtml" />
+    <Content Include="Views\Merchant\_Store_Track_1.cshtml" />
+    <Content Include="Views\Merchant\_Store_Traffic_1.cshtml" />
+    <Content Include="Views\GmType\Edit.cshtml" />
+    <Content Include="Views\GmType\Index.cshtml" />
+    <Content Include="Views\GmType\Update.cshtml" />
+    <Content Include="Views\GmType\_Merchant.cshtml" />
+    <Content Include="Views\GmAccount\GMACT_200201.cshtml" />
+    <Content Include="Views\GmMer\CheckCreation.cshtml" />
+    <Content Include="Views\GmMer\Create.cshtml" />
+    <Content Include="Views\GmMer\Index.cshtml" />
+    <Content Include="Views\GmMer\List.cshtml" />
+    <Content Include="Views\Report\Report200501Result.cshtml" />
+    <Content Include="Views\Report\Report200502Result.cshtml" />
+    <Content Include="Views\GmAccount\GMACT_200601.cshtml" />
+    <Content Include="Views\ACInvoice\ACInvoiceEdit.cshtml" />
+    <Content Include="Views\ACInvoice\ACInvoiceReport.cshtml" />
+    <Content Include="Views\ICASHOPMerchant\Index.cshtml" />
+    <Content Include="Views\ICASHOPMerchant\_PartialQueryResult.cshtml" />
+    <Content Include="Views\ICASHOPMerchant\Edit.cshtml" />
+    <Content Include="Views\Shared\_PageView.cshtml" />
+    <Content Include="Views\ICASHOPMerchantStore\Index.cshtml" />
+    <Content Include="Views\ICASHOPMerchantStore\_PartialQueryResult.cshtml" />
+    <Content Include="Views\ICASHOPReport\Index.cshtml" />
+    <Content Include="Views\ICASHOPInvoiceFile\index.cshtml" />
+    <Content Include="Views\ACInvoice\ACInvoiceEdit_2021.cshtml" />
+    <Content Include="Views\ACInvoice\ACInvoiceReport_2021.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\Index.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\IndexBankData.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\IndexMaintainPayTarget.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\IndexQuotaTrack.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\_PartialQueryBankData.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\_PartialQueryPayTarget.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\_PartialQueryQuotaTrack.cshtml" />
+    <Content Include="Views\CoBrandedSellSponsorship\_PartialQueryRange.cshtml" />
+    <Content Include="Views\ICASHOPOverdraft\index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sql\Report\" />
+    <Folder Include="Views\Base\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="packages.config" />
+    <None Include="Project_Readme.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Business\Business.csproj">
+      <Project>{73486582-91d4-4070-8ab0-cd78ed08887f}</Project>
+      <Name>Business</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{a3027584-d4ce-4dfd-9ae2-bc55444fc2c3}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{098926d8-2c07-460f-9831-ef636843d19d}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{cd84eff3-e817-4db1-affa-6143c34dcbae}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>4815</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:4815/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

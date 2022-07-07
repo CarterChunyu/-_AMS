@@ -1,0 +1,176 @@
+﻿<label for="group">特約機構:</label>
+@Html.DropDownList("group", (IEnumerable<SelectListItem>)ViewBag.MERCHANT, "--請選擇--")
+<label id="show_combo">
+    @*模糊搜尋show和hide用label呈現*@
+    <select id="items" name="items" hidden="hidden"></select>
+
+</label>
+@*模糊搜尋_卷軸*@
+<style>
+    .ui-autocomplete {
+        max-height: 500px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
+<script type="text/javascript" language="javascript">
+
+    $(document).ready(function () {
+        $("#group option[value='@ViewBag.MERCHANT_NAME']").prop("selected", "selected");
+        @*$("#group option[value='@ViewBag.groups']").prop("selected", "selected");
+        $("#retail").hide();
+        $("#bus").hide();
+        $("#bike").hide();
+        $("#track").hide();
+        $("#parking").hide();
+        $("#outsourcing").hide();
+        var groups = "@ViewBag.groups";
+        var groupSelected;
+        if (groups == "PARKING_LOT")
+        { groupSelected = "parking"; }
+        else if (groups == "BANK_OUTSOURCING")
+        { groupSelected = "outsourcing"; }
+        else
+        { groupSelected = groups.toLowerCase(); }
+
+        $("#" + groupSelected).show();*@
+
+        @*var testVar = "@ViewBag.groups";
+        switch (testVar) {
+            case "RETAIL":
+                $("#retail option[value='@ViewBag.retails']").prop("selected", "selected");
+                break;
+
+            case "BUS":
+                $("#bus option[value='@ViewBag.buses']").prop("selected", "selected");
+                break;
+
+            case "BIKE":
+                $("#bike option[value='@ViewBag.bikes']").prop("selected", "selected");
+                break;
+
+            case "TRACK":
+                $("#track option[value='@ViewBag.tracks']").prop("selected", "selected");
+                break;
+
+            case "PARKING_LOT":
+                $("#parking option[value='@ViewBag.parkings']").prop("selected", "selected");
+                break;
+
+            case "BANK_OUTSOURCING":
+                $("#outsourcing option[value='@ViewBag.outsourcings']").prop("selected", "selected");
+                break;
+        }*@
+
+
+        $("#group").on("change", function () {
+            $.ajax({
+                url: '@Url.Action("GetMerchant", "Report")',
+                data: { groupName: $(this).val() },
+                type: 'post',
+                cache: false,
+                async: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.length > 0) {
+                        $('#show_combo').show();
+                        $('#items').empty();
+                        $('#items').append($('<option></option>').val('').text('--請選擇--'));
+                        $.each(data, function (i, item) {
+                            $('#items').append($('<option></option>').val(item.Key).text(item.Value));
+                        });
+						$("#items option[value='ALL']").remove();
+						$('#items').prepend("<option value='ALL'>ALL</option>");
+                        $("#items option[value='@ViewBag.ITEM']").attr("selected", true); //JQuery模糊搜尋_selected
+                        $('#items').combobox_select(); //JQuery模糊搜尋
+                    }
+                    else {
+                        $('#items').hide();
+                    }
+                }
+            });
+        });
+
+        $("#group").trigger("change");
+    })
+
+    //JQuery模糊搜尋
+    $.fn.combobox_select = function () {
+        $.widget("custom.combobox", {
+            _create: function () {
+                this.wrapper = $("<span>")
+                    .addClass("custom-combobox")
+                    .insertAfter(this.element);
+
+                this.element.hide();
+                this._createAutocomplete();
+                this._createShowAllButton();
+            },
+
+            _createAutocomplete: function () {
+                var selected = this.element.children(":selected"),
+                    value = selected.val() ? selected.text() : "";
+                this.input = $("<input>")
+                    .appendTo(this.wrapper)
+                    .val(value)
+                    .attr("title", "")
+                    .autocomplete({
+                        delay: 0,
+                        minLength: 0,
+                        source: $.proxy(this, "_source")
+                    });
+                this._on(this.input, {
+                    autocompleteselect: function (event, ui) {
+                        ui.item.option.selected = true;
+                        this._trigger("select", event, {
+                            item: ui.item.option
+                        });
+                    },
+                });
+            },
+
+            _createShowAllButton: function () {
+                var input = this.input,
+                    wasOpen = false;
+
+                input
+                    .on("mousedown", function () {
+                        wasOpen = input.autocomplete("widget").is(":visible");
+                    })
+                    .on("click", function () {
+                        input.trigger("focus");
+
+                        // Close if already visible
+                        if (wasOpen) {
+                            return;
+                        }
+
+                        // Pass empty string as value to search for, displaying all results
+                        input.autocomplete("search", "");
+                    });
+            },
+
+            _source: function (request, response) {
+                var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                response(this.element.children("option").map(function () {
+                    var text = $(this).text();
+                    if (this.value && (!request.term || matcher.test(text))) {
+                        return {
+                            label: text,
+                            value: text,
+                            option: this
+                        };
+                    }
+                }));
+            },
+
+            _destroy: function () {
+                this.wrapper.remove();
+                this.element.show();
+            }
+        });
+        $('#items').combobox();
+    };
+
+</script>

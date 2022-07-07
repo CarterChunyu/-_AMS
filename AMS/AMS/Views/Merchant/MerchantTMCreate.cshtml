@@ -1,0 +1,144 @@
+﻿@model Domain.GmMerchTM
+
+@{
+    ViewBag.Title = "特約機構簡碼維護";
+}
+
+<h2>特約機構簡碼維護</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">@string.Format(@"{0}特約機構簡碼", ViewBag.ACTION_TYPE)</h3>
+        </div>
+        <div class="panel-body">
+            @if (ViewBag.hasError)
+            {
+                <div id="div_ErrMsg" class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    儲存失敗
+                    <ul>
+                        @if (ViewBag.errMsg != null)
+                        {
+                            foreach (string err_msg in ViewBag.errMsg)
+                            {
+                                <li>@Html.DisplayFor(m => err_msg)</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+            <div class="form-horizontal">
+                <div class="form-group row">
+                    @Html.Label(@"特約機構代號", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @if (ViewBag.ACTION_TYPE == @"新增")
+                        { @Html.TextBoxFor(model => model.MERCHANT_NO, new { @class = "form-control", @maxlength = "8" }); }
+                        else
+                        { 
+                            string merchant_no = ViewBag.MERCHANT_NO;
+                            @Html.HiddenFor(model => model.MERCHANT_NO); 
+                            @Html.Label("Label_Merchant", @merchant_no, new { @class = "control-label" })
+                        }
+                    </div>
+                </div>
+                <div class="form-group row">
+                    @Html.Label(@"簡碼", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @{ string canDelete = ViewBag.CAN_DELETE; }
+                        @Html.Hidden("Hidden_CanDelete", @canDelete)
+                        @if (ViewBag.ACTION_TYPE == @"新增" || ViewBag.CAN_DELETE == @"Y")
+                        { 
+                            @Html.TextBoxFor(model => model.MERCH_TMID, new { @class = "form-control", @maxlength = "3" }); 
+                            <label id="Label_MerchTM_Err" class="text-danger" style="display: none;"></label>
+                        }
+                        else
+                        {
+                            string merchTM = ViewBag.MERCH_TMID;
+                            @Html.HiddenFor(model => model.MERCH_TMID);
+                            @Html.Label("Label_MerchTM", @merchTM, new { @class = "control-label" })
+                        }
+                    </div>
+                </div>
+                <div id="div_account" class="form-group row">
+                    @Html.Label(@"ibon顯示名稱", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.IBON_MERCHANT_NAME, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div id="div_account" class="form-group row">
+                    @Html.Label(@"ibon顯示類型", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownList(@"DD_IBON_SHOW_TYPE", (IEnumerable<SelectListItem>)ViewBag.DDL_IBON_SHOW_TYPE, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+                        @Html.HiddenFor(model => model.IBON_SHOW_TYPE)
+                    </div>
+                </div>
+                <div id="div_account" class="form-group row">
+                    @Html.Label(@"狀態", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.IS_ACTIVE, (IEnumerable<SelectListItem>)ViewBag.DDL_IS_ACTIVE, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+                    </div>
+                </div>
+                <div id="div_account" class="form-group row">
+                    @Html.Label(@"備註", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.NOTE, new { @class = "form-control", @rows = "3" })
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row text-center">
+                <button type="submit" value="CreateSave" class="btn btn-primary">儲存</button>
+                &nbsp&nbsp
+                <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("MerchantTMList", "Merchant")'">取消</button>
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript" language="javascript">
+
+    $(document).ready(function () {
+
+        $("#MERCH_TMID").focusout(function () {
+            $.ajax({
+                url: '@Url.Action("CheckMerchTM", "Merchant")',
+                data: { old_merchant_no: $('#MERCHANT_NO').val(), value: $(this).val() },
+                type: 'post',
+                cache: false,
+                async: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data == "") {
+                        $('#Label_MerchTM_Err').hide();
+                        $('#IBON_MERCHANT_NAME').removeAttr("readonly"); 
+                        $('#DD_IBON_SHOW_TYPE').removeAttr("disabled");
+                    }
+                    else {
+                        $('#Label_MerchTM_Err').show();
+                        $('#IBON_MERCHANT_NAME').val(data.IBON_MERCHANT_NAME);
+                        $('#IBON_MERCHANT_NAME').attr("value", data.IBON_MERCHANT_NAME);
+                        $('#IBON_MERCHANT_NAME').attr("readonly", "true");
+                        $('#DD_IBON_SHOW_TYPE').val(data.IBON_SHOW_TYPE);
+                        $('#DD_IBON_SHOW_TYPE').attr("disabled", "disabled");
+                        $('#IBON_SHOW_TYPE').attr("value", data.IBON_SHOW_TYPE);
+                    }
+                    $('#Label_MerchTM_Err').text("簡碼【" + data.MERCH_TMID + "】已被使用");
+                },
+                error: function (data) {
+                    alert(data.responseText);
+                }
+            });
+        });
+
+        $("#DD_IBON_SHOW_TYPE").change(function () {
+            $('#IBON_SHOW_TYPE').attr("value", $("#DD_IBON_SHOW_TYPE").val());
+        });
+
+        $("#MERCH_TMID").trigger("focusout");
+    })
+
+</script>

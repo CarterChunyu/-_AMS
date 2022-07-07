@@ -1,0 +1,71 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMS", "AMS\AMS.csproj", "{F44D1506-69A5-4CEC-8D3A-7AF505AABF82}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A3027584-D4CE-4DFD-9AE2-BC55444FC2C3} = {A3027584-D4CE-4DFD-9AE2-BC55444FC2C3}
+		{CD84EFF3-E817-4DB1-AFFA-6143C34DCBAE} = {CD84EFF3-E817-4DB1-AFFA-6143C34DCBAE}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business", "Business\Business.csproj", "{73486582-91D4-4070-8AB0-CD78ED08887F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{098926D8-2C07-460F-9831-EF636843D19D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{A3027584-D4CE-4DFD-9AE2-BC55444FC2C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.csproj", "{CD84EFF3-E817-4DB1-AFFA-6143C34DCBAE}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://tfs:8080/tfs/defaultcollection
+		SccProjectUniqueName0 = Domain\\Domain.csproj
+		SccProjectName0 = Domain
+		SccLocalPath0 = Domain
+		SccProjectUniqueName1 = Helpers\\Helpers.csproj
+		SccProjectName1 = Helpers
+		SccLocalPath1 = Helpers
+		SccProjectUniqueName2 = DataAccess\\DataAccess.csproj
+		SccProjectName2 = DataAccess
+		SccLocalPath2 = DataAccess
+		SccProjectUniqueName3 = Business\\Business.csproj
+		SccProjectName3 = Business
+		SccLocalPath3 = Business
+		SccLocalPath4 = .
+		SccProjectUniqueName5 = AMS\\AMS.csproj
+		SccProjectName5 = AMS
+		SccLocalPath5 = AMS
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F44D1506-69A5-4CEC-8D3A-7AF505AABF82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F44D1506-69A5-4CEC-8D3A-7AF505AABF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F44D1506-69A5-4CEC-8D3A-7AF505AABF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F44D1506-69A5-4CEC-8D3A-7AF505AABF82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73486582-91D4-4070-8AB0-CD78ED08887F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73486582-91D4-4070-8AB0-CD78ED08887F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73486582-91D4-4070-8AB0-CD78ED08887F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73486582-91D4-4070-8AB0-CD78ED08887F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{098926D8-2C07-460F-9831-EF636843D19D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{098926D8-2C07-460F-9831-EF636843D19D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{098926D8-2C07-460F-9831-EF636843D19D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{098926D8-2C07-460F-9831-EF636843D19D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3027584-D4CE-4DFD-9AE2-BC55444FC2C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3027584-D4CE-4DFD-9AE2-BC55444FC2C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3027584-D4CE-4DFD-9AE2-BC55444FC2C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3027584-D4CE-4DFD-9AE2-BC55444FC2C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD84EFF3-E817-4DB1-AFFA-6143C34DCBAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD84EFF3-E817-4DB1-AFFA-6143C34DCBAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD84EFF3-E817-4DB1-AFFA-6143C34DCBAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD84EFF3-E817-4DB1-AFFA-6143C34DCBAE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,270 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+
+<!DOCTYPE html>
+<head>
+    <title>@ViewBag.RepName</title>
+    <link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+    <script src="~/js/jquery.dataTables.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+    <style type='text/css'>
+        .ui-datepicker-calendar {
+            display: none;
+        }
+
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+
+        th {
+            text-align: right;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            text-align: left;
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            background-color: #ffffff;
+            text-align: right;
+        }
+    </style>
+
+    <link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+    <script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+    <script type="text/javascript">
+        $(function () {
+            $('#yearMonth').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'yymm',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1));
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#group option[value='BUS']").prop("selected", "selected");
+            $("#retail").hide();
+            $("#bus").hide();
+            $("#bike").hide();
+            $("#track").hide();
+            $("#parking").hide();
+            $("#outsourcing").hide();
+            var groups = "BUS";
+            var groupSelected;
+            if (groups == "PARKING_LOT")
+            { groupSelected = "parking"; }
+            else if (groups == "BANK_OUTSOURCING")
+            { groupSelected = "outsourcing"; }
+            else
+            { groupSelected = groups.toLowerCase(); }
+
+            $("#" + groupSelected).show();
+
+            var testVar = "BUS";
+            switch (testVar) {
+                case "RETAIL":
+                    $("#retail option[value='@ViewBag.retails']").prop("selected", "selected");
+                    break;
+
+                case "BUS":
+                    $("#bus option[value='@ViewBag.buses']").prop("selected", "selected");
+                    break;
+
+                case "BIKE":
+                    $("#bike option[value='@ViewBag.bikes']").prop("selected", "selected");
+                    break;
+
+                case "TRACK":
+                    $("#track option[value='@ViewBag.tracks']").prop("selected", "selected");
+                    break;
+
+                case "PARKING_LOT":
+                    $("#parking option[value='@ViewBag.parkings']").prop("selected", "selected");
+                    break;
+
+                case "BANK_OUTSOURCING":
+                    $("#outsourcing option[value='@ViewBag.outsourcings']").prop("selected", "selected");
+                    break;
+            }
+
+            $("#retail").hide();
+            $("#bus").show();
+            $("#bike").hide();
+            $("#track").hide();
+            $("#parking").hide();
+            $("#outsourcing").hide();
+            $("#group").hide();
+
+
+
+            //$("#group").on("change", function () {
+            //    switch ($(this).val()) {
+            //        case "RETAIL":
+            //            $("#retail").show();
+            //            $("#bus").hide();
+            //            $("#bike").hide();
+            //            $("#track").hide();
+            //            $("#parking").hide();
+            //            $("#outsourcing").hide();
+            //            break;
+            //        case "BUS":
+            //            $("#retail").hide();
+            //            $("#bus").show();
+            //            $("#bike").hide();
+            //            $("#track").hide();
+            //            $("#parking").hide();
+            //            $("#outsourcing").hide();
+            //            break;
+            //        case "BIKE":
+            //            $("#retail").hide();
+            //            $("#bus").hide();
+            //            $("#bike").show();
+            //            $("#track").hide();
+            //            $("#parking").hide();
+            //            $("#outsourcing").hide();
+            //            break;
+            //        case "TRACK":
+            //            $("#retail").hide();
+            //            $("#bus").hide();
+            //            $("#bike").hide();
+            //            $("#track").show();
+            //            $("#parking").hide();
+            //            $("#outsourcing").hide();
+            //            break;
+            //        case "PARKING_LOT":
+            //            $("#retail").hide();
+            //            $("#bus").hide();
+            //            $("#bike").hide();
+            //            $("#track").hide();
+            //            $("#parking").show();
+            //            $("#outsourcing").hide();
+            //            break;
+            //        case "BANK_OUTSOURCING":
+            //            $("#retail").hide();
+            //            $("#bus").hide();
+            //            $("#bike").hide();
+            //            $("#track").hide();
+            //            $("#parking").hide();
+            //            $("#outsourcing").show();
+            //            break;
+            //        default:
+            //            $("#retail").hide();
+            //            $("#bus").hide();
+            //            $("#bike").hide();
+            //            $("#track").hide();
+            //            $("#parking").hide();
+            //            $("#outsourcing").hide();
+            //            break;
+            //    }
+            //})
+        })
+
+    </script>
+</head>
+<body>
+
+    <h2>@ViewBag.RepName</h2>
+
+    @using (Html.BeginForm("RPT_180402", "ReportACT", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div>
+            <label for="settleDate"> 清分日期:</label>
+            <input type="text" name="yearMonth" id="yearMonth" value="@ViewBag.yearMonth" style="width:100px;" /> -
+            <label for="group">特約機構:</label>
+            @Html.DropDownList("group", (IEnumerable<SelectListItem>)ViewBag.GROUP, "--請選擇--")
+            @Html.DropDownList("retail", (IEnumerable<SelectListItem>)ViewBag.RETAIL, "--請選擇--")
+            @Html.DropDownList("bus", (IEnumerable<SelectListItem>)ViewBag.BUS, "--請選擇--")
+            @Html.DropDownList("bike", (IEnumerable<SelectListItem>)ViewBag.BIKE, "--請選擇--")
+            @Html.DropDownList("track", (IEnumerable<SelectListItem>)ViewBag.TRACK, "--請選擇--")
+            @Html.DropDownList("parking", (IEnumerable<SelectListItem>)ViewBag.PARKING, "--請選擇--")
+            @Html.DropDownList("outsourcing", (IEnumerable<SelectListItem>)ViewBag.OUTSOURCING, "--請選擇--")
+
+
+            <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+            <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+        </div>
+    }
+
+    <table class="grid" width="100%">
+        <thead>
+            <tr style="background-color: lightgray">
+                <th>
+                    月別
+                </th>
+                <th>
+                    特約機構名稱
+                </th>
+                <th>
+                    交通系統別
+                </th>
+                <th>
+                    交易類別
+                </th>
+                <th>
+                    金額
+                </th>
+
+
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        if (j == 4)
+                        {
+                            <td>@Convert.ToInt64(row.ItemArray[j]).ToString("n0")</td>
+                        }
+                        else
+                        {
+                            <td>@row.ItemArray[j].ToString()</td>
+                        }
+                    }
+                </tr>
+
+            }
+            @if (Model.Rows.Count > 0)
+            {
+                <tr>
+                    <td style="text-align: center;">合計</td>
+                    <td style="text-align: right; "></td>
+                    <td style="text-align: right; "></td>
+                    <td style="text-align: right; "></td>
+                    <td style="text-align: right; ">@Convert.ToInt64(ViewBag.Total).ToString("n0")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>

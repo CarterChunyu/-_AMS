@@ -1,0 +1,156 @@
+﻿@model AMS.Models.AmEntReceDModel
+@{
+    ViewBag.Title = "收款明細查詢";
+    int totalNumSum = 0;
+}
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yy-mm-dd' });
+        $('#EndDate').datepicker({ dateFormat: 'yy-mm-dd' });
+    });
+</script>
+
+<h2>收款明細查詢結果</h2>
+
+@using (Html.BeginForm("Result", "Accounting", FormMethod.Post, new { id = "searchForm" }))
+{
+    @Html.AntiForgeryToken()
+    <div>
+        @Html.LabelFor(model => model.ActDate)
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" style="width:100px;" /> -
+        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" style="width:100px;" />
+
+        @Html.LabelFor(model => model.ReceType)
+        @Html.DropDownList("ReceTypeSearch")
+
+        @Html.LabelFor(model => model.CaseNo)
+        <input type="text" name="CaseNoSearch" value="@ViewBag.CaseNoSel" maxlength="20" style="width:120px;" />
+
+        @Html.LabelFor(model => model.CheckStatus)
+        @Html.DropDownList("CheckStatusSearch")
+
+        @Html.LabelFor(model => model.AcctCheckStatus)
+        @Html.DropDownList("AcctCheckStatusSearch")
+        <input type="submit" value="搜尋" class="btn btn-default" /> 
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+}
+
+<style>
+.ttt {
+    table-layout: fixed;
+    width:100%
+}
+ td {
+     border: 1px solid black;
+    }
+.ddd {   
+    word-wrap:break-word;
+}
+</style>
+
+<table class="table table-hover ttt">
+    <tr class="active">
+        <th>
+            @Html.DisplayNameFor(model => model.Sn)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BankAcctTo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BankAcctFrom)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ActDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Amt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Summary)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CaseNo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CheckStatus)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AcctCheckStatus)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Operator)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Remark)
+        </th>
+        <th>
+
+        </th>
+    </tr>
+
+    @foreach (var item in Model.AmEntReceDList)
+    {
+        totalNumSum++;
+        <tr class="warning">
+            <td>
+                <font>@item.Sn</font>
+            </td>
+            <td>
+                <font>@item.BankAcctTo</font>
+            </td>
+            <td class="ddd">
+                <font>@item.BankAcctFrom</font>
+            </td>
+            <td>
+                <font>@item.ActDate</font>
+            </td>
+            <td>
+                <font>@item.Amt</font>
+            </td>
+            <td>
+                <font>@item.Summary</font>
+            </td>
+            <td class="ddd">
+                <font>@item.CaseNo</font>
+            </td>
+            <td>
+                <font>@item.CheckStatusName</font>
+            </td>
+            <td>
+                <font>@item.AcctCheckStatusName</font>
+            </td>
+            <td>
+                <font>@item.Operator</font>
+            </td>
+            <td class="ddd">
+                <font>@item.Remark</font>
+            </td>
+            <td>
+                @using (Html.BeginForm("Edit", "Accounting", FormMethod.Post))
+{
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Sn" value="@item.Sn" />
+                    <input type="hidden" name="BankAcctTo" value="@item.BankAcctTo" />
+                    <input type="hidden" name="StartDate" value="@ViewBag.StartDate" />
+                    <input type="hidden" name="EndDate" value="@ViewBag.EndDate" />
+                    <input type="hidden" name="CaseNoSearch" value="@ViewBag.CaseNoSel" />
+                    <input type="hidden" name="CheckStatusSearch" value="@ViewBag.CheckStatusSel" />
+                    <input type="hidden" name="AcctCheckStatusSearch" value="@ViewBag.AcctCheckStatusSel" />
+                    <input type="hidden" name="ReceTypeSearch" value="@ViewBag.ReceTypeSel" />
+                    <button class="btn btn-success" type="submit">修改</button>
+                }
+            </td>
+
+        </tr>
+    }
+</table>
+
+總筆數 : @totalNumSum 
+
+
+
+

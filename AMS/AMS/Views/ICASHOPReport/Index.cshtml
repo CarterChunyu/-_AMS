@@ -1,0 +1,61 @@
+﻿
+<!DOCTYPE html>
+<head>
+    <title>@ViewBag.RepName</title>
+    <link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+    <script src="~/js/jquery.dataTables.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+    <style type='text/css'>
+        .ui-datepicker-calendar {
+            display: none;
+        }
+    </style>
+
+    <link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+    <script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#yearMonth').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'yymm',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1));
+                }
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+    <h2>@ViewBag.RepName</h2>
+
+    @using (Html.BeginForm("Index", "ICASHOPReport", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div>
+            <label for="yearMonth"> 報表年月:</label>
+            <input type="text" name="yearMonth" id="yearMonth" value="@ViewBag.YearMonth" style="width:100px;" />
+            <label for="MerchantList">機構群組:</label>
+            <input type="checkbox" name="checkboxs" value="0" id="Group_TaiYa"/><label for="Group_TaiYa">台亞</label>
+            <input type="checkbox" name="checkboxs" value="1" id="Group_TaiSu"/><label for="Group_TaiSu">台塑</label>
+            <input type="checkbox" name="checkboxs" value="2" id="Group_XiOu"/><label for="Group_XiOu">西歐</label>
+            <input type="checkbox" name="checkboxs" value="3" id="Group_FuMou"/><label for="Group_FuMou">福懋</label>
+            <input type="checkbox" name="checkboxs" value="4" id="Group_TongYiDuJiaCun"/><label for="Group_TongYiDuJiaCun">統一渡假村</label>
+            &nbsp
+            <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+        </div>
+    }
+
+</body>
+
+
+
+

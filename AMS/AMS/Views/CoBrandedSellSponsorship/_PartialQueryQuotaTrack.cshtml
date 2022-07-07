@@ -1,0 +1,226 @@
+﻿@using System.Data;
+@using Domain.Common;
+@using Newtonsoft.Json;
+@using Domain.CoBrandedSellSponsorship;
+
+@{
+    /**/
+
+    Layout = null;
+    ExecInfo ei = ViewBag.ExecInfo;
+    QueryBankDataReq qbdrq = ViewBag.QueryRequest;
+    DataSet ds_QueryResult = ViewBag.QueryResult;
+
+    DataTable dt_BankData = ds_QueryResult.Tables[0];
+    DataTable dt_Quota = ds_QueryResult.Tables[1];
+    DataTable dt_Track = ds_QueryResult.Tables[2];
+}
+
+@if (ei.RtnResult == false)
+{
+    <script>
+        alert("@(ei.RtnMsg)");
+    </script>
+}
+else
+{
+    <div id="div_title_data">
+        @Html.Hidden("hid_MERCHANT_STNAME", dt_BankData.AsEnumerable().FirstOrDefault().Field<string>("MERCHANT_STNAME"))
+        @Html.Hidden("hid_AMT_Quota", dt_BankData.AsEnumerable().FirstOrDefault().Field<int>("AMT_Quota").ToString("N0"))
+        @Html.Hidden("hid_AMT_Track", dt_BankData.AsEnumerable().FirstOrDefault().Field<int>("AMT_Track").ToString("N0"))
+        @Html.Hidden("hid_AMT_UnUse", dt_BankData.AsEnumerable().FirstOrDefault().Field<int>("AMT_UnUse").ToString("N0"))
+    </div>
+
+    @* 額度明細清單 *@
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">額度明細清單</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>項次</th>
+                    <th>額度項目</th>
+                    <th>金額</th>
+                    <th>編輯</th>
+                    <th>刪除</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (dt_Quota.Rows.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" style="text-align:left;color:red;">
+                            查無資料！！
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int i_ser_id_Quota = 1;
+
+                    foreach (DataRow dr in dt_Quota.AsEnumerable().OrderBy(x => x.Field<DateTime>("CreateDate")))
+                    {
+                        <tr>
+                            <td>@(i_ser_id_Quota.ToString())</td>
+                            <td>@(dr["ITEM"].ToString())</td>
+                            <td>@(int.Parse(dr["AMT"].ToString()).ToString("N0"))</td>
+                            <td>
+                                <a id="a_link_Quota_edit_@dr["DQID"].ToString()"
+                                   style="cursor:pointer;"
+                                   DQID="@dr["DQID"].ToString()"
+                                   BID="@dr["BID"].ToString()"
+                                   ITEM="@dr["ITEM"].ToString()"
+                                   AMT="@dr["AMT"].ToString()"
+                                   onclick="fun_editlink_Quota_click(this)">
+                                    編輯
+                                </a>
+                            </td>
+                            <td>
+                                <a id="a_link_Quota_delete_@dr["DQID"].ToString()"
+                                   style="cursor:pointer;"
+                                   DQID="@dr["DQID"].ToString()"
+                                   BID="@dr["BID"].ToString()"
+                                   onclick="fun_deletelink_Quota_click(this)">
+                                    刪除
+                                </a>
+                            </td>
+                        </tr>
+
+                        i_ser_id_Quota++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* 請款項目清單 *@
+    <div style="overflow-x:auto;">
+        <div class="panel panel-default" style="width:2000px;">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">請款項目清單</h3>
+                </div>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>項次</th>
+                            <th>請款項目</th>
+                            <th>支付對象</th>
+                            <th>計算期間</th>
+                            <th>發票日期</th>
+                            <th>發票號碼(營業)</th>
+                            <th>金額(未稅)</th>
+                            <th>金額(含稅)</th>
+                            <th>備註</th>
+                            <th>送件時間</th>
+                            <th>發票號碼(財會)</th>
+                            <th>發票入帳數</th>
+                            <th>價差數</th>
+                            <th>編輯</th>
+                            <th>刪除</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @if (dt_Track.Rows.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="15" style="text-align:left;color:red;">
+                                    查無資料！！
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            int i_ser_id_Track = 1;
+
+                            foreach (DataRow dr in dt_Track.AsEnumerable().OrderBy(x => x.Field<DateTime>("CreateDate")))
+                            {
+                                string s_hidden_id = string.Empty;
+                                string s_Range_Date = string.Empty;
+                                string s_AMT_Diff = string.Empty;
+
+                                s_hidden_id = string.Format("PTID_{0}",
+                                                            dr["DTID"].ToString());
+
+                                if (dr["Range_Date_B"] == DBNull.Value &&
+                                    dr["Range_Date_E"] == DBNull.Value)
+                                {
+                                    s_Range_Date = string.Empty;
+                                }
+                                else
+                                {
+                                    s_Range_Date = string.Format("{0}~{1}",
+                                                                 (dr["Range_Date_B"] == DBNull.Value ? string.Empty : ((DateTime)dr["Range_Date_B"]).ToString("yyyy/MM/dd")),
+                                                                 (dr["Range_Date_E"] == DBNull.Value ? string.Empty : ((DateTime)dr["Range_Date_E"]).ToString("yyyy/MM/dd")));
+                                }
+                                s_AMT_Diff = ((dr["AMT_UnTax"] == DBNull.Value ? 0 : (int.Parse(dr["AMT_UnTax"].ToString()))) -
+                                              (dr["AMT_Pay"] == DBNull.Value ? 0 : (int.Parse(dr["AMT_Pay"].ToString())))).ToString("N0");
+
+
+                                <tr>
+                                    <td>@(i_ser_id_Track.ToString())</td>
+                                    <td>@(dr["Item"].ToString())</td>
+                                    <td>
+                                        @Html.Hidden(s_hidden_id, dr["PTID"].ToString())
+                                    </td>
+                                    <td>@(s_Range_Date)</td>
+                                    <td>@(dr["Bus_Invoice_Date"] == DBNull.Value ? string.Empty : ((DateTime)dr["Bus_Invoice_Date"]).ToString("yyyy/MM/dd"))</td>
+                                    <td>@(dr["Bus_Invoice_No"].ToString())</td>
+                                    <td>@(dr["AMT_UnTax"] == DBNull.Value ? string.Empty : (int.Parse(dr["AMT_UnTax"].ToString())).ToString("N0"))</td>
+                                    <td>@(dr["AMT_TaxIncluded"] == DBNull.Value ? string.Empty : (int.Parse(dr["AMT_TaxIncluded"].ToString())).ToString("N0"))</td>
+                                    <td>@(dr["Comment"].ToString())</td>
+                                    <td>@(dr["SendDate"] == DBNull.Value ? string.Empty : ((DateTime)dr["SendDate"]).ToString("yyyy/MM/dd"))</td>
+                                    <td>@(dr["Act_Invoice_No"].ToString())</td>
+                                    <td>@(dr["AMT_Pay"] == DBNull.Value ? string.Empty : (int.Parse(dr["AMT_Pay"].ToString())).ToString("N0"))</td>
+                                    <td>@(s_AMT_Diff)</td>
+                                    <td>
+                                        <a id="a_link_Track_edit_@dr["DTID"].ToString()"
+                                           style="cursor:pointer;"
+                                           DTID="@dr["DTID"].ToString()"
+                                           BID="@dr["BID"].ToString()"
+                                           ITEM="@dr["ITEM"].ToString()"
+                                           PTID="@dr["PTID"].ToString()"
+                                           Range_Date_B="@(dr["Range_Date_B"] == DBNull.Value ? string.Empty : ((DateTime)dr["Range_Date_B"]).ToString("yyyyMMdd"))"
+                                           Range_Date_E="@(dr["Range_Date_E"] == DBNull.Value ? string.Empty : ((DateTime)dr["Range_Date_E"]).ToString("yyyyMMdd"))"
+                                           Bus_Invoice_Date="@(dr["Bus_Invoice_Date"] == DBNull.Value ? string.Empty : ((DateTime)dr["Bus_Invoice_Date"]).ToString("yyyyMMdd"))"
+                                           Bus_Invoice_No="@dr["Bus_Invoice_No"].ToString()"
+                                           AMT_UnTax="@dr["AMT_UnTax"].ToString()"
+                                           AMT_TaxIncluded="@dr["AMT_TaxIncluded"].ToString()"
+                                           Comment="@dr["Comment"].ToString()"
+                                           SendDate="@(dr["SendDate"] == DBNull.Value ? string.Empty : ((DateTime)dr["SendDate"]).ToString("yyyyMMdd"))"
+                                           Act_Invoice_No="@dr["Act_Invoice_No"].ToString()"
+                                           AMT_Pay="@dr["AMT_Pay"].ToString()"
+                                           onclick="fun_editlink_Track_click(this)">
+                                            編輯
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a id="a_link_Track_delete_@dr["DTID"].ToString()"
+                                           style="cursor:pointer;"
+                                           DTID="@dr["DTID"].ToString()"
+                                           BID="@dr["BID"].ToString()"
+                                           Act_Invoice_No="@dr["Act_Invoice_No"].ToString()"
+                                           AMT_Pay="@dr["AMT_Pay"].ToString()"
+                                           onclick="fun_deletelink_Track_click(this)">
+                                            刪除
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                i_ser_id_Track++;
+                            }
+                        }
+                    </tbody>
+                </table>
+                <div class="panel-footer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="div_Data">
+        @Html.Hidden("hid_Data_Quota")
+        @Html.Hidden("hid_Data_Track")
+    </div>
+}

@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A3027584-D4CE-4DFD-9AE2-BC55444FC2C3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DataAccess</RootNamespace>
+    <AssemblyName>DataAccess</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Common.Logging, Version=2.1.2.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Reference\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net1211, Version=2.1.2.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Reference\Common.Logging.Log4Net1211.dll</HintPath>
+    </Reference>
+    <Reference Include="Dapper">
+      <HintPath>..\packages\Dapper.1.50.2\lib\net45\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Reference\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACInvoice2021DAO.cs" />
+    <Compile Include="ACInvoiceDAO.cs" />
+    <Compile Include="ACInvoiceRewardReport2021DAO.cs" />
+    <Compile Include="AmAccountRoleDAO.cs" />
+    <Compile Include="AmChoiceDAO.cs" />
+    <Compile Include="AmEntAccountDDAO.cs" />
+    <Compile Include="AmEntAcctDDAO.cs" />
+    <Compile Include="AmEntReceDDAO.cs" />
+    <Compile Include="AmEntReceLogDDAO.cs" />
+    <Compile Include="AmRolesDAO.cs" />
+    <Compile Include="AmUsersDAO.cs" />
+    <Compile Include="BasicDAL.cs" />
+    <Compile Include="AmMenuADO.cs" />
+    <Compile Include="BasicHisDAL.cs" />
+    <Compile Include="BasicOPDAL.cs" />
+    <Compile Include="BmTransTypeDAO.cs" />
+    <Compile Include="CmBankDDAO.cs" />
+    <Compile Include="CoBrandedSellSponsorshipDAO.cs" />
+    <Compile Include="CommonDAO.cs" />
+    <Compile Include="CrBankAdjcaseDDAO.cs" />
+    <Compile Include="CrBankAdjcaseDTmpDAO.cs" />
+    <Compile Include="CrBankAdjcaseMDAO.cs" />
+    <Compile Include="CrBankAdjcaseMTmpDAO.cs" />
+    <Compile Include="GmAccountDAO.cs" />
+    <Compile Include="GmCodeMappingDAO.cs" />
+    <Compile Include="GmMercAdjDAO.cs" />
+    <Compile Include="GmMerchantActStoreDAO.cs" />
+    <Compile Include="GmMerchantStoreDAO.cs" />
+    <Compile Include="GmMerchantTypeDAO.cs" />
+    <Compile Include="GmMerchTMDAO.cs" />
+    <Compile Include="GmMerDAO.cs" />
+    <Compile Include="GmSchemaObjDAO.cs" />
+    <Compile Include="GmTypeDAO.cs" />
+    <Compile Include="HwCounterDDAO.cs" />
+    <Compile Include="ICASHOPDAO.cs" />
+    <Compile Include="ICASHOPInvoiceFileDAO.cs" />
+    <Compile Include="ICASHOPMerchantDAO.cs" />
+    <Compile Include="ICASHOPMerchantStoreDAO.cs" />
+    <Compile Include="ICASHOPOverdraftDAO.cs" />
+    <Compile Include="ICASHOPReportDAO.cs" />
+    <Compile Include="ReportACTDAO.cs" />
+    <Compile Include="ReportBankDAO.cs" />
+    <Compile Include="ReportMarketingDAO.cs" />
+    <Compile Include="GmMerchantDAO.cs" />
+    <Compile Include="IbonActivityDAO.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportDAO.cs" />
+    <Compile Include="ReportMarketingHistoryDAO.cs" />
+    <Compile Include="ReportSystemDAO.cs" />
+    <Compile Include="WebPasswordLogDAO.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{098926d8-2c07-460f-9831-ef636843d19d}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{cd84eff3-e817-4db1-affa-6143c34dcbae}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

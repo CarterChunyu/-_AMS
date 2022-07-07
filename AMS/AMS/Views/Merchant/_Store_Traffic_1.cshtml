@@ -1,0 +1,128 @@
+﻿@model Domain.BmStoreM
+
+@Html.Hidden(@"Hidden_Store_Layout", @"TRAFFIC_1")
+<div class="form-group row">
+    @Html.Label(@"路線代碼", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @if (ViewBag.ACTION_TYPE == @"新增")
+        { @Html.TextBoxFor(model => model.STORE_NO, new { @class = "form-control", @maxlength = "8" }); }
+        else
+        { 
+            string store_no = ViewBag.STORE_NO;
+            @Html.HiddenFor(model => model.STORE_NO); 
+            @Html.Label("Label_Store", @store_no, new { @class = "control-label" })
+        }
+        @Html.ValidationMessageFor(model => model.STORE_NO, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div class="form-group row">
+    @Html.Label(@"路線全名", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.STO_NAME_LONG, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.STO_NAME_LONG, "", new { @class = "text-danger" })
+        @Html.Label(@"※ 若此特約機構在簡碼維護設定是顯示【特店+站名】，則路線全名會顯示在ibon！", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"路線簡稱", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.STO_NAME_SHORT, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.STO_NAME_SHORT, "", new { @class = "text-danger" })
+    </div>
+</div>
+@Html.HiddenFor(model => model.EFF_DATE_FROM) 
+@Html.HiddenFor(model => model.EFF_DATE_TO)
+@Html.HiddenFor(model => model.SALES_DATE)
+@Html.HiddenFor(model => model.CLOSE_DATE)
+<div id="div_account" class="form-group row">
+    @Html.Label(@"開幕日", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.TextBoxFor(model => model.OPEN_DATE, new { @class = "form-control", @maxlength = "8", @Value = DateTime.Today.AddDays(1).ToString("yyyyMMdd") })
+        @Html.ValidationMessageFor(model => model.OPEN_DATE, "", new { @class = "text-danger" })
+        @Html.Label(@"※ 此為OP APP門市主檔生效日期，日期必須在明天之後", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"路線類別", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.OPERATE_TYPE, (IEnumerable<SelectListItem>)ViewBag.DDL_OPERATE_TYPE, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.OPERATE_TYPE, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"路線總段數", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.LINE_QTY, (IEnumerable<SelectListItem>)ViewBag.DDL_LINE_QTY, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.HiddenFor(model => model.LINE_QTY)
+        @Html.ValidationMessageFor(model => model.LINE_QTY, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"主管機關", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.LINE_TYPE, (IEnumerable<SelectListItem>)ViewBag.DDL_LINE_TYPE, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.LINE_TYPE, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"市區/非市區判別", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.CITY_TYPE, (IEnumerable<SelectListItem>)ViewBag.DDL_CITY_TYPE, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.CITY_TYPE, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"捷運/台鐵轉乘判別", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.TRANSFER_TYPE, (IEnumerable<SelectListItem>)ViewBag.DDL_TRANSFER_TYPE, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.TRANSFER_TYPE, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"公車轉乘判別", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.LINE_NO_03, (IEnumerable<SelectListItem>)ViewBag.DDL_LINE_NO_03, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.LINE_NO_03, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"公路客運代碼判別 ", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.SUBSIDY_TYPE, (IEnumerable<SelectListItem>)ViewBag.DDL_SUBSIDY_TYPE, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.SUBSIDY_TYPE, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"路線分類", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.LINE_NO_04, (IEnumerable<SelectListItem>)ViewBag.DDL_LINE_NO_04, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.LINE_NO_04, "", new { @class = "text-danger" })
+    </div>
+</div>
+<div id="div_account" class="form-group row">
+    @Html.Label(@"設備商代碼 ", new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor(model => model.LINE_SI_NO, (IEnumerable<SelectListItem>)ViewBag.DDL_LINE_SI_NO, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+        @Html.ValidationMessageFor(model => model.LINE_SI_NO, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#OPERATE_TYPE").trigger('change');
+    });
+
+    $("#OPERATE_TYPE").change(function () {
+        var ot = $("#OPERATE_TYPE").val();
+        if (ot == "03") {
+            $("input[id='LINE_QTY']").val('1');
+            $("#LINE_QTY").val('1');
+            $("#LINE_QTY").prop('disabled', 'disabled');
+        }
+        else {
+            $("#LINE_QTY").prop('disabled', false);
+        }
+    });
+
+</script>

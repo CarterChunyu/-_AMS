@@ -1,0 +1,87 @@
+﻿<label for="group">特約機構:</label>
+@Html.DropDownList("group", (IEnumerable<SelectListItem>)ViewBag.MERCHANT, "--請選擇--")
+<select id="items" name="items" hidden="hidden"><option>@ViewBag.ITEM</option></select>
+
+<script type="text/javascript" language="javascript">
+
+    $(document).ready(function () {
+        $("#group option[value='@ViewBag.MERCHANT_NAME']").prop("selected", "selected");
+        @*$("#group option[value='@ViewBag.groups']").prop("selected", "selected");
+        $("#retail").hide();
+        $("#bus").hide();
+        $("#bike").hide();
+        $("#track").hide();
+        $("#parking").hide();
+        $("#outsourcing").hide();
+        var groups = "@ViewBag.groups";
+        var groupSelected;
+        if (groups == "PARKING_LOT")
+        { groupSelected = "parking"; }
+        else if (groups == "BANK_OUTSOURCING")
+        { groupSelected = "outsourcing"; }
+        else
+        { groupSelected = groups.toLowerCase(); }
+
+        $("#" + groupSelected).show();*@
+
+        @*var testVar = "@ViewBag.groups";
+        switch (testVar) {
+            case "RETAIL":
+                $("#retail option[value='@ViewBag.retails']").prop("selected", "selected");
+                break;
+
+            case "BUS":
+                $("#bus option[value='@ViewBag.buses']").prop("selected", "selected");
+                break;
+
+            case "BIKE":
+                $("#bike option[value='@ViewBag.bikes']").prop("selected", "selected");
+                break;
+
+            case "TRACK":
+                $("#track option[value='@ViewBag.tracks']").prop("selected", "selected");
+                break;
+
+            case "PARKING_LOT":
+                $("#parking option[value='@ViewBag.parkings']").prop("selected", "selected");
+                break;
+
+            case "BANK_OUTSOURCING":
+                $("#outsourcing option[value='@ViewBag.outsourcings']").prop("selected", "selected");
+                break;
+        }*@
+
+
+        $("#group").on("change", function () {
+            $.ajax({
+                url: '@Url.Action("GetMerchant", "Report")',
+                data: { groupName: $(this).val() },
+                type: 'post',
+                cache: false,
+                async: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.length > 0) {
+                        $('#items').show();
+                        $('#items').empty();
+                        $('#items').append($('<option></option>').val('').text('--請選擇--'));
+                        $.each(data, function (i, item) {
+                            if (item.Value != 'ALL') //20190301專用，禁止選ALL
+                            {
+                                $('#items').append($('<option></option>').val(item.Key).text(item.Value));
+                            }
+                        });
+                            
+                            $("#items option[value='@ViewBag.ITEM']").prop("selected", "selected");
+                    }
+                    else {
+                        $('#items').hide();
+                    }
+                }
+            });
+        });
+
+        $("#group").trigger("change");
+    })
+
+</script>

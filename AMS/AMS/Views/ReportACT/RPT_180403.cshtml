@@ -1,0 +1,119 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+
+
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+        $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+
+</script>
+
+
+<meta name="viewport" content="width=device-width" />
+<title>@ViewBag.RepName</title>
+
+<h2>@ViewBag.RepName</h2>
+
+
+
+@using (Html.BeginForm("RPT_180403", "ReportACT", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate"> 交易日期:</label>
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.Start" style="width:100px;" /> ~
+        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.End" style="width:100px;" />
+
+       
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出CSV" class="btn btn-default" />
+    </div>
+}
+<table class="grid" width="100%">
+    <thead>
+        <tr style="background-color: lightgray">
+            <th>
+                員工編號
+            </th>
+            <th>
+                員工姓名
+            </th>
+            <th>
+                金額
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+
+        @foreach (DataRow row in Model.Rows)
+        {
+            <tr>
+                @for (int j = 0; j < row.ItemArray.Length; j++)
+                {
+                    <td>@row.ItemArray[j].ToString()</td>
+                }
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+
+
+
+

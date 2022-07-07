@@ -1,0 +1,63 @@
+﻿@model AMS.Models.AmRolesModel
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title" id="myModalLabel">新增管理部門</h4>
+</div>
+
+    <div class="modal-body">
+        @if ((int)ViewBag.NoRoleCount>0) {
+        using (Html.BeginForm("CreateDept", "Bank", FormMethod.Post, new { id = "searchForm" }))
+        {
+            @Html.AntiForgeryToken()
+            <div>
+                選擇部門
+                @Html.DropDownList("RoleIdN")
+                <input type="hidden" name="bankNo" value="@ViewBag.BankNo" />
+                <input type="hidden" name="bankAcct" value="@ViewBag.BankAcct" />
+                <input type="submit" value="新增" class="btn btn-default" />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            </div>
+        }
+        }
+        <table class="table">
+            <tr class="alert-success">
+
+                <th>
+                    @Html.DisplayNameFor(model => model.RoleId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.RoleName)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.AmRolesList)
+            {
+                <tr class="warning">
+                    <td>
+                        <font> @item.RoleId</font>
+                    </td>
+                    <td>
+                        <font> @item.RoleName</font>
+                    </td>
+                    <td>
+                        @using (Html.BeginForm("DeleteAccountRole", "Bank", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="bankNo" value="@ViewBag.BankNo" />
+                            <input type="hidden" name="bankAcct" value="@ViewBag.BankAcct" />
+                            <input type="hidden" name="roleId" value="@item.RoleId" />
+                            <button class="btn btn-success" type="submit">刪除</button>
+                        }
+                    </td>
+                </tr>
+
+            }
+        </table>
+
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancel</button>
+    </div>

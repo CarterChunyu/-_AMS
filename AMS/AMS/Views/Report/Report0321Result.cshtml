@@ -1,0 +1,164 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    ViewBag.Title = "每日餘額返還報表";
+   
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+@if (ViewBag.Count > 0) { 
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+
+
+}
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+        $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+
+</script>
+
+<h2>每日餘額返還報表</h2>
+
+@using (Html.BeginForm("Report0321Result", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">日期 :</label>
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.Start" style="width:100px;" /> 
+        銀行特約機構 : <a style="visibility:visible">@Html.DropDownList("Merchant")</a>
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+}
+
+@if (TempData["message"] != null)
+{
+    <script type="text/javascript">
+
+	var message = @Html.Raw(Json.Encode(TempData["message"]))
+	alert(message);
+    </script>
+}
+
+@if (ViewBag.Count > 0)
+{
+    int k = 0;
+    <table class="grid" width="100%">
+        <thead>
+            <tr style="background-color: lightgray">
+                <th style="text-align: center; border: solid; border-color: gray">銀行</th>
+                <th style="text-align: center; border: solid; border-color: gray">通知日期</th>
+                <th style="text-align: center; border: solid; border-color: gray">處理日期</th>
+                <th colspan="2" style="text-align: center; border: solid; border-color: gray">一般餘額返還</th>
+                <th colspan="2" style="text-align: center; border: solid; border-color: gray">掛失餘額返還</th>
+                <th style="text-align: center; border: solid; border-color: gray">愛金卡應返還金額</th>
+            </tr>
+            <tr style="background-color: lightgray">
+                <th style="text-align: right; border: solid; border-color: gray"></th>
+                <th style="text-align: right; border: solid; border-color: gray"></th>
+                <th style="text-align: right; border: solid; border-color: gray"></th>
+                <th style="text-align: center; border: solid; border-color: gray">金額</th>
+                <th style="text-align: center; border: solid; border-color: gray">筆數</th>
+                <th style="text-align: center; border: solid; border-color: gray">金額</th>
+                <th style="text-align: center; border: solid; border-color: gray">筆數</th>
+                <th style="text-align: right; border: solid; border-color: gray"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (DataRow row in Model.Rows)
+{
+    int j = 0;
+    k++;
+    <tr>
+        @foreach (DataColumn col in Model.Columns)
+        {
+            string colValue = row[col.ColumnName].ToString();
+            j++;
+            if (j >= 4 && j <= 8)
+            {
+                Int32 t = Int32.Parse(row[col.ColumnName].ToString());
+                colValue = t.ToString("N", nfi);
+                <td style="text-align: right; border: solid; border-color: gray">@colValue</td>
+
+            }
+            else
+            {
+                <td style="text-align: center; border: solid; border-color: gray">@colValue</td>
+            }
+        }
+    </tr>
+}
+
+
+
+        </tbody>
+        <tfoot>
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    //<th>@col.ColumnName</th>
+                    <th></th>
+                }
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+
+
+}
+
+

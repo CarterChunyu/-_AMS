@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{73486582-91D4-4070-8AB0-CD78ED08887F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Business</RootNamespace>
+    <AssemblyName>Business</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EPPlus">
+      <HintPath>..\AMS\bin\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ACInvoice2021Manager.cs" />
+    <Compile Include="ACInvoiceManager.cs" />
+    <Compile Include="ACInvoiceRewardReport2021Manager.cs" />
+    <Compile Include="AmAccountRoleManager.cs" />
+    <Compile Include="AmAcctRoleManager.cs" />
+    <Compile Include="AmChoiceManager.cs" />
+    <Compile Include="AmEntAccountDManager.cs" />
+    <Compile Include="AmEntAcctDManager.cs" />
+    <Compile Include="AmEntReceDManager.cs" />
+    <Compile Include="AmEntReceLogDManager.cs" />
+    <Compile Include="AmMenuManager.cs" />
+    <Compile Include="AmRolesManager.cs" />
+    <Compile Include="AmUsersManager.cs" />
+    <Compile Include="CmBankDManager.cs" />
+    <Compile Include="CoBrandedSellSponsorshipManager.cs" />
+    <Compile Include="CrBankAdjcaseDTmpManager.cs" />
+    <Compile Include="CrBankAdjcaseManager.cs" />
+    <Compile Include="CrBankAdjcaseMTmpManager.cs" />
+    <Compile Include="GmAccountManager.cs" />
+    <Compile Include="GmAccountStoreManager .cs" />
+    <Compile Include="GmCodeMappingManager.cs" />
+    <Compile Include="GmMerchantManager.cs" />
+    <Compile Include="GmMerchantStoreManager.cs" />
+    <Compile Include="GmMerchTMManager.cs" />
+    <Compile Include="GmSchemaObjManager.cs" />
+    <Compile Include="GmTypeManager.cs" />
+    <Compile Include="HwCounterDManager.cs" />
+    <Compile Include="IbonActivityManager.cs" />
+    <Compile Include="ICASHOPInvoiceFileManager.cs" />
+    <Compile Include="ICASHOPManager.cs" />
+    <Compile Include="ICASHOPMerchantManager.cs" />
+    <Compile Include="ICASHOPMerchantStoreManager.cs" />
+    <Compile Include="ICASHOPOverdraftManager.cs" />
+    <Compile Include="ICASHOPReportManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportACTManager.cs" />
+    <Compile Include="ReportBankManager.cs" />
+    <Compile Include="ReportManager.cs" />
+    <Compile Include="ReportMarketingManager.cs" />
+    <Compile Include="ReportSystemManager.cs" />
+    <Compile Include="WebPasswordLogManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{a3027584-d4ce-4dfd-9ae2-bc55444fc2c3}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{098926d8-2c07-460f-9831-ef636843d19d}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{cd84eff3-e817-4db1-affa-6143c34dcbae}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,72 @@
+﻿@using System.Data;
+@using Domain.Common;
+@using Domain.CoBrandedSellSponsorship;
+
+@{
+    Layout = null;
+    ExecInfo ei = ViewBag.ExecInfo;
+    DataTable dt_QueryResult = ViewBag.QueryResult;
+}
+
+@if (ei.RtnResult == false)
+{
+    @*查詢失敗*@
+    <script>
+        fun_AlertCtrl(true, "@(ei.RtnMsg)");
+    </script>
+}
+else
+{
+    @*查詢成功*@
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">年度清單</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>年度起始日</th>
+                    <th>年度結束日</th>
+                    <th>編輯</th>
+                    <th>檢視</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DataRow dr in dt_QueryResult.AsEnumerable().OrderByDescending(x => x.Field<DateTime>("Date_B")))
+                {
+                    <tr>
+                        <td>@(DateTime.Parse(dr["Date_B"].ToString()).ToString("yyyy/MM/dd"))</td>
+                        <td>@(DateTime.Parse(dr["Date_E"].ToString()).ToString("yyyy/MM/dd"))</td>
+                        <td>
+                            <a id="a_link_edit_@(dr["RID"].ToString())"
+                               style="cursor:pointer;"
+                               RID="@(dr["RID"].ToString())"
+                               Date_B="@(DateTime.Parse(dr["Date_B"].ToString()).ToString("yyyyMMdd"))"
+                               Date_E="@(DateTime.Parse(dr["Date_E"].ToString()).ToString("yyyyMMdd"))"
+                               onclick="fun_editlink_click(this);">
+                                編輯
+                            </a>
+                        </td>
+                        <td>
+                            <a style="cursor:pointer;"
+                               href="@(Url.Action("IndexBankData",new QueryBankDataReq
+                                                                  {
+                                                                      RID = int.Parse(dr["RID"].ToString()),
+                                                                      BID = null,
+                                                                      Date_B = DateTime.Parse(dr["Date_B"].ToString()),
+                                                                      Date_E = DateTime.Parse(dr["Date_E"].ToString())
+                                                                  }))">
+                                檢視
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="panel-footer"></div>
+    </div>
+
+    <div id="div_Data">
+        @Html.Hidden("hid_Data_Range")
+    </div>
+}

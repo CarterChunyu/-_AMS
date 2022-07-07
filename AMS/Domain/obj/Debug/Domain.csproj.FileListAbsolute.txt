@@ -1,0 +1,6 @@
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Domain\bin\Debug\Domain.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Domain\bin\Debug\Domain.pdb
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Domain\obj\Debug\Domain.csproj.AssemblyReference.cache
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Domain\obj\Debug\Domain.csproj.CoreCompileInputs.cache
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Domain\obj\Debug\Domain.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Domain\obj\Debug\Domain.pdb

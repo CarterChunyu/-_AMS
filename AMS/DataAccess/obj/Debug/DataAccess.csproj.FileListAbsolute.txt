@@ -1,0 +1,17 @@
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\DataAccess.dll.config
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\DataAccess.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\DataAccess.pdb
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Common.Logging.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Common.Logging.Log4Net1211.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Dapper.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Domain.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Helpers.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\log4net.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Domain.pdb
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Helpers.pdb
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\bin\Debug\Dapper.xml
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\obj\Debug\DataAccess.csproj.AssemblyReference.cache
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\obj\Debug\DataAccess.csproj.CoreCompileInputs.cache
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\obj\Debug\DataAccess.csproj.CopyComplete
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\obj\Debug\DataAccess.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\DataAccess\obj\Debug\DataAccess.pdb

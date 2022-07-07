@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="AMS.Models.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BM_TRANS_TYPE">
+          <Key>
+            <PropertyRef Name="TRANS_TYPE" />
+          </Key>
+          <Property Name="MERCHANT_NO" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="TRANS_TYPE" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="FILE_TRANS_TYPE" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="FILE_TRANS_DESC" Type="varchar" MaxLength="30" />
+          <Property Name="FILE_SUB_TYPE" Type="varchar" MaxLength="5" />
+          <Property Name="SUB_TYPE_DESC" Type="varchar" MaxLength="30" />
+          <Property Name="SETTLE_FLG" Type="varchar" MaxLength="1" Nullable="false" />
+          <Property Name="CONTRACT_TYPE" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="SETTLE_TYPE" Type="varchar" MaxLength="1" Nullable="false" />
+          <Property Name="SETTLE_SIGN" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="TR_TRANS_TYPE" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="TR_FILE_TRANS_TYPE" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="TR_FILE_TRANS_DESC" Type="varchar" MaxLength="30" />
+          <Property Name="TR_FILE_SUB_TYPE" Type="varchar" MaxLength="5" />
+          <Property Name="TR_SUB_TYPE_DESC" Type="varchar" MaxLength="30" />
+          <Property Name="ACT_NAME_ICASH" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ARAP_ICASH" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="RPT_ISSHOW_ICASH" Type="varchar" MaxLength="1" Nullable="false" />
+          <Property Name="RPT_SHOW_ORDER_ICASH" Type="varchar" MaxLength="3" Nullable="false" />
+          <Property Name="ACT_NAME_MERCHANT" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="ACT_SEQ_MERCHANT" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="ACT_NO_MERCHANT" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="SETTLE_SIGN_MERCHANT" Type="numeric" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="ARAP_MERCHANT" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="RPT_ISSHOW_MERCHANT" Type="varchar" MaxLength="1" Nullable="false" />
+          <Property Name="RPT_SHOW_ORDER_MERCHANT" Type="varchar" MaxLength="3" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TM_ADJ_APPLICATION">
+          <Key>
+            <PropertyRef Name="FORM_ID" />
+          </Key>
+          <Property Name="FORM_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="APP_DATE" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="OPP_DATE_START" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="OPP_DATE_END" Type="varchar" MaxLength="8" Nullable="false" />
+          <Property Name="FORM_SERIAL" Type="varchar" MaxLength="11" Nullable="false" />
+          <Property Name="RCPT_DATE" Type="varchar" MaxLength="8" />
+          <Property Name="MODIFIABLE" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="ADJ_REMARK" Type="varchar" MaxLength="100" />
+          <Property Name="REPLY_REMARK" Type="varchar" MaxLength="100" />
+          <Property Name="CREATE_DATETIME" Type="varchar" MaxLength="14" />
+          <Property Name="UPDATE_DATETIME" Type="varchar" MaxLength="14" />
+        </EntityType>
+        <EntityType Name="TM_ADJ_APPLICATION_ITEM">
+          <Key>
+            <PropertyRef Name="APP_ITEM_ID" />
+          </Key>
+          <Property Name="APP_ITEM_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ARAP" Type="char" MaxLength="2" Nullable="false" />
+          <Property Name="TRANS_TYPE" Type="varchar" MaxLength="7" Nullable="false" />
+          <Property Name="FILE_TRANS_TYPE" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="FILE_SUB_TYPE" Type="varchar" MaxLength="5" Nullable="false" />
+          <Property Name="FORM_ID" Type="int" Nullable="false" />
+          <Property Name="REMARK" Type="varchar" MaxLength="100" />
+          <Property Name="TRANS_CNT" Type="int" />
+          <Property Name="TRANS_AMT" Type="numeric" Precision="8" Scale="0" />
+          <Property Name="CREATE_DATETIME" Type="varchar" MaxLength="14" />
+          <Property Name="UPDATE_DATETIME" Type="varchar" MaxLength="14" />
+        </EntityType>
+        <Association Name="FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION">
+          <End Role="TM_ADJ_APPLICATION" Type="Self.TM_ADJ_APPLICATION" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="TM_ADJ_APPLICATION_ITEM" Type="Self.TM_ADJ_APPLICATION_ITEM" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TM_ADJ_APPLICATION">
+              <PropertyRef Name="FORM_ID" />
+            </Principal>
+            <Dependent Role="TM_ADJ_APPLICATION_ITEM">
+              <PropertyRef Name="FORM_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AMSModelsStoreContainer">
+          <EntitySet Name="BM_TRANS_TYPE" EntityType="Self.BM_TRANS_TYPE" Schema="TRA" store:Type="Tables" />
+          <EntitySet Name="TM_ADJ_APPLICATION" EntityType="Self.TM_ADJ_APPLICATION" Schema="TRA" store:Type="Tables" />
+          <EntitySet Name="TM_ADJ_APPLICATION_ITEM" EntityType="Self.TM_ADJ_APPLICATION_ITEM" Schema="TRA" store:Type="Tables" />
+          <AssociationSet Name="FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION" Association="Self.FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION">
+            <End Role="TM_ADJ_APPLICATION" EntitySet="TM_ADJ_APPLICATION" />
+            <End Role="TM_ADJ_APPLICATION_ITEM" EntitySet="TM_ADJ_APPLICATION_ITEM" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AMS.Models" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="BM_TRANS_TYPE">
+          <Key>
+            <PropertyRef Name="TRANS_TYPE" />
+          </Key>
+          <Property Name="MERCHANT_NO" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TRANS_TYPE" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FILE_TRANS_TYPE" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FILE_TRANS_DESC" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="FILE_SUB_TYPE" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="SUB_TYPE_DESC" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="SETTLE_FLG" Type="String" MaxLength="1" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CONTRACT_TYPE" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="SETTLE_TYPE" Type="String" MaxLength="1" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="SETTLE_SIGN" Type="Decimal" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="TR_TRANS_TYPE" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TR_FILE_TRANS_TYPE" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TR_FILE_TRANS_DESC" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="TR_FILE_SUB_TYPE" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="TR_SUB_TYPE_DESC" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ACT_NAME_ICASH" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ARAP_ICASH" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="RPT_ISSHOW_ICASH" Type="String" MaxLength="1" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="RPT_SHOW_ORDER_ICASH" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ACT_NAME_MERCHANT" Type="String" MaxLength="30" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ACT_SEQ_MERCHANT" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ACT_NO_MERCHANT" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="SETTLE_SIGN_MERCHANT" Type="Decimal" Precision="1" Scale="0" Nullable="false" />
+          <Property Name="ARAP_MERCHANT" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="RPT_ISSHOW_MERCHANT" Type="String" MaxLength="1" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="RPT_SHOW_ORDER_MERCHANT" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TM_ADJ_APPLICATION">
+          <Key>
+            <PropertyRef Name="FORM_ID" />
+          </Key>
+          <Property Name="FORM_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="APP_DATE" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="OPP_DATE_START" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="OPP_DATE_END" Type="String" MaxLength="8" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FORM_SERIAL" Type="String" MaxLength="11" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="RCPT_DATE" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="MODIFIABLE" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="ADJ_REMARK" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="REPLY_REMARK" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CREATE_DATETIME" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="UPDATE_DATETIME" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="TM_ADJ_APPLICATION_ITEM" Relationship="Self.FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION" FromRole="TM_ADJ_APPLICATION" ToRole="TM_ADJ_APPLICATION_ITEM" />
+        </EntityType>
+        <EntityType Name="TM_ADJ_APPLICATION_ITEM">
+          <Key>
+            <PropertyRef Name="APP_ITEM_ID" />
+          </Key>
+          <Property Name="APP_ITEM_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ARAP" Type="String" MaxLength="2" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="TRANS_TYPE" Type="String" MaxLength="7" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FILE_TRANS_TYPE" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FILE_SUB_TYPE" Type="String" MaxLength="5" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FORM_ID" Type="Int32" Nullable="false" />
+          <Property Name="REMARK" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="TRANS_CNT" Type="Int32" />
+          <Property Name="TRANS_AMT" Type="Decimal" Precision="8" Scale="0" />
+          <Property Name="CREATE_DATETIME" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <Property Name="UPDATE_DATETIME" Type="String" MaxLength="14" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="TM_ADJ_APPLICATION" Relationship="Self.FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION" FromRole="TM_ADJ_APPLICATION_ITEM" ToRole="TM_ADJ_APPLICATION" />
+        </EntityType>
+        <Association Name="FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION">
+          <End Role="TM_ADJ_APPLICATION" Type="Self.TM_ADJ_APPLICATION" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="TM_ADJ_APPLICATION_ITEM" Type="Self.TM_ADJ_APPLICATION_ITEM" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TM_ADJ_APPLICATION">
+              <PropertyRef Name="FORM_ID" />
+            </Principal>
+            <Dependent Role="TM_ADJ_APPLICATION_ITEM">
+              <PropertyRef Name="FORM_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TRAADJEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BM_TRANS_TYPE" EntityType="Self.BM_TRANS_TYPE" />
+          <EntitySet Name="TM_ADJ_APPLICATION" EntityType="Self.TM_ADJ_APPLICATION" />
+          <EntitySet Name="TM_ADJ_APPLICATION_ITEM" EntityType="Self.TM_ADJ_APPLICATION_ITEM" />
+          <AssociationSet Name="FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION" Association="Self.FK_TM_ADJ_APPLICATION_ITEM_TM_ADJ_APPLICATION">
+            <End Role="TM_ADJ_APPLICATION" EntitySet="TM_ADJ_APPLICATION" />
+            <End Role="TM_ADJ_APPLICATION_ITEM" EntitySet="TM_ADJ_APPLICATION_ITEM" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AMSModelsStoreContainer" CdmEntityContainer="TRAADJEntities">
+          <EntitySetMapping Name="BM_TRANS_TYPE">
+            <EntityTypeMapping TypeName="AMS.Models.BM_TRANS_TYPE">
+              <MappingFragment StoreEntitySet="BM_TRANS_TYPE">
+                <ScalarProperty Name="MERCHANT_NO" ColumnName="MERCHANT_NO" />
+                <ScalarProperty Name="TRANS_TYPE" ColumnName="TRANS_TYPE" />
+                <ScalarProperty Name="FILE_TRANS_TYPE" ColumnName="FILE_TRANS_TYPE" />
+                <ScalarProperty Name="FILE_TRANS_DESC" ColumnName="FILE_TRANS_DESC" />
+                <ScalarProperty Name="FILE_SUB_TYPE" ColumnName="FILE_SUB_TYPE" />
+                <ScalarProperty Name="SUB_TYPE_DESC" ColumnName="SUB_TYPE_DESC" />
+                <ScalarProperty Name="SETTLE_FLG" ColumnName="SETTLE_FLG" />
+                <ScalarProperty Name="CONTRACT_TYPE" ColumnName="CONTRACT_TYPE" />
+                <ScalarProperty Name="SETTLE_TYPE" ColumnName="SETTLE_TYPE" />
+                <ScalarProperty Name="SETTLE_SIGN" ColumnName="SETTLE_SIGN" />
+                <ScalarProperty Name="TR_TRANS_TYPE" ColumnName="TR_TRANS_TYPE" />
+                <ScalarProperty Name="TR_FILE_TRANS_TYPE" ColumnName="TR_FILE_TRANS_TYPE" />
+                <ScalarProperty Name="TR_FILE_TRANS_DESC" ColumnName="TR_FILE_TRANS_DESC" />
+                <ScalarProperty Name="TR_FILE_SUB_TYPE" ColumnName="TR_FILE_SUB_TYPE" />
+                <ScalarProperty Name="TR_SUB_TYPE_DESC" ColumnName="TR_SUB_TYPE_DESC" />
+                <ScalarProperty Name="ACT_NAME_ICASH" ColumnName="ACT_NAME_ICASH" />
+                <ScalarProperty Name="ARAP_ICASH" ColumnName="ARAP_ICASH" />
+                <ScalarProperty Name="RPT_ISSHOW_ICASH" ColumnName="RPT_ISSHOW_ICASH" />
+                <ScalarProperty Name="RPT_SHOW_ORDER_ICASH" ColumnName="RPT_SHOW_ORDER_ICASH" />
+                <ScalarProperty Name="ACT_NAME_MERCHANT" ColumnName="ACT_NAME_MERCHANT" />
+                <ScalarProperty Name="ACT_SEQ_MERCHANT" ColumnName="ACT_SEQ_MERCHANT" />
+                <ScalarProperty Name="ACT_NO_MERCHANT" ColumnName="ACT_NO_MERCHANT" />
+                <ScalarProperty Name="SETTLE_SIGN_MERCHANT" ColumnName="SETTLE_SIGN_MERCHANT" />
+                <ScalarProperty Name="ARAP_MERCHANT" ColumnName="ARAP_MERCHANT" />
+                <ScalarProperty Name="RPT_ISSHOW_MERCHANT" ColumnName="RPT_ISSHOW_MERCHANT" />
+                <ScalarProperty Name="RPT_SHOW_ORDER_MERCHANT" ColumnName="RPT_SHOW_ORDER_MERCHANT" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TM_ADJ_APPLICATION">
+            <EntityTypeMapping TypeName="AMS.Models.TM_ADJ_APPLICATION">
+              <MappingFragment StoreEntitySet="TM_ADJ_APPLICATION">
+                <ScalarProperty Name="FORM_ID" ColumnName="FORM_ID" />
+                <ScalarProperty Name="APP_DATE" ColumnName="APP_DATE" />
+                <ScalarProperty Name="OPP_DATE_START" ColumnName="OPP_DATE_START" />
+                <ScalarProperty Name="OPP_DATE_END" ColumnName="OPP_DATE_END" />
+                <ScalarProperty Name="FORM_SERIAL" ColumnName="FORM_SERIAL" />
+                <ScalarProperty Name="RCPT_DATE" ColumnName="RCPT_DATE" />
+                <ScalarProperty Name="MODIFIABLE" ColumnName="MODIFIABLE" />
+                <ScalarProperty Name="ADJ_REMARK" ColumnName="ADJ_REMARK" />
+                <ScalarProperty Name="REPLY_REMARK" ColumnName="REPLY_REMARK" />
+                <ScalarProperty Name="CREATE_DATETIME" ColumnName="CREATE_DATETIME" />
+                <ScalarProperty Name="UPDATE_DATETIME" ColumnName="UPDATE_DATETIME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TM_ADJ_APPLICATION_ITEM">
+            <EntityTypeMapping TypeName="AMS.Models.TM_ADJ_APPLICATION_ITEM">
+              <MappingFragment StoreEntitySet="TM_ADJ_APPLICATION_ITEM">
+                <ScalarProperty Name="APP_ITEM_ID" ColumnName="APP_ITEM_ID" />
+                <ScalarProperty Name="ARAP" ColumnName="ARAP" />
+                <ScalarProperty Name="TRANS_TYPE" ColumnName="TRANS_TYPE" />
+                <ScalarProperty Name="FILE_TRANS_TYPE" ColumnName="FILE_TRANS_TYPE" />
+                <ScalarProperty Name="FILE_SUB_TYPE" ColumnName="FILE_SUB_TYPE" />
+                <ScalarProperty Name="FORM_ID" ColumnName="FORM_ID" />
+                <ScalarProperty Name="REMARK" ColumnName="REMARK" />
+                <ScalarProperty Name="TRANS_CNT" ColumnName="TRANS_CNT" />
+                <ScalarProperty Name="TRANS_AMT" ColumnName="TRANS_AMT" />
+                <ScalarProperty Name="CREATE_DATETIME" ColumnName="CREATE_DATETIME" />
+                <ScalarProperty Name="UPDATE_DATETIME" ColumnName="UPDATE_DATETIME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

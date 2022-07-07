@@ -1,0 +1,318 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    ViewBag.Title = "月別超商每日交易一覽表";
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+@if (ViewBag.Count > 0) { 
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align:right;
+    }
+</style>
+
+
+
+<script type='text/javascript'>
+//<![CDATA[
+    window.onload = function () {
+        $(document).ready(function () {
+            var table = $('.grid').not('.initialized').addClass('initialized').show().DataTable({
+                "columnDefs": [
+                    { "visible": false, "targets": 0 }
+                ],
+                "order": [[0, 'asc']],
+                "bSort": false,
+                "bFilter": false,
+                "sProcessing": "處理中...",
+                "bInfo": false,
+                "stateSave": false,
+                "stateDuration": 60 * 60 * 24 * 365,
+                "displayLength": 10,
+                "rowNum": 10,
+                "bLengthChange": true,
+                "rowList": [10, 20, 50, 1000],
+                "viewrecords": true,
+                "bPaginate": false,
+                "dom": 'lfTrtip',
+                "drawCallback": function (settings) {
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+                    var colonne = api.row(0).data().length;
+                    var totale = new Array();
+                    totale['Totale'] = new Array();
+                    var groupid = -1;
+                    var subtotale = new Array();
+
+                    var rowCountss = 0;
+                    var rowCounts = new Array();
+                    var totFeeUT = 0;
+                    var totFeeUT3 = 0;
+                    var totFee6 = 0;
+                    var totFee = 0;
+                    var totFee12 = 0;
+
+                    api.column(0, { page: 'current' }).data().each(function (group, i) {
+                        if (last !== group) {
+                            groupid++;
+
+                            $(rows).eq(i).before(
+                                '<tr class="roupp" style="display:none;height:0px"><td style="display:none;height:-10px">' + group + '</td></tr>'
+                            );
+                            last = group;
+                        }
+                    });
+
+                    
+                    $('tbody').find('.roupp').each(function (i, v) {
+                        rowCounts[i] = $(this).nextUntil('.roupp').length;
+                    });
+
+                    groupid = -1;
+                    last = null;
+                    api.column(0, { page: 'current' }).data().each(function (group, i) {
+
+                        if (last !== group) {
+                            groupid++;
+                            
+                            $(rows).eq(i + rowCounts[groupid] - 1).after(
+                                '<tr class="group"><td style="visibility:hidden">' + group + '</td></tr>'
+                            );
+                            last = group;
+                        }
+
+                        val = api.row(api.row($(rows).eq(i)).index()).data();      //current order index
+                        $.each(val, function (index2, val2) {
+                            if (typeof subtotale[groupid] == 'undefined') {
+                                subtotale[groupid] = new Array();
+                            }
+                            if (typeof subtotale[groupid][index2] == 'undefined') {
+                                subtotale[groupid][index2] = 0;
+                            }
+                            if (typeof totale['Totale'][index2] == 'undefined') { totale['Totale'][index2] = 0; }
+
+                            //valore = Number(val2.replace('€', "").replace('.', "").replace(',', "."));
+                            if (index2 > 2) {
+                                //var s = s.replace(/\你要置換的字串/g, 'AA');
+                                var s = val2.replace(/\,/g, '');
+                                s = s.replace('%', "");
+                                s = s.replace(/font/g, '');
+                                s = s.replace(/[<>]/g, '');
+                                s = s.replace(/\\>/g, '');
+                                s = s.replace(/\//g, '');
+                                s = s.replace(/\=/g, '');
+                                s = s.replace(/\"/g, '');
+                                s = s.replace(/\(/g, '-');
+                                s = s.replace(/\)/g, '');
+                                s = s.replace(/color/g, '');
+                                s = s.replace(/red/g, '');
+
+                                valore = Number(s);
+                                subtotale[groupid][index2] += valore;
+
+                                totale['Totale'][index2] += valore;
+                            }
+
+                            //totale['Totale'][index2] += valore;
+                        });
+
+                    });
+
+                    $('tbody').find('.group').each(function (i, v) {
+                        var rowCount = $(this).nextUntil('.group').length;
+                        $(this).find('td:first').append($('<span />', { 'class': 'rowCount-grid' }).append($('<b />', { 'text': ' (' + rowCounts[i] + ')' })));
+                        var subtd = '<td></td><td></td><td>總計</td>';
+                        for (var a = 5; a < colonne ; a++) {
+                            //subtd += '<td>' + subtotale[i][a] + ' OUT OF ' + totale['Totale'][a] + ' (' + Math.round(subtotale[i][a] * 100 / totale['Totale'][a], 2) + '%) ' + '</td>';
+                            if (a != 8 && a != 13 && a != 16 && a != 19 && a != 22) {
+                                subtd += '<td Style="text-align:right" >' + formatThousands(subtotale[i][a]) + '</td>';
+                            }
+                            else
+                            {
+                                //subtd += '<td Style="text-align:right" >' + formatThousands(Math.round(subtotale[i][a - 1] * subtotale[i][a] / rowCounts[i] / 100)) + '</td>';
+                                subtd += '<td Style="text-align:right" >' + '' + '</td>';
+                                if (a == 8) totFeeUT += (subtotale[i][a - 1] * subtotale[i][a] / rowCounts[i] / 100);
+                                if (a == 13) totFeeUT3 += (subtotale[i][a - 1] * subtotale[i][a] / rowCounts[i] / 100);
+                                if (a == 16) totFee6 += (subtotale[i][a - 1] * subtotale[i][a] / rowCounts[i] / 100);
+                                if (a == 19) totFee += (subtotale[i][a - 1] * subtotale[i][a] / rowCounts[i] / 100);
+                                if (a == 22) totFee12 += (subtotale[i][a - 1] * subtotale[i][a] / rowCounts[i] / 100);
+                            }
+                        }
+                        $(this).append(subtd);
+
+                    });
+
+                }
+            });
+
+
+
+        });
+
+    }//]]>
+
+    function formatThousands(n, dp) {
+        var s = '' + (Math.floor(n)), d = n % 1, i = s.length, r = '';
+        s = s.replace(/-/g, '');
+        i = s.length;
+        while ((i -= 3) > 0) { r = ',' + s.substr(i, 3) + r; }
+        if (n >= 0)
+            return s.substr(0, i + 3) + r + (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '');
+        else
+        {
+            return "<font color='red'>(" + s.substr(0, i + 3) + r + (d ? '.' + Math.round(d * Math.pow(10, dp || 2)) : '') + ")</font>";
+        }
+    }
+</script>
+
+}
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('.date-picker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'yymm',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).datepicker('setDate', new Date(year, month, 1));
+            }
+        });
+    });
+    //$(function () {
+    //    $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+    //    $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    //});
+</script>
+<style>
+    .ui-datepicker-calendar {
+        display: none;
+    }
+</style>
+<h2>月別超商每日交易一覽表</h2>
+
+@using (Html.BeginForm("Report0122Result", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">傳輸年月 :</label>
+        <input type="text" name="StartDate" id="StartDate" class="date-picker" value="@ViewBag.Start" style="width:100px;" /> 
+        資料來源:
+        <input type="radio" name="SRC_FLG" value="POS" @ViewBag.ch1> POS　
+        <input type="radio" name="SRC_FLG" value="TXLOG" @ViewBag.ch2> TXLOG
+
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+}
+
+@if (ViewBag.Count > 0) {
+<table class="grid" width="100%">
+    <thead>
+        <tr>
+            @foreach (DataColumn col in Model.Columns)
+            {
+                <th style="text-align:right">@col.ColumnName</th>
+            }
+        </tr>
+
+    </thead>
+    <tbody>
+
+        @foreach (DataRow row in Model.Rows)
+        {
+            int j = 0;
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    string colValue = row[col.ColumnName].ToString();
+                    j++;
+                    if (j > 5 && j != 9 && j != 14 && j != 17 && j != 20 && j != 23)
+                    {
+                        Int32 t = Int32.Parse(row[col.ColumnName].ToString());
+                        colValue = t.ToString("N", nfi);
+                        colValue = t.ToString("#,##0;#,##0;0");
+            if (t < 0)
+            {
+                <td><font color="red"> (@colValue)</font></td>
+            }                        
+            else
+            {
+                <td> @colValue</td>
+            }                        
+
+                    }
+                    else if (j == 9 || j == 14 || j == 17 || j == 20 || j == 23)
+                    {
+                        colValue = colValue + '%';
+                    <td>@colValue</td>
+                    }
+                    else
+                    {
+                        <td>@colValue</td>
+                        
+                    }
+                }
+            </tr>
+        }
+
+
+    </tbody>
+    <tfoot>
+        <tr>
+            @foreach (DataColumn col in Model.Columns)
+            {
+                //<th style="text-align:right">@col.ColumnName</th>
+            }
+        </tr>
+    </tfoot>
+</table>
+}

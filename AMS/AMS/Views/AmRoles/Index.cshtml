@@ -1,0 +1,41 @@
+﻿@model AMS.Models.AmRolesModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>部門維護</h2>
+
+<p>
+
+    @Html.ActionLink("新增部門", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.RoleId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RoleName)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.AmRolesList)
+    {
+
+            <tr>
+                <td>
+                    <font>@item.RoleId</font>
+                </td>
+                <td>
+                    <font> @item.RoleName</font>
+                </td>
+                
+                <td>
+                    @Html.ActionLink("刪除", "Delete", new { roleId = item.RoleId }, new { onclick = "return confirm('確定要刪除嗎?');" })
+                </td>
+            </tr>
+        
+    }
+</table>

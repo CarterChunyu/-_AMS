@@ -1,0 +1,6 @@
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Helpers\bin\Debug\Helpers.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Helpers\bin\Debug\Helpers.pdb
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Helpers\obj\Debug\Helpers.csproj.AssemblyReference.cache
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Helpers\obj\Debug\Helpers.csproj.CoreCompileInputs.cache
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Helpers\obj\Debug\Helpers.dll
+C:\Users\p10366706\Source\Workspaces\icasH-CodeHistory\AM\AMS\Helpers\obj\Debug\Helpers.pdb

@@ -1,0 +1,404 @@
+﻿@using Domain.ICASHOPMerchant;
+@model Domain.ICASHOPMerchant.EditReq
+
+<h2>自串點數特店主檔維護</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">特店主檔@(Model.EditType == EditReq.en_EditType.Add ? "新增" : "編輯")</h3>
+    </div>
+    <div class="panel-body">
+        <div id="div_query" class="form-horizontal">
+            <div class="form-group row">
+                <div class="col-md-8">
+                    @Html.Label("特店統編：", new { @class = "control-label col-md-2" })
+                    @if (Model.EditType == EditReq.en_EditType.Add)
+                    {
+                        @Html.TextBox("txt_UnifiedBusinessNo", string.Empty, new { maxlength = "8", style = "width:200px;" });
+                    }
+                    else if (Model.EditType == EditReq.en_EditType.Modify)
+                    {
+                        @Html.Label("lab_UnifiedBusinessNo", Model.UnifiedBusinessNo);
+                    }
+                </div>
+                <div class="col-md-8">
+                    @Html.Label("特店名稱：", new { @class = "control-label col-md-2" })
+                    @Html.TextBox("txt_MerchantName", Model.MerchantName, new { style = "width:200px;" })
+                </div>
+            </div>
+        </div>
+        <hr />
+        <table>
+            <tbody>
+                <tr>
+                    <td style="vertical-align:top;">
+                        <div class="panel-heading">
+                            <h3 class="panel-title" style="color:blue; font-weight:900;">每日交易檔案FTP相關設定</h3>
+                        </div>
+                        <div id="div_query" class="form-horizontal">
+                            <div class="form-group row">
+                                <div class="col-md-8">
+                                    @Html.Label("FTP類型：", new { @class = "control-label col-md-6" })
+                                    @Html.DropDownList("ddl_Trans_FTPType",
+                                                       new List<SelectListItem>()
+                                                       {
+                                                           new SelectListItem{ Text="請選擇",Value="" },
+                                                           new SelectListItem{ Text="不傳送檔案",Value="NoTrans",Selected=(Model.Trans_FTPType== "NoTrans")},
+                                                           new SelectListItem{ Text="FTPS",Value="FTPS",Selected=(Model.Trans_FTPType== "FTPS")},
+                                                           new SelectListItem{ Text="FTP",Value="FTP",Selected=(Model.Trans_FTPType== "FTP")}
+                                                       },
+                                                       new
+                                                       {
+                                                           @class = "btn btn-default dropdown-toggle"
+                                                       })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("HOST名稱：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_FtpHost", Model.Trans_FtpHost, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("PORT：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_FtpPort", Model.Trans_FtpPort, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("帳號：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_FtpUser", Model.Trans_FtpUser, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("密碼：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_FtpPwd", Model.Trans_FtpPwd, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("Proxy主機名稱：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_PoxyIP", Model.Trans_PoxyIP, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("ProxyPort：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_PoxyPort", Model.Trans_PoxyPort, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("Proxy帳號：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_PoxyUser", Model.Trans_PoxyUser, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("Proxy密碼：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_PoxyPwd", Model.Trans_PoxyPwd, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("FTP路徑：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Trans_FtpDir", Model.Trans_FtpDir, new { style = "width:150px;" })
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="panel-heading">
+                            <h3 class="panel-title" style="color:blue; font-weight:900;">門市主檔檔案FTP相關設定</h3>
+                        </div>
+                        <div id="div_query" class="form-horizontal">
+                            <div class="form-group row">
+                                <div class="col-md-8">
+                                    @Html.Label("門市檔案匯入類型：", new { @class = "control-label col-md-6" })
+                                    @Html.DropDownList("ddl_Store_FileType",
+                                                       new List<SelectListItem>()
+                                                       {
+                                                           new SelectListItem{ Text="請選擇",Value="" },
+                                                           new SelectListItem{ Text="Excel檔UI匯入",Value="Excel",Selected=(Model.Store_FileType== "Excel") },
+                                                           new SelectListItem{ Text="文字檔JOB匯入",Value="FTP",Selected=(Model.Store_FileType== "FTP") }
+                                                       },
+                                                       new
+                                                       {
+                                                           @class = "btn btn-default dropdown-toggle"
+                                                       })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("FTP類型：", new { @class = "control-label col-md-6" })
+                                    @Html.DropDownList("ddl_Store_FTPType",
+                                                       new List<SelectListItem>()
+                                                       {
+                                                           new SelectListItem{ Text="請選擇",Value="" },
+                                                           new SelectListItem{ Text="FTPS",Value="FTPS",Selected=(Model.Store_FTPType== "FTPS") },
+                                                           new SelectListItem{ Text="FTP",Value="FTP",Selected=(Model.Store_FTPType== "FTP") }
+                                                       },
+                                                       new
+                                                       {
+                                                           @class = "btn btn-default dropdown-toggle"
+                                                       })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("HOST名稱：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_FtpHost", Model.Store_FtpHost, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("PORT：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_FtpPort", Model.Store_FtpPort, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("帳號：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_FtpUser", Model.Store_FtpUser, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("密碼：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_FtpPwd", Model.Store_FtpPwd, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("Proxy主機名稱：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_PoxyIP", Model.Store_PoxyIP, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("ProxyPort：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_PoxyPort", Model.Store_PoxyPort, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("Proxy帳號：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_PoxyUser", Model.Store_PoxyUser, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("Proxy密碼：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_PoxyPwd", Model.Store_PoxyPwd, new { style = "width:150px;" })
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.Label("FTP路徑：", new { @class = "control-label col-md-6" })
+                                    @Html.TextBox("txt_Store_FtpDir", Model.Store_FtpDir, new { style = "width:150px;" })
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <hr />
+        <div style="text-align:center;">
+            <button id="but_save" type="button" class="btn btn-primary" onclick="fun_but_save_click(this);">
+                儲存
+            </button>
+            &nbsp&nbsp
+            <button type="button" class="btn btn-primary" onclick="location.href='@Url.Action("Index",
+                                                                                              "ICASHOPMerchant",
+                                                                                              new QueryReq
+                                                                                              {
+                                                                                                  IsQuery = Model.Qry_IsQuery,
+                                                                                                  CurrentPage = Model.Qry_CurrentPage,
+                                                                                                  UnifiedBusinessNo = Model.Qry_UnifiedBusinessNo,
+                                                                                                  MerchantName = Model.Qry_MerchantName
+                                                                                              })'">
+                取消
+            </button>
+        </div>
+    </div>
+</div>
+
+@* Alert訊息 *@
+<div id="div_Alert" class="alert alert-danger" role="alert" style="display:none;">
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+    <div id="div_AlertMsg"></div>
+</div>
+
+<input type="hidden" id="hid_EditType" value="@(Model.EditType == EditReq.en_EditType.Add ? "Add" : "Modify")" />
+
+<script type="text/javascript">
+
+    //控制訊息框
+    //IsShow(是否顯示訊息框)，true=顯示、flase=不顯示
+    //Msg(訊息)
+    function fun_AlertCtrl(IsShow, Msg) {
+        var obj_div_Alert = $("#div_Alert");
+        var obj_msg = obj_div_Alert.find("#div_AlertMsg");
+
+        obj_div_Alert.css("display", (IsShow == true ? "block" : "none"));
+        obj_msg.html((IsShow == true ? Msg : ""));
+    }//fun_AlertCtrl
+
+    function fun_but_save_click(button) {
+
+        //設定變數
+        obj_div_ErrMsg = $("#div_ErrMsg");
+        obj_button = $(button);
+
+        //鎖定Button，避免使用者重複按
+        obj_button.attr("disabled", true);
+
+        //隱藏訊息框
+        fun_AlertCtrl(false);
+
+        if (confirm("確定要儲存嗎？") == false) {
+            //解開Button
+            obj_button.attr("disabled", false);
+            return;
+        }
+        else {
+
+            //設定變數
+            var s_Edit_Type = $("#hid_EditType").val();//編輯類別
+            var obj_MerchantData = {
+                UnifiedBusinessNo: (s_Edit_Type == "Add" ?
+                                    jQuery.trim($("#txt_UnifiedBusinessNo").val()) :
+                                    jQuery.trim($("[for=lab_UnifiedBusinessNo]").text())),//特店統編
+                MerchantName: jQuery.trim($("#txt_MerchantName").val()),//特店名稱
+                Trans_FTPType: jQuery.trim($("#ddl_Trans_FTPType").val()),//每日交易檔案FTP相關設定，FTP類型
+                Trans_FtpHost: jQuery.trim($("#txt_Trans_FtpHost").val()),//每日交易檔案FTP相關設定，HOST名稱
+                Trans_FtpPort: jQuery.trim($("#txt_Trans_FtpPort").val()),//每日交易檔案FTP相關設定，PORT
+                Trans_FtpUser: jQuery.trim($("#txt_Trans_FtpUser").val()),//每日交易檔案FTP相關設定，帳號
+                Trans_FtpPwd: jQuery.trim($("#txt_Trans_FtpPwd").val()),//每日交易檔案FTP相關設定，密碼
+                Trans_PoxyIP: jQuery.trim($("#txt_Trans_PoxyIP").val()),//每日交易檔案FTP相關設定，Proxy主機名稱
+                Trans_PoxyPort: jQuery.trim($("#txt_Trans_PoxyPort").val()),//每日交易檔案FTP相關設定，ProxyPort
+                Trans_PoxyUser: jQuery.trim($("#txt_Trans_PoxyUser").val()),//每日交易檔案FTP相關設定，Proxy帳號
+                Trans_PoxyPwd: jQuery.trim($("#txt_Trans_PoxyPwd").val()),//每日交易檔案FTP相關設定，Proxy密碼
+                Trans_FtpDir: jQuery.trim($("#txt_Trans_FtpDir").val()),//每日交易檔案FTP相關設定，FTP路徑
+                Store_FTPType: jQuery.trim($("#ddl_Store_FTPType").val()),//門市主檔檔案FTP相關設定，FTP類型
+                Store_FtpHost: jQuery.trim($("#txt_Store_FtpHost").val()),//門市主檔檔案FTP相關設定，HOST名稱
+                Store_FtpPort: jQuery.trim($("#txt_Store_FtpPort").val()),//門市主檔檔案FTP相關設定，PORT
+                Store_FtpUser: jQuery.trim($("#txt_Store_FtpUser").val()),//門市主檔檔案FTP相關設定，帳號
+                Store_FtpPwd: jQuery.trim($("#txt_Store_FtpPwd").val()),//門市主檔檔案FTP相關設定，密碼
+                Store_PoxyIP: jQuery.trim($("#txt_Store_PoxyIP").val()),//門市主檔檔案FTP相關設定，Proxy主機名稱
+                Store_PoxyPort: jQuery.trim($("#txt_Store_PoxyPort").val()),//門市主檔檔案FTP相關設定，ProxyPort
+                Store_PoxyUser: jQuery.trim($("#txt_Store_PoxyUser").val()),//門市主檔檔案FTP相關設定，Proxy帳號
+                Store_PoxyPwd: jQuery.trim($("#txt_Store_PoxyPwd").val()),//門市主檔檔案FTP相關設定，Proxy密碼
+                Store_FtpDir: jQuery.trim($("#txt_Store_FtpDir").val()),//門市主檔檔案FTP相關設定，FTP路徑
+                Store_FileType: jQuery.trim($("#ddl_Store_FileType").val())//門市主檔檔案FTP相關設定，門市檔案匯入類型
+            };
+
+            //檢核資料
+            if (fun_chk_data(obj_MerchantData) == false) {
+                //解開Button
+                obj_button.attr("disabled", false);
+                return;
+            }
+
+            //利用Ajax，進行新增或編輯
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("EditSave", "ICASHOPMerchant")",
+                data: {
+                    EditType: "@Model.EditType",
+                    EditJsonData: JSON.stringify(obj_MerchantData)
+                },
+                async: true,
+                timeout: (1000 * 30),
+                cache: false,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(["Ajax發生異常：", "。Status：", textStatus, "。ErrMsg：", errorThrown].join(""));
+                }, //error結束
+                success: function (ajax_rtn) {
+
+                    switch (ajax_rtn.RtnResult) {
+
+                        //儲存成功
+                        case true:
+
+                            //alert成功訊息
+                            alert("儲存成功！!");
+
+                            //導頁
+                            var url = ['@Url.Action("Index", "ICASHOPMerchant")','?'].join('');
+
+                            switch (s_Edit_Type) {
+                                case "Add":
+                                    //如果是[新增]模式，導頁至查詢頁，查出新增的資料
+                                    url = [url, "IsQuery", "=", "true"].join("");
+                                    url = [url, "&", "CurrentPage", "=", "1"].join("");
+                                    url = [url, "&", "UnifiedBusinessNo", "=", jQuery.trim($("#txt_UnifiedBusinessNo").val())].join("");
+                                    url = [url, "&", "MerchantName", "=", jQuery.trim($("#txt_MerchantName").val())].join("");
+                                    break;
+                                case "Modify":
+                                    //如果是[修改]模式，導頁至查詢頁，查出原查詢的資料
+                                    url = [url, "IsQuery", "=", "@Model.Qry_IsQuery.ToString()"].join("");
+                                    url = [url, "&", "CurrentPage", "=", "@Model.Qry_CurrentPage.ToString()"].join("");
+                                    url = [url, "&", "UnifiedBusinessNo", "=", "@Model.Qry_UnifiedBusinessNo"].join("");
+                                    url = [url, "&", "MerchantName", "=", "@Model.Qry_MerchantName"].join("");
+                                    break;
+                            }//switch
+
+                            location.href = url;
+
+                            break;
+
+                        //儲存失敗
+                        case false:
+
+                            //顯示錯誤訊息
+                            fun_AlertCtrl(true, ajax_rtn.RtnMsg);
+
+                            //解開Button
+                            obj_button.attr("disabled", false);
+
+                            break;
+                    }//switch
+                } //success結束
+            }); //ajax結束
+        }
+    }//fun_but_save_click
+
+    function fun_chk_data(obj_MerchantData) {
+
+        //設定變數
+        obj_div_ErrMsg = $("#div_ErrMsg");
+        var s_break_line = "<br/>";
+        var s_err_msg = "";
+
+        //檢核必填欄位
+        if (obj_MerchantData.UnifiedBusinessNo == "") { s_err_msg = [s_err_msg, "欄位[特店統編]為必填欄位", s_break_line].join("");}
+        if (obj_MerchantData.MerchantName == "") { s_err_msg = [s_err_msg, "欄位[特店名稱]為必填欄位", s_break_line].join(""); }
+
+        if (obj_MerchantData.Trans_FTPType == "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]為必填欄位", s_break_line].join(""); }
+
+        if (obj_MerchantData.Trans_FTPType != "" &&
+            obj_MerchantData.Trans_FTPType != "NoTrans") {
+            if (obj_MerchantData.Trans_FtpHost == "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[HOST名稱]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpPort == "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[PORT]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpUser == "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[帳號]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpPwd == "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[密碼]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpDir == "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP路徑]為必填欄位", s_break_line].join(""); }
+        }
+        else {
+            if (obj_MerchantData.Trans_FtpHost != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[HOST名稱]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpPort != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[PORT]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpUser != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[帳號]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpPwd != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[密碼]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_PoxyIP != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[Proxy主機名稱]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_PoxyPort != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[ProxyPort]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_PoxyUser != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[Proxy帳號]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_PoxyPwd != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[Proxy密碼]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Trans_FtpDir != "") { s_err_msg = [s_err_msg, "每日交易檔案FTP相關設定，欄位[FTP類型]選擇[不傳送檔案]，欄位[FTP路徑]不可有值", s_break_line].join(""); }
+        }
+
+        if (obj_MerchantData.Store_FileType == "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[門市檔案匯入類型]為必填欄位", s_break_line].join(""); }
+        //如果門市主檔檔案FTP相關設定，欄位[門市檔案匯入類型]選擇[文字檔JOB匯入]，就必須選擇[FTP類型]
+        if (obj_MerchantData.Store_FileType == "FTP") {
+            if (obj_MerchantData.Store_FTPType == "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[門市檔案匯入類型]選擇[文字檔JOB匯入]，則欄位[FTP類型]為必填欄位", s_break_line].join(""); }
+        }
+        else {
+            if (obj_MerchantData.Store_FTPType != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[門市檔案匯入類型]不是選擇[文字檔JOB匯入]，則欄位[FTP類型]不可有值", s_break_line].join(""); }
+        }
+
+        //如果門市主檔檔案FTP相關設定，欄位[FTP類型]有選擇，就必續設定以下相關資訊
+        if (obj_MerchantData.Store_FTPType != "") {
+            if (obj_MerchantData.Store_FtpHost == "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]有選擇，則欄位[HOST名稱]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpPort == "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]有選擇，則欄位[PORT]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpUser == "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]有選擇，則欄位[帳號]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpPwd == "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]有選擇，則欄位[密碼]為必填欄位", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpDir == "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]有選擇，則欄位[FTP路徑]為必填欄位", s_break_line].join(""); }
+        }
+        else {
+            if (obj_MerchantData.Store_FtpHost != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[HOST名稱]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpPort != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[PORT]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpUser != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[帳號]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpPwd != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[密碼]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_PoxyIP != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[Proxy主機名稱]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_PoxyPort != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[ProxyPort]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_PoxyUser != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[Proxy帳號]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_PoxyPwd != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[Proxy密碼]不可有值", s_break_line].join(""); }
+            if (obj_MerchantData.Store_FtpDir != "") { s_err_msg = [s_err_msg, "門市主檔檔案FTP相關設定，欄位[FTP類型]沒有選擇，則欄位[FTP路徑]不可有值", s_break_line].join(""); }
+        }
+
+        //顯示錯誤訊息
+        if (s_err_msg != "") {
+            fun_AlertCtrl(true, s_err_msg);
+            return false;
+        }
+
+        return true;
+
+    }//fun_chk_data
+
+</script>

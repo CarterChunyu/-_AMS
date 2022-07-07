@@ -1,0 +1,221 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+
+@{
+    ViewBag.Title = ViewBag.RepName;
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.RepName</title>
+    <link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+    <script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+    <script type="text/javascript">
+        $(function () {
+            $('#YM').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'yymm',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1));
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript" src="~/Scripts/jquery.validate.min.js"> </script>
+    <script>
+        $(function () {
+            // Initialize form validation on the registration form.
+            // It has the name attribute "registration"
+            $("form[name='frm1']").validate({
+                errorClass: "my-error-class",
+
+                // Specify validation rules
+                rules: {
+                    // The key name on the left side is the name attribute
+                    // of an input field. Validation rules are defined
+                    // on the right side
+                    YM:
+                    {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 6
+                    },
+                    NRate:
+                        {
+                            required: true,
+                            number:true
+                        }
+                    
+
+                },
+                // Specify validation error messages
+                messages:
+                {
+                    YM:
+                    {
+                        required: "請輸入年及月份",
+                        minlength: "最小長度為6",
+                        maxlength: "最大長度為6"
+                    },
+                    NRate:
+                    {
+                        required: "請輸入新費率",
+                        number: "需為數字",
+                     
+                    }
+                    
+                },
+                // Make sure the form is submitted to the destination defined
+                // in the "action" attribute of the form when valid
+                submitHandler: function (form) {
+                    form.submit();
+                }
+            });
+        });
+
+    </script>
+    
+
+    
+    <style type='text/css'>
+
+        .ui-datepicker-calendar {
+            display: none;
+        }
+
+        .my-error-class{
+            color:red;
+        }
+
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+        /*
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+        */
+        th {
+            text-align: right;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            
+            text-align: right;
+        }
+    </style>
+
+</head>
+<body>
+    <h2>@ViewBag.RepName</h2>
+
+    @using (Html.BeginForm(null,null,FormMethod.Post, new { name = "frm1", id = "frm1" }))
+    {
+        @:年與月分(六碼)
+        <input type="text" name="YM" id="YM" value="@Request.Form["YM"]" style="width:100px;" />
+        @:新費率
+         <input type="text" name="NRate" id="NRate" value="@Request.Form["NRate"]" style="width:100px;" />
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    }
+
+    <table class="grid" width="100%">
+        
+          <tr style="background-color: lightgray">
+                <th>
+                    序號
+                </th>
+                <th>
+                    特約機構
+                </th>
+                <th>
+                    購貨淨額
+                </th>
+                <th>
+                    購貨手續費率
+                </th>
+                <th>
+                    購貨手續費(含)
+                </th>
+                <th>
+                </th>
+                <th>
+                </th>
+               
+          </tr>
+        @{int i = 0; long untaxedTotal = 0; long taxTotal = 0;}
+        @foreach(DataRow row in Model.Rows)
+        { 
+          i++;
+          <tr>
+              <td rowspan="2">@i
+              </td>
+              <td rowspan="2">@row["MERCHANT_STNAME"].ToString()</td>
+                @{ string net1 = Convert.ToInt64(row["NET"]).ToString("n0");}
+              <td class="currency">@net1</td>
+                @{ string feeRate = (Convert.ToDecimal(@row["FEE_RATE"]) * 100).ToString("n2") + "%";}
+              <td>@feeRate</td>
+                @{string charge = Convert.ToInt64(row["CHARGE"]).ToString("n0");}
+              <td class="currency">@charge</td>
+              <td rowspan="2">未稅</td>
+              <td rowspan="2">稅額</td>
+          </tr>
+          <tr>
+                @{ string net2 = Convert.ToInt64(row["NET"]).ToString("n0");}
+              <td class="currency">@net2</td>   
+                @{ string newRate = (Convert.ToDecimal(@row["NEW_RATE"]) * 100).ToString("n2") + "%";}            
+              <td>@newRate</td>
+                @{ string newCharge = Convert.ToInt64(row["NEW_CHARGE"]).ToString("n0");}
+              <td class="currency">@newCharge</td>
+       
+          </tr>
+          <tr style="background-color: lightgray">
+            <td colspan="4" style="text-align: center;">費率調整</td>
+              @{string diff = Convert.ToInt64(row["DIFF"]).ToString("n0");}
+            <td class="currency">@diff</td>
+              @{string untaxed = Convert.ToInt64(row["UNTAXED"]).ToString("n0");}
+              @{untaxedTotal+=Convert.ToInt64(row["UNTAXED"]);}
+            <td class="currency">@untaxed</td>
+              @{string tax = Convert.ToInt64(row["TAX"]).ToString("n0");}
+              @{taxTotal += Convert.ToInt64(row["TAX"]);}
+            <td class="currency">@tax</td>
+          </tr>
+        }
+        @{string untaxedTotalString=untaxedTotal.ToString("n0");}
+        @{string taxTotalString=taxTotal.ToString("n0");}
+        <tr><td colspan="5" style="text-align:center">總計</td><td>@untaxedTotalString</td><td>@taxTotalString</td>
+    </table>
+
+    
+
+    
+</body>
+</html>

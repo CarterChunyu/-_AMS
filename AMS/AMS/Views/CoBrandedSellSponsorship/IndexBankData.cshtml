@@ -1,0 +1,481 @@
+﻿@using System.Data;
+@using Domain.Common;
+@using Newtonsoft.Json;
+@model Domain.CoBrandedSellSponsorship.QueryBankDataReq
+
+@section scripts {
+    @*引用此js才可使用Ajax.BeginForm*@
+    <script src="@Url.Content("~/Scripts/jquery.unobtrusive-ajax.min.js")"></script>
+}
+
+@{
+    ExecInfo ei = ViewBag.ExecInfo;
+    DataTable dt_QueryResult = ViewBag.QueryResult;
+    string s_UserData = ViewBag.UserData;
+}
+
+<style>
+    .mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(0,0,0,0.9);
+        display: none;
+    }
+
+    .mask_content {
+        width: 60%;
+        border: 2px solid #ccc;
+        background-color: white;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1001;
+        word-wrap: break-word;
+        padding: 3px;
+        display: inline-block;
+    }
+</style>
+
+<script>
+
+    $(document).ready(function () {
+
+        //設定控制項權限
+        fun_set_control_authority();
+
+        //觸發查詢銀行特約機構明細
+        $("#but_QueryBankData").click();
+
+        //返回年度清單
+        $("#btn_Back").click(function () {
+            window.location.href = $("#hid_script_url_Index").val();
+        });
+
+        //按下[新增銀行特約機構]鈕
+        $("#btn_Add").click(function () {
+
+            var json_data_Bank = {};
+            json_data_Bank["ExecType"] = "Add";
+            json_data_Bank["BID"] = -1;
+            json_data_Bank["RID"] = $("#hid_script_RID").val();
+            json_data_Bank["MERCHANT_NO"] = null;
+
+            $("#hid_Data_Bank").val(JSON.stringify(json_data_Bank));
+
+            fun_load_mask_data();
+        });//$("#btn_Add").click
+
+        //按下[取消]鈕
+        $("#btn_Cancle").click(function () {
+            //設定變數
+            var obj_div_mask = $("#div_mask");
+            obj_div_mask.css("display", "none");
+        });//$("#btn_Cancle").click
+
+        //按下[匯出]鈕
+        $("#btn_Export").click(function () {
+
+            //設定下載連結
+            var v_Url_Export = $("#hid_script_url_Export").val();
+            var v_RID = $("#hid_script_RID").val();
+            var v_Date_B = $("#hid_script_Date_B").val();
+            var v_Date_E = $("#hid_script_Date_E").val();
+            var v_ExcludeData = "";
+
+            //檢核使用者是否有勾選資料
+            var v_not_checked = $("input[id^='chb_BID_']:not(:checked)");//沒有勾選的checkbox控制項
+            var v_checked = $("input[id^='chb_BID_']");//所有的checkbox控制項
+            if (v_checked.length == v_not_checked.length) {
+                alert("請勾選要匯出的檔案！");
+                return;
+            }
+
+            //找出checkbox沒有被勾選的資料
+            var json_data_ExcludeData = { "root": {} };
+            var array_ExcludeData = [];
+
+            v_not_checked.each(function () {
+                var v_BID = Number(this.id.split("_")[2]);
+                array_ExcludeData.push({ "BID": v_BID });
+            });
+
+            $.extend(json_data_ExcludeData.root, { "ExcludeData": array_ExcludeData })
+
+            //將排除資料Json物件轉換為字串
+            v_ExcludeData = JSON.stringify(json_data_ExcludeData);
+
+            //組合URL
+            v_Url_Export = [
+                v_Url_Export, "?",
+                "RID=", v_RID, "&",
+                "Date_B=", v_Date_B, "&",
+                "Date_E=", v_Date_E, "&",
+                "ExcludeData=", v_ExcludeData
+            ].join("");
+
+            //匯出聯名卡行銷贊助金資料
+            fun_Export(v_Url_Export);
+
+        });//$("#btn_Export").click
+
+    });//$(document).ready
+
+    //載入遮罩資料
+    function fun_load_mask_data() {
+
+        //設定變數
+        var obj_div_mask = $("#div_mask");
+        var obj_ddl_BankMerchant = $("#ddl_BankMerchant");
+
+        //清除DropDownList資料
+        obj_ddl_BankMerchant.find("option").remove();
+
+        //取得資料
+        var json_BankMerchantData = sortJSON(JSON.parse($("#hid_BankMerchantData").val()), "MERCHANT_NO");//所有銀行特約機構資料
+        var json_All_Data_Bank = JSON.parse($("#hid_All_Data_Bank").val());//銀行特約機構明細清單
+
+        //設定DropDownList資料
+        obj_ddl_BankMerchant.append(new Option("--請選擇--", ""));
+
+        for (var index in json_BankMerchantData) {
+
+            var s_MERCHANT_STNAME = json_BankMerchantData[index].MERCHANT_STNAME;
+            var s_MERCHANT_NO = json_BankMerchantData[index].MERCHANT_NO;
+
+            var data = $.grep(json_All_Data_Bank, function (detl, index) {
+                return detl.MERCHANT_NO == s_MERCHANT_NO;
+            });
+
+            //排除[銀行特約機構明細清單]已經存在的資料
+            if (data.length == 0) {
+                obj_ddl_BankMerchant.append(new Option(s_MERCHANT_STNAME, s_MERCHANT_NO));
+            }
+        }//for
+
+        //開啟遮罩
+        obj_div_mask.css("display", "block");
+    }//fun_load_mask_data
+
+    //排序
+    function sortJSON(arr, key) {
+        return arr.sort(function (a, b) {
+            var x = a[key];
+            var y = b[key];
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        });
+    }//sortJSON
+
+    //存檔資料
+    function fun_save_mask_data(obj_id) {
+
+        //設定變數
+        var obj_trigger_control = $(obj_id);//觸發function控制項
+        var obj_div_mask = $("#div_mask");
+        var json_data_Bank = JSON.parse($("#hid_Data_Bank").val());
+
+        //將頁面上的值寫入Json物件
+        json_data_Bank.MERCHANT_NO = fun_set_value($("#ddl_BankMerchant").val());
+
+        //檢核資料
+        $("#hid_Data_Bank").val(JSON.stringify(json_data_Bank));
+        if (fun_chk_mask_save() == false) {
+            return;
+        }
+        else {
+            //檢核成功，鎖定觸發控制項
+            obj_trigger_control.prop("disabled", true);
+        }
+
+        $.ajax({
+            type: "POST",
+            url: $("#hid_script_url_SaveBankData").val(),
+            data: json_data_Bank,
+            async: true,
+            timeout: (1000 * 30),//30秒timeout
+            cache: false,
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(["ajax發生異常：", "。Status：", textStatus, "。ErrMsg：", errorThrown].join(""));
+                obj_trigger_control.prop("disabled", false);//解除鎖定觸發控制項
+            }, //error結束
+            success: function (ajax_rtn_data) {
+
+                if (ajax_rtn_data.ExecInfo.RtnResult == false) {
+                    //顯示訊息
+                    alert(ajax_rtn_data.ExecInfo.RtnMsg);
+                }
+                else {
+                    //顯示訊息
+                    alert("存檔成功");
+
+                    //觸發查詢銀行特約機構明細清單
+                    $("#but_QueryBankData").click();
+
+                    //關閉遮罩
+                    obj_div_mask.css("display", "none");
+                }
+
+                //解除鎖定觸發控制項
+                obj_trigger_control.prop("disabled", false);
+
+            } //success結束
+        }); //ajax結束
+    }//fun_save_mask_data
+
+    //設定值
+    function fun_set_value(v_value) {
+        if (!v_value) {
+            return null;
+        }
+        else {
+            return (jQuery.trim(v_value) == "" ? null : jQuery.trim(v_value));
+        }
+    }//fun_set_value
+
+    //點擊[銀行特約機構明細清單]td，選擇checkbox
+    function fun_choice_checkbox(obj_td) {
+        var obj_checkbox = $(obj_td).closest("tr").find("input:checkbox");
+        obj_checkbox.click();
+    }//fun_choice_checkbox
+
+    //點選checkbox[全選]
+    function fun_check_all(checkbox_all) {
+
+        //找出所有明細的checkbox控制項
+        obj_checkboxs = $(checkbox_all).closest("table").children("tbody").find("input:checkbox");
+
+        obj_checkboxs.each(function () {
+            this.checked = checkbox_all.checked;
+        });
+
+    }//fun_check_all
+
+    //點選checkbox[個別銀行]
+    function fun_check_detail(checkbox_detail) {
+
+        //找出所有的明細checkbox控制項
+        obj_checkboxs = $(checkbox_detail).closest("table").children("tbody").find("input[type=checkbox]");
+        //找出所有有被勾選的明細checkbox控制項
+        obj_checkboxs_checked = $(checkbox_detail).closest("table").children("tbody").find("input[type=checkbox]:checked");
+        //全選checkbox控制項
+        obj_chb_all = $("#chb_ALL");
+
+        switch (obj_checkboxs.length == obj_checkboxs_checked.length) {
+            case true:
+                //如果所有控制項都被勾選，則全選的checkbox也要被勾選
+                obj_chb_all.prop("checked", true);
+                break;
+            case false:
+                //如果不是所有控制項都被勾選，則全選的checkbox不可被勾選
+                obj_chb_all.prop("checked", false);
+                break;
+        }
+    }//fun_check_detail
+
+    //匯出聯名卡行銷贊助金資料
+    function fun_Export(v_Url_Export) {
+
+        //清除先前下載時所建立的iframe
+        $("iframe[id='iframe_Export']").remove();
+
+        //新增iframe來進行下載
+        var obj_iframe_Export = $("<iframe id='iframe_Export' style='display:none;' />");
+        obj_iframe_Export.attr("src", v_Url_Export);
+        obj_iframe_Export.appendTo("body");
+
+        //iframe的Load事件
+        //下載發生錯誤，load事件會被觸發，會回傳頁面資訊
+        //下載沒發生錯誤，則load事件不會被觸發
+        obj_iframe_Export.load(function () {
+            var Msg = $(this).contents().find("body").html();
+            alert(Msg);
+        });
+    }//fun_Export
+
+    //設定控制項權限
+    function fun_set_control_authority() {
+
+        var v_UserData = $("#hid_UserData").val();//使用者所屬部門
+
+        //true=>失效、false=>生效
+        var json_control_authority = [];
+        //Button類
+        json_control_authority.push({ "Like": false, "Control_Id": "btn_Add", "System": false, "Sales": false, "Accounting": true, "Other": true });//新增銀行特約機構
+
+        for (var index in json_control_authority) {
+
+            var json_detl = json_control_authority[index];
+            var v_control;
+
+            switch (json_detl.Like) {
+                case true:
+                    v_control = $(["a[id^='", json_detl.Control_Id, "']"].join(""));
+                    break;
+                case false:
+                    v_control = $(["#", json_detl.Control_Id].join(""));
+                    break;
+            }
+
+            var b_IsDisabled;
+
+            switch (v_UserData) {
+                case "System":
+                    b_IsDisabled = json_detl.System;
+                    break;
+                case "Sales":
+                    b_IsDisabled = json_detl.Sales;
+                    break;
+                case "Accounting":
+                    b_IsDisabled = json_detl.Accounting;
+                    break;
+                default:
+                    b_IsDisabled = json_detl.Other;
+                    break;
+            }
+
+            if (json_detl.Like == true) {
+                if (b_IsDisabled == true) {
+                    v_control.css("pointer-events", "none").css("color", "gray");
+                }
+            }
+            else {
+                v_control.prop("disabled", b_IsDisabled);
+            }
+
+        }//for
+
+    }//fun_set_control_authority
+
+    //遮罩[銀行特約機構]，按下[確定]鈕，檢核存檔資料
+    function fun_chk_mask_save() {
+
+        var v_Rtn_Msg = "";
+        var json_data_Bank = JSON.parse($("#hid_Data_Bank").val());
+
+        v_Rtn_Msg = [v_Rtn_Msg, fun_chk_required(json_data_Bank.MERCHANT_NO, "請選擇欄位[銀行特約機構]")].join("");
+        if (v_Rtn_Msg != "") { alert(v_Rtn_Msg); return false; }
+
+        //都沒錯誤，回傳true
+        return true;
+    }//fun_chk_mask_save
+
+    //檢核必填欄位
+    function fun_chk_required(v_value, v_err_msg) {
+
+        var v_Rtn_Msg = "";
+        v_value = fun_set_value(v_value);
+
+        if (!v_value) {
+            v_Rtn_Msg = [v_err_msg, "\r\n"].join("");
+        }
+
+        return v_Rtn_Msg;
+    }//fun_chk_required
+
+</script>
+
+<h2>聯名卡行銷贊助金</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">年度</h3>
+    </div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <div class="form-group row">
+                @{
+                    string YearRange = string.Empty;
+                    string s_Date_B = Model.Date_B.HasValue == true ? Model.Date_B.Value.ToString("yyyy/MM/dd") : string.Empty;
+                    string s_Date_E = Model.Date_E.HasValue == true ? Model.Date_E.Value.ToString("yyyy/MM/dd") : string.Empty;
+
+                    if (string.IsNullOrEmpty(s_Date_B) == false ||
+                        string.IsNullOrEmpty(s_Date_E) == false)
+                    {
+                        YearRange = string.Format("年度起迄：{0}~{1}",
+                                                  s_Date_B,
+                                                  s_Date_E);
+                    }
+                    else
+                    {
+                        YearRange = "年度起迄：";
+                    }
+                }
+                @Html.Label(YearRange, new { @class = "control-label col-md-8", @style = "text-align:left;" })
+                <button id="btn_Add" type="submit" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true">新增銀行特約機構</span>
+                </button>
+                <button id="btn_Export" type="submit" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-download" aria-hidden="true">匯出</span>
+                </button>
+                <button id="btn_Back" type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true">返回年度清單</span>
+                </button>
+            </div>
+            @using (Ajax.BeginForm("QueryBankData", "CoBrandedSellSponsorship",
+            new AjaxOptions()
+            {
+                HttpMethod = "Post",
+                UpdateTargetId = "div_QueryResult",
+                InsertionMode = InsertionMode.Replace
+            }))
+            {
+                @Html.Hidden("RID", Model.RID.Value)
+                @Html.Hidden("Date_B", Model.Date_B.Value)
+                @Html.Hidden("Date_E", Model.Date_E.Value)
+                <div style="display:none;">
+                    <button id="but_QueryBankData" type="submit" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* 查詢結果 *@
+<div id="div_QueryResult">
+</div>
+
+<div id="div_Data">
+    @Html.Hidden("hid_UserData", s_UserData)
+    @Html.Hidden("hid_BankMerchantData", JsonConvert.SerializeObject(dt_QueryResult))
+    @Html.Hidden("hid_script_RID", Model.RID)
+    @Html.Hidden("hid_script_Date_B", Model.Date_B.Value.ToString("yyyy/MM/dd"))
+    @Html.Hidden("hid_script_Date_E", Model.Date_E.Value.ToString("yyyy/MM/dd"))
+    @Html.Hidden("hid_script_url_Index", Url.Action("Index", "CoBrandedSellSponsorship"))
+    @Html.Hidden("hid_script_url_SaveBankData", Url.Action("SaveBankData", "CoBrandedSellSponsorship"))
+    @Html.Hidden("hid_script_url_Export", Url.Action("Export", "CoBrandedSellSponsorship"))
+</div>
+
+@* 新增銀行特約機構 *@
+<div id="div_mask" class="mask" style="display:none;">
+    <div class="mask_content">
+        <div class="panel panel-default" style="margin:auto;">
+            <div class="panel-heading">
+                <h3 class="panel-title">新增銀行特約機構</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group row">
+                        @Html.Label("銀行特約機構：", new { @class = "control-label col-md-2" })
+                        <div class="col-md-1">
+                            <select id="ddl_BankMerchant" class="btn btn-default dropdown-toggle"></select>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="text-right col-md-8" style="text-align:left;">
+                            <button id="btn_Save" type="button" class="btn btn-primary" onclick="fun_save_mask_data(this);">
+                                <span class="glyphicon" aria-hidden="true">確定</span>
+                            </button>
+                            <button id="btn_Cancle" type="button" class="btn btn-primary">
+                                <span class="glyphicon" aria-hidden="true">取消</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

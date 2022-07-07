@@ -1,0 +1,104 @@
+﻿@model AMS.Models.TM_ADJ_APPLICATION
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>ADJ_APPLICATION</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.APP_DATE)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.APP_DATE)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OPP_DATE_START)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OPP_DATE_START)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.OPP_DATE_END)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OPP_DATE_END)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FORM_SERIAL)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FORM_SERIAL)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RCPT_DATE)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RCPT_DATE)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MODIFIABLE)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MODIFIABLE)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ADJ_REMARK)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ADJ_REMARK)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.REPLY_REMARK)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.REPLY_REMARK)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CREATE_DATETIME)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CREATE_DATETIME)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UPDATE_DATETIME)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UPDATE_DATETIME)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("取消回查詢列表", "Index", new { begin = Session["beginDate"], end = Session["endDate"] })
+        </div>
+    }
+</div>

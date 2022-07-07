@@ -1,0 +1,345 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+
+
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#SettleDate').datepicker({ dateFormat: 'yymmdd' });
+
+    });
+
+
+</script>
+<script type="text/javascript">
+
+    function padding1(num, length) {
+        for (var len = (num + "").length; len < length; len = num.length) {
+            num = "0" + num;
+        }
+        return num;
+    }
+
+</script>
+<script>
+    $(document).ready(function () {
+        $("#group option[value='@ViewBag.GROUP_VALUES']").prop("selected", "selected");
+        $("#classtype option[value='@ViewBag.CLASS_VALUES']").prop("selected", "selected");
+        $("#pay option[value='@ViewBag.PAY_VALUES']").prop("selected", "selected");
+
+        $("#invoiceRule option[value='@ViewBag.INVOICE_RULE_VALUE']").prop("selected", "selected");
+        $("#setGroupM option[value='@ViewBag.SET_GROUP_M_VALUE']").prop("selected", "selected");
+        $("#settleRule option[value='@ViewBag.SETTLE_RULE_VALUE']").prop("selected", "selected");
+        $("#sourceRule option[value='@ViewBag.SOURCE_RULE_VALUE']").prop("selected", "selected");
+        $("#showFlg option[value='@ViewBag.SHOW_FLG_VALUE']").prop("selected", "selected");
+        $("#remType option[value='@ViewBag.REM_TYPE_VALUE']").prop("selected", "selected");
+        $("#orderNo option[value='@ViewBag.ORDER_NO_VALUE']").prop("selected", "selected");
+
+        var g = $("#group").val();
+
+        if (g == 'Y001') {
+            $("#setGroupM option[value='N']").attr("selected", false);
+            $("#setGroupM option[value='Y']").prop("selected", "selected");
+
+        }
+        else if (g == 'N001') {
+            $("#setGroupM option[value='Y']").attr("selected", false);
+            $("#setGroupM option[value='N']").prop("selected", "selected");
+
+        }
+
+        
+        $("#group").on("change", function () {
+            var g = $("#group").val();
+
+            if (g == 'Y001') {
+                $("#setGroupM option[value='N']").attr("selected", false);
+                $("#setGroupM option[value='Y']").prop("selected", "selected");
+
+            }
+            else if (g == 'N001') {
+                $("#setGroupM option[value='Y']").attr("selected", false);
+                $("#setGroupM option[value='N']").prop("selected", "selected");
+
+            }
+
+        });
+
+        $("#setGroupM").on("change", function () {
+            var g = $("#setGroupM").val();
+
+            if (g == 'Y') {
+                $("#group option[value='N001']").attr("selected", false);
+                $("#group option[value='Y001']").prop("selected", "selected");
+
+            }
+            else if (g == 'N') {
+                $("#group option[value='Y001']").attr("selected", false);
+                $("#group option[value='N001']").prop("selected", "selected");
+
+            }
+
+        });
+
+        $("#settleRule").on("change", function () {
+            var g = $("#settleRule").val();
+
+            if (g == 'D')
+            {
+                $("#sourceRule").attr('disabled', true);
+            }
+            else
+            {
+                $("#sourceRule").attr('disabled', false);
+
+            }
+
+        });
+
+    })
+
+</script>
+
+
+<meta name="viewport" content="width=device-width" />
+<title>@ViewBag.RepName</title>
+
+<h2>@ViewBag.RepName</h2>
+
+
+
+
+<div class="form-horizontal">
+
+    <hr />
+    @using (Html.BeginForm("Update", "GmAccount", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div class="form-group">
+            <label for="mno" class="control-label col-md-2">特約機構代碼 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_NO" id="MERCHANT_NO" value="@ViewBag.MERCHANT_NO" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">AMS名稱 :</label>
+            <div class="col-md-10">
+                <input type="text" name="AMS_NAME" id="AMS_NAME" value="@ViewBag.AMS_NAME" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">門市代號對應值 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_NO_ACT" id="MERCHANT_NO_ACT" value="@ViewBag.MERCHANT_NO_ACT" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">摘要欄位 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_NOTE" id="MERCHANT_NOTE" value="@ViewBag.MERCHANT_NOTE" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">類別 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("classtype", (IEnumerable<SelectListItem>)ViewBag.CLASS, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">撥款單位 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("pay", (IEnumerable<SelectListItem>)ViewBag.PAY, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">關係人 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("group", (IEnumerable<SelectListItem>)ViewBag.GROUP, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10">====================應收手續費主檔====================</div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">門市代號對應值(手續費) :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_NO_ACT_M" id="MERCHANT_NO_ACT_M" value="@ViewBag.MERCHANT_NO_ACT_M" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">開立方式 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("invoiceRule", (IEnumerable<SelectListItem>)ViewBag.INVOICE_RULE, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">關係人(手續費) :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("setGroupM", (IEnumerable<SelectListItem>)ViewBag.SET_GROUP_M, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">特店性質 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERC_GROUP" id="MERC_GROUP" value="@ViewBag.MERC_GROUP" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">特店簡稱 :</label>
+            <div class="col-md-10">
+                <input type="text" name="MERCHANT_STNAME" id="MERCHANT_STNAME" value="@ViewBag.MERCHANT_STNAME" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">結算週期 :</label>
+            <div class="col-md-10">
+                <input type="text" name="CONTRACT_PREIOD" id="CONTRACT_PREIOD" value="@ViewBag.CONTRACT_PREIOD" readonly class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">委外-周期代碼 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("remType", (IEnumerable<SelectListItem>)ViewBag.REM_TYPE, "--請選擇--",new { style="disabled='disabled'"})
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2"> 結算方式 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("settleRule", (IEnumerable<SelectListItem>)ViewBag.SETTLE_RULE, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">手續費收款日 :</label>
+            <div class="col-md-10">
+                <input type="text" name="FEE_DAY" id="FEE_DAY" value="@ViewBag.FEE_DAY" class="form-control" maxlength="2"
+                       onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"
+                       onblur="this.value=padding1(this.value,2)" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">來源規則 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("sourceRule", (IEnumerable<SelectListItem>)ViewBag.SOURCE_RULE, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">預設開立 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("showFlg", (IEnumerable<SelectListItem>)ViewBag.SHOW_FLG, "--請選擇--")
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">部門 :</label>
+            <div class="col-md-10">
+                <input type="text" name="DEPARTMENT" id="DEPARTMENT" value="@ViewBag.DEPARTMENT" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">專案代號 :</label>
+            <div class="col-md-10">
+                <input type="text" name="PROJECT_NO" id="PROJECT_NO" value="@ViewBag.PROJECT_NO" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">會計科目 :</label>
+            <div class="col-md-10">
+                <input type="text" name="ACCOUNTING" id="ACCOUNTING" value="@ViewBag.ACCOUNTING" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">收款方式 :</label>
+            <div class="col-md-10">
+                @Html.DropDownList("orderNo", (IEnumerable<SelectListItem>)ViewBag.ORDER_NO, "--請選擇--")
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <input type="submit" name="searchConfirm" value="更新" class="btn btn-default" />
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <label for="mname" class="control-label col-md-2"></label>
+        <div class="col-md-10">
+            <input type="submit" name="back" value="取消" class="btn btn-default" onclick="history.back()" />
+        </div>
+    </div>
+
+
+
+</div>
+
+
+

@@ -1,0 +1,29 @@
+﻿@Html.DropDownList("Merc_Group", (IEnumerable<SelectListItem>)ViewBag.GROUP, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+@Html.DropDownList("Merc_Merchant", (IEnumerable<SelectListItem>)ViewBag.MERCHANT, "--請選擇--", new { @class = "btn btn-default dropdown-toggle" })
+@*<select id="Merchant_Merchant" name="Merchant_Merchant" hidden="hidden" class="btn btn-default dropdown-toggle"><option>--請選擇--</option></select>*@
+
+<script type="text/javascript" language="javascript">
+
+    $(document).ready(function () {
+        
+        $("#Merc_Group").on("change", function () {
+            $.ajax({
+                url: '@Url.Action("GetMerchant", "Merchant")',
+                data: { group_id: $(this).val() },
+                type: 'post',
+                cache: false,
+                async: false,
+                dataType: 'json',
+                success: function (data) {
+                    $('#Merc_Merchant').show();
+                    $('#Merc_Merchant').empty();
+                    $('#Merc_Merchant').append($('<option></option>').val('').text('--請選擇--'));
+                    $.each(data, function (i, item) {
+                        $('#Merc_Merchant').append($('<option></option>').val(item.Key).text(item.Value));
+                    });
+                }
+            });
+        });
+    })
+
+</script>

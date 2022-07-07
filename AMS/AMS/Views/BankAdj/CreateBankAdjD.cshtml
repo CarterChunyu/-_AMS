@@ -1,0 +1,140 @@
+﻿@model AMS.Models.CrBankAdjcaseDTmpModel
+@{
+    ViewBag.Title = "帳務調整明細";
+}
+
+<h2>帳務調整明細</h2>
+@if (ViewBag.MainStatus == "0") {
+    using (Html.BeginForm("CreateBankAdjD", "BankAdj", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AdjCaseNo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AdjCaseNo, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IccNo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.IccNo, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.IccNo, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AdjAmt, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AdjAmt, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.AdjAmt, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="hidden" name="StartDate" value="@ViewBag.StartDate" />
+                <input type="hidden" name="EndDate" value="@ViewBag.EndDate" />
+                <input type="hidden" name="StatusSearch" value="@ViewBag.StatusSel" />
+                <input type="submit" value="新增" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+    }
+}
+@if (Model.CrBankAdjcaseDTmpList.Count() > 0)
+    {
+<font>共 @Model.CrBankAdjcaseDTmpList.Count() 筆</font>
+<table class="table" id="example">
+    <thead>
+        <tr>
+            <th>
+                項次
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AdjCaseNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BankMerchant)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IccNo)
+            <th>
+                @Html.DisplayNameFor(model => model.AdjAmt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreateUser)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdateUser)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UptDatetime)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{int iCount = 0;}
+        @foreach (var item in Model.CrBankAdjcaseDTmpList)
+        {
+            iCount++;
+            <tr>
+                <td>
+                    <font>@iCount</font>
+                </td>
+                <td>
+                    <font>@item.AdjCaseNo</font>
+                </td>
+                <td>
+                    <font> @item.BankMerchant</font>
+                </td>
+                <td>
+                    <font> @item.IccNo</font>
+                </td>
+                <td>
+                    <font> @item.AdjAmt</font>
+                </td>
+                <td>
+                    <font> @item.CreateUser</font>
+                </td>
+                <td>
+                    <font> @item.UpdateUser</font>
+                </td>
+                <td>
+                    <font>@item.UptDatetime</font>
+                </td>
+                <td>
+                    @if (ViewBag.MainStatus == "0") {
+                        @Html.ActionLink("刪除", "DeleteBankAdjD", new { adjCaseNo = item.AdjCaseNo, iccNo=item.IccNo, startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, statusSearch = ViewBag.StatusSel })
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+    }
+
+
+<div>
+@using (Html.BeginForm("BankAdjIndex", "BankAdj", FormMethod.Post))
+{
+    <input type="hidden" name="StartDate" value="@ViewBag.StartDate" />
+    <input type="hidden" name="EndDate" value="@ViewBag.EndDate" />
+    <input type="hidden" name="StatusSearch" value="@ViewBag.StatusSel" />
+    <button class="btn btn-success" name="SearchConfirm" type="submit">回查詢列表</button>
+}
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript" src="~/Scripts/localization/messages_zh_TW.js"> </script>
+}
+

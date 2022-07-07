@@ -1,0 +1,205 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+
+<!DOCTYPE html>
+<head>
+    <title>@ViewBag.RepName</title>
+    <link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+    <script src="~/js/jquery.dataTables.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+    
+    <style type='text/css'>
+        .ui-datepicker-calendar {
+            display: none;
+        }
+
+        .dataTables_scrollBody thead {
+            visibility: hidden;
+        }
+
+        .group {
+            background-color: #333 !important;
+            font-size: 15px;
+            color: #fff !important;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        tr:hover th, tr:hover td {
+            background-color: #ebebeb;
+            background-image: none;
+        }
+
+        th {
+            text-align: right;
+        }
+
+        td {
+            height: 26px;
+            padding: 0px 0px 0px 8px !important;
+            text-align: left;
+            border-bottom: 1px solid #d0d0d0;
+            vertical-align: middle;
+            color: #555555;
+            background-color: #ffffff;
+            text-align: right;
+        }
+    </style>
+
+    <link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+    <script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#yearMonth').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'yymm',
+                onClose: function (dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1));
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <h2>@ViewBag.RepName</h2>
+
+    @using (Html.BeginForm("RPT_170103", "ReportACT", FormMethod.Post, new { id = "searchForm" }))
+    {
+        <div>
+            <label for="yearMonth"> 報表年月:</label>
+            <input type="text" name="yearMonth" id="yearMonth" value="@ViewBag.YearMonth" style="width:100px;" />
+
+            <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+            <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+        </div>
+    }
+
+            <table id="report0103" class="grid">
+                <thead>
+                    <tr style="background-color: lightgray">
+                        <th width="100px" >
+                            特約機構代號
+                        </th>
+                        <th width="100px">
+                            清分日
+                        </th>
+                        <th width="100px">
+                            交易日期
+                        </th>
+                        <th width="100px">
+                            購貨金額
+                        </th>
+                        <th width="100px">
+                            購貨有值筆數
+                        </th>
+                        <th width="100px">
+                            購貨取消金額
+                        </th>
+                        <th width="100px">
+                            購貨取消有值筆數
+                        </th>
+                        <th width="100px">
+                            購貨手續費率
+                        </th>
+                        <!--其他-->
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            其他<br />加值金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            其他<br />加值筆數
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="200px">
+                            其他<br />加值取消金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="250px">
+                            其他<br />加值取消筆數
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="200px">
+                            其他<br />加值手續費率
+                        </th>
+                        <!--ATIM-->
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            ATIM<br />加值金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            ATIM<br />加值筆數
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="200px">
+                            ATIM<br />加值取消金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="250px">
+                            ATIM<br />加值取消筆數
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="200px">
+                            ATIM<br />加值手續費率
+                        </th>
+                        <!--晚點補植-->
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            晚點補植<br />加值金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            晚點補植<br />加值筆數
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="200px">
+                            晚點補植<br />加值取消金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="250px">
+                            晚點補植<br />加值取消筆數
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="200px">
+                            晚點補植<br />加值手續費率
+                        </th>
+                        <!--小計-->
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            小計<br />加值金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="100px">
+                            小計<br />加值筆數
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="200px">
+                            小計<br />加值取消金額
+                        </th>
+                        <th style="text-align: center;vertical-align: middle!important;" width="250px">
+                            小計<br />加值取消筆數
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (DataRow row in Model.Rows)
+                    {
+                        <tr>
+                            @for (int j = 0; j < row.ItemArray.Length; j++)
+                            {
+                                if ((j >= 3 && j <= 6) || (j >= 8 && j <= 11) || (j >= 13 && j <= 16) || (j >= 18 && j <= 21) || (j >= 23 && j <= 26))
+                                {
+                                    <td>@Convert.ToInt64(row.ItemArray[j]).ToString("n0")</td>
+                                }
+                                else if (j == 7 || j == 12 || j == 17 || j == 22)
+                                {
+                                    <td>@Convert.ToDecimal(row.ItemArray[j]).ToString("n3")</td>
+                                }
+                                else
+                                {
+                                    <td>@row.ItemArray[j].ToString()</td>}
+                            }
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+</body>
+

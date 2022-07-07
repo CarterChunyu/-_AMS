@@ -1,0 +1,163 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    ViewBag.Title = "電子票證發行資料統計表";
+   
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+@if (ViewBag.Count > 0) { 
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+
+
+}
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('.date-picker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'yymm',
+            onClose: function (dateText, inst) {
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).datepicker('setDate', new Date(year, month, 1));
+            }
+        });
+    });
+    //$(function () {
+    //    $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+    //    $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    //});
+</script>
+<style>
+    .ui-datepicker-calendar {
+        display: none;
+    }
+</style>
+
+<h2>電子票證發行資料統計表</h2>
+
+@using (Html.BeginForm("Report0411Result", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">年月 :</label>
+        <input type="text" name="StartDate" id="StartDate" class="date-picker" value="@ViewBag.Start" style="width:80px;" /> 
+        　<a style="display: none">@Html.DropDownList("Merchant")</a>
+        　卡片名稱: 
+        <input type="radio" name="CARD_TYPE" value="21" @ViewBag.ch1 > icash 2.0　
+        <input type="radio" name="CARD_TYPE" value="11" @ViewBag.ch2 > icash
+
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+}
+
+
+@if (ViewBag.Count > 0)
+{
+    <table class="grid" width="100%">
+        <thead>
+            <tr style="background-color: lightgray">
+                <th style="text-align: right; border: solid; border-color: grey">資料名稱</th>
+                <th style="text-align: right; border: solid; border-color: grey">總數</th>
+                <th style="text-align: center; border: solid; border-color: grey">單位</th>
+            </tr>
+
+        </thead>
+        <tbody>
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                int j = 0;
+                <tr>
+                    @foreach (DataColumn col in Model.Columns)
+                    {
+                        string colValue = row[col.ColumnName].ToString();
+                        j++;
+                        if (j == 2)
+                        {
+                            Int32 t = Int32.Parse(row[col.ColumnName].ToString());
+                            colValue = t.ToString("N", nfi);
+
+                        }
+                        if (j == 3)
+                        {
+                            <td style ="text-align: left; border: solid; border-color: grey">@colValue</td>
+                        }
+                        else
+                        {
+                            <td style="text-align: right; border: solid; border-color: grey">@colValue</td>
+                        }
+                    }
+                </tr>
+            }
+
+
+
+        </tbody>
+        <tfoot>
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    //<th>@col.ColumnName</th>
+                }
+            </tr>
+        </tfoot>
+    </table>
+
+        
+}
+
+

@@ -1,0 +1,125 @@
+﻿@model AMS.Models.TM_ADJ_APPLICATION_ITEM
+
+@{
+    ViewBag.Title = "新增應收項目";
+}
+
+<style>
+
+    .my-error-class {
+        color: red;
+    }
+
+
+</style>
+<script type="text/javascript" src="~/Scripts/jquery.validate.min.js"> </script>
+<script>
+    $(function () {
+        // Initialize form validation on the registration form.
+        // It has the name attribute "registration"
+        $("form[name='frm1']").validate({
+            errorClass: "my-error-class",
+            // Specify validation rules
+            rules: {
+                // The key name on the left side is the name attribute
+                // of an input field. Validation rules are defined
+                // on the right side
+                TRANS_CNT: 
+                {
+                    required: true,
+                    digits: true
+                },
+                TRANS_AMT:
+                {
+                    required : true,
+                    digits: true
+                }
+             
+
+            },
+            // Specify validation error messages
+            messages: {
+                TRANS_CNT:
+                {
+                    required: "請輸入筆數",
+                    digits : "請輸入數字"
+                },
+                TRANS_AMT:
+                {
+                    required: "請輸入筆數",
+                    digits : "請輸入數字"
+                }       
+            },
+            // Make sure the form is submitted to the destination defined
+            // in the "action" attribute of the form when valid
+            submitHandler: function (form) {
+                form.submit();
+            }
+        });
+    });
+
+</script>
+
+<h2>新增應收項目</h2>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { name = "frm1", id = "frm1" }))
+{
+    @Html.AntiForgeryToken()
+
+
+
+    <hr />
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.APP_ITEM_ID)
+
+
+    <table>
+        <tr>
+            <td>
+                <label for="SELECTITEM">調整項目</label>
+            </td>
+            <td>
+                @Html.DropDownList("SELECTITEM", (IEnumerable<SelectListItem>)ViewBag.CodesList, "--請選擇--")
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.TRANS_CNT)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.TRANS_CNT)
+                @Html.ValidationMessageFor(model => model.TRANS_CNT)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.TRANS_AMT)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.TRANS_AMT)
+                @Html.ValidationMessageFor(model => model.TRANS_AMT)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.REMARK)
+            </td>
+            <td>
+                @Html.TextAreaFor(model => model.REMARK, new { @cols = "200", @rows = "3" })
+                @Html.ValidationMessageFor(model => model.REMARK)
+            </td>
+        </tr>
+    </table>
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="新增" class="btn btn-default" />
+        </div>
+    </div>
+
+}
+
+<div>    
+    @Html.ActionLink("取消回編輯畫面", "Edit", new { id = Session["formId"] })
+</div>

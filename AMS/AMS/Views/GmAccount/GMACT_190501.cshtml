@@ -1,0 +1,170 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+
+
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#SettleDate').datepicker({ dateFormat: 'yymmdd' });
+        
+    });
+   
+
+</script>
+<script type="text/javascript">
+
+    function padding1(num, length) {
+        for (var len = (num + "").length; len < length; len = num.length) {
+            num = "0" + num;
+        }
+        return num;
+    }
+   
+</script>
+
+
+<meta name="viewport" content="width=device-width" />
+<title>@ViewBag.RepName</title>
+
+<h2>@ViewBag.RepName</h2>
+
+
+
+@using (Html.BeginForm("GMACT_190501", "GmAccount", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate"> 清分日期:</label>
+        <input type="text" name="SettleDate" id="SettleDate" value="@ViewBag.SettleDate" style="width:100px;" />
+        <label for="no1">底稿批號:</label>
+        <input type="text" name="Number1" id="Number1" value="@ViewBag.Number1" style="width:100px;" maxlength="3" onkeyup="this.value=this.value.replace(/\D/g,'')"
+               onafterpaste="this.value=this.value.replace(/\D/g,'')" onblur="this.value=padding1(this.value,3)" />
+        <label for="no2">底稿序號:</label>
+        <input type="text" name="Number2" id="Number2" value="@ViewBag.Number2" style="width:100px;" maxlength="4" onkeyup="this.value=this.value.replace(/\D/g,'')"
+               onafterpaste="this.value=this.value.replace(/\D/g,'')" onblur="this.value=padding1(this.value,4)" />
+
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出DAT" class="btn btn-default" />
+    </div>
+}
+@if (Model.Rows.Count > 0)
+{
+    <table class="grid" width="100%">
+        <thead>
+            @*傳票單別	傳票日期	底稿批號	底稿序號	序號	科目代號	空白格式	借貸(D/C)	金額	立沖代號	空白格式	貨幣符號	匯率	空白格式	摘要*@
+            <tr style="background-color: lightgray">
+                <th>
+                    傳票單別
+                </th>
+                <th>
+                    傳票日期
+                </th>
+                <th>
+                    底稿批號
+                </th>
+                <th>
+                    底稿序號
+                </th>
+                <th>
+                    序號
+                </th>
+                <th>
+                    科目代號
+                </th>
+                <th></th>
+                <th>
+                    借貸(D/C)
+                </th>
+                <th>
+                    金額
+                </th>
+                <th>
+                    立沖代號
+                </th>
+                <th></th>
+                <th>
+                    貨幣符號
+                </th>
+                <th>
+                    匯率
+                </th>
+                <th></th>
+                <th>
+                    摘要
+                </th>
+                <th>
+                    專案代號
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                <tr>
+                    @for (int j = 0; j < row.ItemArray.Length; j++)
+                    {
+                        <td>@row.ItemArray[j].ToString()</td>
+                    }
+                </tr>
+            }
+
+        </tbody>
+</table>
+}
+
+
+
+

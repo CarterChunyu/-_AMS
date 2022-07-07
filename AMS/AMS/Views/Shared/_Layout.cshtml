@@ -1,0 +1,96 @@
+﻿@using Domain.Entities;
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style type='text/css'>
+        .scrollable-menu {
+            height: auto;
+            max-height: 450px;
+            overflow-x: hidden;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - 愛金卡對帳系統</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+
+</head>
+
+<body>
+    <div class="navbar navbar-default navbar-fixed-top alert-danger">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("愛金卡對帳系統", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+
+                    @if (ViewBag.MenuList != null)
+                    {
+                        foreach (var item in ViewBag.MenuList as List<AmMenu>)
+                        {
+                            if (item.SubMenuList.Count > 0)
+                            {
+                                <li class="dropdown">
+                                    <a href="@item.Path" class="dropdown-toggle" data-toggle="dropdown">@item.Name <b class="caret"></b></a>
+
+                                    <ul class="dropdown-menu">
+                                        @foreach (var itemSub in item.SubMenuList as List<AmMenu>)
+                                        {
+                                            //string ss = "http://" + Request.Url.Authority + Request.ApplicationPath + itemSub.Path;
+                                            string ss = Url.Content( Request.ApplicationPath + itemSub.Path);
+                                            <li class="dropdown">
+                                                <a href="@ss">@itemSub.Name</a>
+
+                                                @if (itemSub.SubMenuList.Count > 0)
+                                                {
+                                                    <ul class="dropdown-menu2 scrollable-menu" role="menu">
+                                                        @foreach (var itemSub2 in itemSub.SubMenuList as List<AmMenu>)
+                                                        {
+                                                            //string ss2 = "http://" + Request.Url.Authority + Request.ApplicationPath + itemSub2.Path;
+                                                            string ss2 = Url.Content( Request.ApplicationPath + itemSub2.Path);
+                                                            <li class="dropdown2"><a href="@ss2">@itemSub2.Name</a></li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+
+                                </li>
+                            }
+                            else
+                            {
+                                <li><a href="@item.Path">@item.Name</a></li>
+                            }
+                        }
+                    }
+
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+
+        <hr />
+        <footer>
+            <p>&copy; 2019.10.14 - 愛金卡對帳系統 - @ViewBag.Version</p>
+        </footer>
+
+    </div>
+
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,129 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+
+
+<head>
+<title>@ViewBag.RepName</title>
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#sDate').datepicker({ dateFormat: 'yymmdd' });
+        $('#eDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+
+</script>
+</head>
+<body>
+    
+<h2>@ViewBag.RepName</h2>
+
+@using (Html.BeginForm("RPT_161001", "ReportBank", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate"> 清分日期:</label>
+        <input type="text" name="sDate" id="sDate" value="@ViewBag.sDate" style="width:100px;" /> ~
+        <input type="text" name="eDate" id="eDate" value="@ViewBag.edate" style="width:100px;" />
+        銀行別
+        @Html.DropDownList("bank", (IEnumerable<SelectListItem>)ViewBag.BanksList, "--請選擇--")
+        卡號
+        <input type="text" name="cardId" id="cardId" value="@ViewBag.cardId" style="width:200px;" />
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+}
+
+<table class="grid" width="100%">
+    <thead>
+        <tr style="background-color: lightgray">
+            <th>
+                清分日
+            </th>
+            <th>
+                異常代號
+            </th>
+            <th>
+                卡號
+            </th>
+            <th>
+                銀行別
+            </th>
+            <th>
+                交易別
+            </th>
+            <th>
+                交易日
+            </th>
+
+            <th>
+                本次交易金額
+            </th>
+
+            <th>
+                儲值序號
+            </th>
+            <th>
+                消費序號
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (DataRow row in Model.Rows)
+        {
+            <tr>
+                @for (int j = 0; j < row.ItemArray.Length; j++)
+                {
+                    <td>@row.ItemArray[j].ToString()</td>
+                }
+            </tr>
+        }
+
+    </tbody>
+</table>
+</body>

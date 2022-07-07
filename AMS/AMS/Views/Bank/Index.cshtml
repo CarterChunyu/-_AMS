@@ -1,0 +1,132 @@
+﻿@model AMS.Models.AmEntAccountDModel
+
+@{
+    ViewBag.Title = "銀行帳戶管理";
+}
+
+<h2>銀行帳戶</h2>
+<p>
+    選擇狀態
+    @Html.DropDownList("Status")
+</p>
+<p>
+
+    @Html.ActionLink("新增銀行帳戶", "Create")
+</p>
+
+<!-- modal placeholder-->
+<div id='myModal' class='modal fade in'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='myModalContent'></div>
+        </div>
+    </div>
+</div>
+
+
+
+    <table class="table">
+        <tr class="alert-success">
+            <th>
+                @Html.DisplayNameFor(model => model.AcctTitle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BankNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BankAcct)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AcctCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CompanyId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Remark)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Operator)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdateDate)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.AmEntAccountDList)
+        {
+            <tr class="warning">
+                <td>
+                    <font>@item.AcctTitle</font>
+                </td>
+                <td>
+                    <font> @item.BankNo</font>
+                </td>
+                <td>
+                    <font> @item.BankAcct</font>
+                </td>
+                <td>
+                    <font> @item.AcctCode</font>
+                </td>
+                <td>
+                    <font> @item.CompanyId</font>
+                </td>
+                <td>
+                    <font> @item.Department</font>
+                </td>
+                <td>
+                    <font> @item.Name</font>
+                </td>
+                <td>
+                    <font> @item.Remark</font>
+                </td>
+                <td>
+                    <font> @item.Status</font>
+                </td>
+                <td>
+                    <font> @item.Operator</font>
+                </td>
+                <td>
+                    <font> @item.UpdateDate</font>
+                </td>
+                <td>
+                    @Html.ActionLink("編輯", "Edit", new { bankNo = item.BankNo, bankAcct = item.BankAcct }) | 
+                    @Html.ActionLink("部門管理", "GetRoleListing", "Bank", new { bankNo = item.BankNo, bankAcct = item.BankAcct }, new { data_modal = "", id = "btnCreate" })
+                </td>
+            </tr>
+
+        }
+    </table>
+
+
+
+
+
+
+
+
+
+<script>
+
+    $("#Status").change(function () {
+        @*location = "http://" + '@Request.Url.Authority' + '@Request.ApplicationPath' +'/Bank/Index?status=' + this.value;*@
+        location =   '@Request.ApplicationPath' + '/Bank/Index?status=' + this.value;
+    });
+
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/modalform")
+}
+

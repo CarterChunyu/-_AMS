@@ -1,0 +1,277 @@
+﻿@model System.Data.DataTable
+@using System.Data;
+@using System.Globalization;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+    ViewBag.Title = "中心端自動加值比對認列明細表";
+   
+}
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+
+
+
+<script type='text/javascript' src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+
+
+<script type='text/javascript' src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+
+@if (ViewBag.Count > 0) { 
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+
+
+}
+
+<script>
+    $(document).ready(function () {
+        @*$("#group option[value='@ViewBag.groups']").prop("selected", "selected");
+        $("#retail").hide();
+        $("#bus").hide();
+        $("#bike").hide();
+        $("#track").hide();
+        $("#parking").hide();
+        $("#outsourcing").hide();
+        var groups = "@ViewBag.groups";
+        var groupSelected;
+        if (groups == "PARKING_LOT")
+        { groupSelected = "parking"; }
+        else if (groups == "BANK_OUTSOURCING")
+        { groupSelected = "outsourcing"; }
+        else
+        { groupSelected = groups.toLowerCase(); }
+
+        $("#"+groupSelected).show();
+
+        var testVar="@ViewBag.groups";
+        switch(testVar)
+        {
+            case "RETAIL":
+                $("#retail option[value='@ViewBag.retails']").prop("selected", "selected");
+                break;
+
+            case "BUS":
+                $("#bus option[value='@ViewBag.buses']").prop("selected", "selected");
+                break;
+
+            case "BIKE":
+                $("#bike option[value='@ViewBag.bikes']").prop("selected", "selected");
+                break;
+
+            case "TRACK":
+                $("#track option[value='@ViewBag.tracks']").prop("selected", "selected");
+                break;
+
+            case "PARKING_LOT":
+                $("#parking option[value='@ViewBag.parkings']").prop("selected", "selected");
+                break;
+
+            case "BANK_OUTSOURCING":
+                $("#outsourcing option[value='@ViewBag.outsourcings']").prop("selected", "selected");
+                break;
+        }
+
+
+        $("#group").on("change", function () {
+            switch ($(this).val()) {
+                case "RETAIL":
+                    $("#retail").show();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "BUS":
+                    $("#retail").hide();
+                    $("#bus").show();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "BIKE":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").show();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "TRACK":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").show();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+                case "PARKING_LOT":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").show();
+                    $("#outsourcing").hide();
+                    break;
+                case "BANK_OUTSOURCING":
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").show();
+                    break;
+                default:
+                    $("#retail").hide();
+                    $("#bus").hide();
+                    $("#bike").hide();
+                    $("#track").hide();
+                    $("#parking").hide();
+                    $("#outsourcing").hide();
+                    break;
+            }
+        })*@
+    })
+
+</script>
+
+<script type="text/javascript" src="~/Scripts/merchantdropdown.js"> </script>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"> </script>
+<script type="text/javascript">
+    $(function () {
+        $('#StartDate').datepicker({ dateFormat: 'yymmdd' });
+        $('#EndDate').datepicker({ dateFormat: 'yymmdd' });
+    });
+
+</script>
+
+<h2>中心端自動加值比對認列明細表</h2>
+
+@using (Html.BeginForm("Report0328Result", "Report", FormMethod.Post, new { id = "searchForm" }))
+{
+    <div>
+        <label for="startDate">清分日期 :</label>
+        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.Start" style="width:100px;" /> ~
+        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.End" style="width:100px;" />
+        銀行: <a style="visibility: visible">@Html.DropDownList("MerchantBank")</a>
+        @Html.Partial("_Merchant")
+        @*<label for="group">特約機構:</label>
+        @Html.DropDownList("group", (IEnumerable<SelectListItem>)ViewBag.GROUP, "--請選擇--")
+        @Html.DropDownList("retail", (IEnumerable<SelectListItem>)ViewBag.RETAIL, "--請選擇--")
+        @Html.DropDownList("bus", (IEnumerable<SelectListItem>)ViewBag.BUS, "--請選擇--")
+        @Html.DropDownList("bike", (IEnumerable<SelectListItem>)ViewBag.BIKE, "--請選擇--")
+        @Html.DropDownList("track", (IEnumerable<SelectListItem>)ViewBag.TRACK, "--請選擇--")
+        @Html.DropDownList("parking", (IEnumerable<SelectListItem>)ViewBag.PARKING, "--請選擇--")
+        @Html.DropDownList("outsourcing", (IEnumerable<SelectListItem>)ViewBag.OUTSOURCING, "--請選擇--")*@
+        <input type="submit" name="searchConfirm" value="搜尋" class="btn btn-default" />
+        <input type="submit" name="ExportExcel" value="匯出Excel" class="btn btn-default" />
+    </div>
+}
+
+@if (TempData["message"] != null)
+{
+    <script type="text/javascript">
+
+	var message = @Html.Raw(Json.Encode(TempData["message"]))
+	alert(message);
+    </script>
+}
+
+@if (ViewBag.Count > 0)
+{
+    int k = 0;
+    <table class="grid" width="100%">
+        <thead>
+            <tr style="background-color: lightgray">
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    <th style="text-align: center; border: solid; border-color: grey">@col.ColumnName</th>
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (DataRow row in Model.Rows)
+            {
+                int j = 0;
+                k++;
+                <tr>
+                    @foreach (DataColumn col in Model.Columns)
+                    {
+                        string colValue = row[col.ColumnName].ToString();
+                        j++;
+                        if (j ==11)
+                        {
+                            Int32 t = Int32.Parse(row[col.ColumnName].ToString());
+                            colValue = t.ToString("N", nfi);
+                            <td style="text-align: right; border: solid; border-color: grey">@colValue</td>
+
+                        }
+                        else
+                        {
+                            <td style="text-align: center; border: solid; border-color: grey">@colValue</td>
+                        }
+                    }
+                </tr>
+            }
+
+
+
+        </tbody>
+        <tfoot>
+            <tr>
+                @foreach (DataColumn col in Model.Columns)
+                {
+                    //<th>@col.ColumnName</th>
+                    <th></th>
+                }
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+
+
+}
+
+

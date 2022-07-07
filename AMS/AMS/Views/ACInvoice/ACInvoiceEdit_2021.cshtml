@@ -1,0 +1,184 @@
+﻿@model System.Data.DataRow
+@using System.Data;
+@using System.Globalization;
+@using Newtonsoft.Json;
+@{
+    NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    nfi.NumberDecimalDigits = 0;
+}
+
+<link href="~/css/jquery.dataTables.css" rel="stylesheet">
+
+<script src="~/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+<style type='text/css'>
+    .dataTables_scrollBody thead {
+        visibility: hidden;
+    }
+
+    .group {
+        background-color: #333 !important;
+        font-size: 15px;
+        color: #fff !important;
+        opacity: 0.7;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    tr:hover th, tr:hover td {
+        background-color: #ebebeb;
+        background-image: none;
+    }
+
+    th {
+        text-align: right;
+    }
+
+    td {
+        height: 26px;
+        padding: 0px 0px 0px 8px !important;
+        text-align: left;
+        border-bottom: 1px solid #d0d0d0;
+        vertical-align: middle;
+        color: #555555;
+        background-color: #ffffff;
+        text-align: right;
+    }
+</style>
+
+<link href="@Url.Content("~/Content/themes/redmond/jquery-ui.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery-ui-1.11.2.js")"></script>
+<script type="text/javascript" src="~/Scripts/datepicker-zh-TW.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#is_apply_show option[value='@ViewBag.IS_APPLY']").prop("selected", "selected");
+    })
+</script>
+
+
+<meta name="viewport" content="width=device-width" />
+@{ string pay_type = ViewBag.PAY_TYPE; }
+<title>2021振興券專案請款維護(@pay_type)</title>
+<h2>2021振興券專案請款維護(@pay_type)</h2>
+
+
+
+
+<div class="form-horizontal">
+    <hr />
+    <table class="grid" width="100%">
+        <thead>
+            <tr style="background-color: lightgray">
+                <th width="40" style="text-align:center">萬元<br />週次</th>
+                <th width="80" style="text-align:center">清分日</th>
+                <th width="80" style="text-align:center">日期起</th>
+                <th width="80" style="text-align:center">日期訖</th>
+                <th width="60" style="text-align:center">預撥<br />付款</th>
+                <th width="60" style="text-align:center">當期<br />回饋金</th>
+                <th width="60" style="text-align:center">累計<br />回饋金</th>
+                <th width="60" style="text-align:center">墊付<br />款項</th>
+                <th width="60" style="text-align:center">水位</th>
+                <th width="60" style="text-align:center">超過50%</th>
+                <th width="80" style="text-align:center">當期<br />綁定人數</th>
+                <th width="80" style="text-align:center">累計<br />綁定人數</th>
+                <th width="80" style="text-align:center">綁定可<br />請款金額</th>
+                <th width="80" style="text-align:center">預計<br />請款金額<br />(綁定+回饋)</th>
+                <th width="60" style="text-align:center">請款<br />期數</th>
+                @*<th width="60" style="text-align:center">已領取</th>
+                <th width="60" style="text-align:center">未領取</th>*@
+                <th width="60" style="text-align:center">是否<br />請款</th>
+                <th width="60" style="text-align:center"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@ViewBag.INVOICE_LIST.STAGE</td>
+                <td>@ViewBag.INVOICE_LIST.CPT_DATE.ToString("yyyy/MM/dd")</td>
+                <td>@ViewBag.INVOICE_LIST.REWARD_START_DATE.ToString("yyyy/MM/dd")</td>
+                <td>@ViewBag.INVOICE_LIST.REWARD_END_DATE.ToString("yyyy/MM/dd")</td>
+                <td>@((ViewBag.INVOICE_LIST.PRE_ISSUANCE_AMT).ToString("#,0"))</td>
+                <td>@((ViewBag.INVOICE_LIST.REWARD_AMT).ToString("#,0"))</td>
+                <td>@((ViewBag.INVOICE_LIST.TOTAL_REWARD_AMT).ToString("#,0"))</td>
+                <td>@((ViewBag.INVOICE_LIST.BALANCE).ToString("#,0"))</td>
+                <td>@(ViewBag.INVOICE_LIST.LIMIT)</td>
+                <td>@(ViewBag.INVOICE_LIST.OVER_LIMIT)</td>
+                <td>@(ViewBag.INVOICE_LIST.BINDING_COUNT_MEMBER)</td>
+                <td>@(ViewBag.INVOICE_LIST.TOTAL_BINDING_COUNT)</td>
+                <td>@((ViewBag.INVOICE_LIST.TOTAL_BINDING_AMT).ToString("#,0"))</td>
+                <td>@((ViewBag.INVOICE_LIST.TOTAL_BINDING_AMT + ViewBag.INVOICE_LIST.BALANCE).ToString("#,0"))</td>
+                @*<td>@(ViewBag.INVOICE_LIST.APPLY_STAGE)</td>
+                <td>@((ViewBag.INVOICE_LIST.ACQUIRED_AMT).ToString("#,0"))</td>*@
+                <td>@((ViewBag.INVOICE_LIST.NOT_ACQUIRE_AMT).ToString("#,0"))</td>
+                <td>@((ViewBag.INVOICE_LIST.IS_APPLY == "Y") ? "是" : "否")</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    @using (Html.BeginForm("ACInvoiceEdit_2021", "ACInvoice", FormMethod.Post, new { id = "searchForm" }))
+    {
+        string can_edit = (ViewBag.CAN_EDIT == "Y") ? "" : "disabled";
+        <input type="hidden" name="MEMBER_ID" id="MEMBER_ID" value="@ViewBag.MEMBER_ID" class="form-control" />
+        <input type="hidden" name="REWARD_START_DATE" id="REWARD_START_DATE" value="@ViewBag.REWARD_START_DATE" class="form-control" />
+        <input type="hidden" name="REWARD_END_DATE" id="REWARD_END_DATE" value="@ViewBag.REWARD_END_DATE" class="form-control" />
+        <input type="hidden" name="CAN_EDIT" id="CAN_EDIT" value="@ViewBag.CAN_EDIT" class="form-control" />
+        <input type="hidden" name="COUPON_TP" id="COUPON_TP" value="@ViewBag.COUPON_TP" class="form-control" />
+        <input type="hidden" name="ROWDATA" id="ROWDATA" value="@JsonConvert.SerializeObject(ViewBag.INVOICE_LIST)" class="form-control" />
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2">是否請款 :</label>
+            <div class="col-md-10">
+                @{
+                    var attributes = (can_edit == "") ? (object)new { @class = "btn btn-default dropdown-toggle" } : (object)new { @class = "btn btn-default dropdown-toggle"/*, @disabled = @can_edit*/ };
+                }
+                @Html.DropDownList("is_apply_show", (IEnumerable<SelectListItem>)ViewBag.IS_APPLY_DDL, "--請選擇--", attributes)
+                <input type="hidden" name="IS_APPLY" id="IS_APPLY" value="@ViewBag.IS_APPLY" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mno" class="control-label col-md-2">原因 :</label>
+            <div class="col-md-10">
+                @{
+                    string note = ViewBag.NOTE;
+                    string is_readonly = (can_edit == "") ? "" : "readonly";
+                    var attributes_note = (can_edit == "") ? (object)new { @class = "form-control", @rows = "5" } : (object)new { @class = "form-control", @rows = "5"/*, @readonly = @is_readonly*/ };
+                }
+                @Html.TextArea("NOTE", note, attributes_note)
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="mname" class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <input type="submit" name="searchConfirm" value="更新" class="btn btn-default" @*@can_edit*@ />
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <label for="mname" class="control-label col-md-2"></label>
+        <div class="col-md-10">
+            <input type="submit" name="back" value="取消" class="btn btn-default" onclick="history.back()" />
+        </div>
+    </div>
+    @if (ViewBag.hasError)
+    {
+        <div id="div_ErrMsg" class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            儲存失敗
+            <ul>
+                @if (ViewBag.errMsg != null)
+                {
+                    foreach (string err_msg in ViewBag.errMsg)
+                    {
+                        <li>@Html.DisplayFor(m => err_msg)</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+
+

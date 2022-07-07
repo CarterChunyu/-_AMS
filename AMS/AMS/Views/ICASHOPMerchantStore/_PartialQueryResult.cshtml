@@ -1,0 +1,57 @@
+﻿@using System.Data;
+@using Domain.Common;
+@using Domain.ICASHOPMerchantStore;
+
+@{
+    Layout = null;
+    ExecInfo ei = ViewBag.ExecInfo;
+    DataTable dt_QueryResult = ViewBag.QueryResult;
+    PageCountViewModel pcv = ViewBag.PageModel;
+}
+
+@if (ei.RtnResult == false)
+{
+    @*查詢失敗*@
+    <script>
+        fun_AlertCtrl(true, "@(ei.RtnMsg)");
+    </script>
+}
+else
+{
+    @*查詢成功*@
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">自串點數特店主檔清單</h3>
+        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>統一編號</th>
+                    <th>愛金編特店代號</th>
+                    <th>特店名稱</th>
+                    <th>下載</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DataRow dr in dt_QueryResult.AsEnumerable().OrderBy(x => x.Field<string>("UnifiedBusinessNo")))
+                {
+                    <tr>
+                        <td>@dr["UnifiedBusinessNo"].ToString()</td>
+                        <td>@dr["ICashMID"].ToString()</td>
+                        <td>@dr["MerchantName"].ToString()</td>
+                        <td>
+                            <a style="cursor:pointer;" UnifiedBusinessNo="@dr["UnifiedBusinessNo"].ToString()" onclick="fun_but_download_store(this)">
+                                下載門市明細資料
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="text-center">
+            @*分頁*@
+            @Html.Partial("_PageView", pcv)
+        </div>
+        <div class="panel-footer"></div>
+    </div>
+}
